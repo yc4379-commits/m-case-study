@@ -1,0 +1,234 @@
+# Domain taxonomy: geography, seniority, sectors.
+#
+# Same purpose as firms.yaml -- encode the judgement a recruiter applies
+# automatically and a model applies inconsistently.
+
+# ---------------------------------------------------------------------------
+# Geography
+#
+# The case brief names three markets: US, Europe, Asia-Pacific. We keep the
+# country as well as the market, because "APAC" collapses Hong Kong and Mumbai
+# into one bucket while a requisition often means one and not the other.
+# ---------------------------------------------------------------------------
+regions:
+  US:
+    countries: [United States, USA, US]
+    cities: [New York, NY, Brooklyn, Boston, Greenwich, Chicago, Ann Arbor,
+             Cambridge, San Francisco, Los Angeles, Stamford, Connecticut, CT, MA, IL, MI]
+  Europe:
+    countries: [United Kingdom, UK, France, Germany, Switzerland, Netherlands,
+                Ireland, Spain, Italy, Sweden]
+    cities: [London, Paris, Frankfurt, Zurich, Geneva, Amsterdam, Dublin, Lyon, Milan]
+  APAC:
+    countries: [Hong Kong, China, Singapore, Japan, Australia, India, Korea, Taiwan]
+    cities: [Hong Kong, Shanghai, Beijing, Singapore, Tokyo, Sydney, Mumbai,
+             Noida, Delhi, Bangalore, Seoul, Shenzhen]
+  MEA:
+    countries: [Morocco, UAE, Saudi Arabia, South Africa, Israel, Egypt]
+    cities: [Rabat, Casablanca, Dubai, Abu Dhabi, Tel Aviv, Johannesburg]
+  LatAm:
+    countries: [Brazil, Mexico, Chile, Argentina, Colombia]
+    cities: [Sao Paulo, São Paulo, Mexico City, Santiago, Buenos Aires]
+
+
+# ---------------------------------------------------------------------------
+# Seniority
+#
+# Titles do not transfer across market sides. A sell-side "Associate" supports
+# a senior analyst and is junior; a buy-side "Associate" at some funds is a
+# senior investment professional. An Indian sell-side "Lead Analyst" owns
+# coverage outright and is senior.
+#
+# Because of this we treat title as a WEAK signal and computed years of
+# experience as the primary one. `level` below is advisory, used only to break
+# ties and to flag mismatches between stated title and computed tenure.
+# ---------------------------------------------------------------------------
+# Bands are assigned from COMPUTED TENURE, listed low to high. The first band
+# whose max_years the candidate does not exceed wins.
+#
+# An earlier version derived the band from the job title by keyword. It was
+# wrong for almost every candidate in the corpus: the `mid` list contained a
+# bare "analyst", which swallowed "Junior Analyst", "Lead Healthcare Analyst"
+# and "Investment Analyst" alike, so nine of ten records came back "mid" and
+# "Quantitative Developer" matched nothing at all.
+#
+# The deeper problem is that titles are not comparable across market sides. A
+# sell-side Associate is junior; a buy-side Associate can be senior; an Indian
+# sell-side "Lead Analyst" owns coverage outright. Tenure is comparable, and
+# we already compute it.
+seniority_bands:
+  - {band: junior, max_years: 5}
+  - {band: mid, max_years: 9}
+  - {band: senior, max_years: 99}
+
+# Titles are kept only as a CROSS-CHECK. When the title implies a very
+# different level from the computed tenure, that disagreement is surfaced as a
+# flag for a human -- it usually means a date was misread, or the candidate
+# holds an unusually senior or junior title for their experience. Patterns are
+# specific; no bare "analyst".
+title_hints:
+  intern: [intern, internship, summer analyst, trainee, co-op]
+  junior: [junior analyst, jr. analyst, jr. desk analyst, research associate,
+           research assistant, analyst i, associate analyst]
+  senior: [senior analyst, lead analyst, lead healthcare analyst, lead pharma analyst,
+           vice president, principal, sector head, senior investment, director]
+  portfolio_manager: [portfolio manager, chief investment officer,
+                      managing director, partner, founder, head of]
+
+# A requisition for a "junior analyst" in this business generally means
+# 2-5 years of post-graduate experience, not zero. Stated here so the number
+# is one place to change rather than scattered through the matching code.
+junior_years_range: [1, 5]
+
+
+# ---------------------------------------------------------------------------
+# Sector aliases
+#
+# Maps the vocabulary resumes actually use onto the controlled enum in
+# schema.py. Without this, "Pharmaceuticals", "Pharma", "Life Sciences" and
+# "Healthcare" become four unrelated filter values and the filter is useless.
+# ---------------------------------------------------------------------------
+sector_aliases:
+  healthcare: [healthcare, health care, pharmaceutical, pharmaceuticals, pharma,
+               biotech, biotechnology, life sciences, medtech, medical devices,
+               diagnostics, hospital, therapeutics, digital health, specialty chemicals]
+  technology: [technology, tech, software, enterprise software, semiconductors,
+               cloud, cloud computing, internet, e-commerce, ecommerce, fintech,
+               financial technology, it services, consumer internet, ai]
+  media_telecom: [media, telecom, telecommunications, tmt, digital advertising,
+                  streaming, entertainment, social media, gaming]
+  financials: [financials, banks, banking, insurance, asset management,
+               financial services, brokerage]
+  energy: [energy, oil, gas, "oil & gas", oil and gas, renewable, renewables,
+           renewable energy, clean energy, utilities power]
+  utilities: [utilities, power, electric utilities]
+  industrials: [industrials, manufacturing, aerospace, defense, transportation,
+                logistics, infrastructure, capital goods, 3d printing]
+  consumer: [consumer, retail, consumer discretionary, consumer staples,
+             food, beverage, alcobev, apparel, luxury]
+  materials: [materials, chemicals, metals, mining, steel]
+  real_estate: [real estate, reit, reits, property]
+  credit: [credit, structured credit, high yield, distressed, leveraged finance,
+           fixed income credit, royalty financing]
+  macro_rates_fx: [macro, rates, fixed income, fx, foreign exchange, currencies,
+                   yield curve, sovereign]
+
+
+# ---------------------------------------------------------------------------
+# Approach keywords
+#
+# Advisory only. The LLM makes the approach call with evidence; these lists
+# let us flag disagreements between the model's judgement and the surface
+# vocabulary, which is a useful review queue rather than an override.
+# ---------------------------------------------------------------------------
+approach_signals:
+  systematic:
+    strong: [backtest, backtesting, factor model, multi-factor, signal,
+             systematic strategy, alpha model, sharpe, statistical arbitrage,
+             algorithmic trading, quantitative model]
+    weak: [python, machine learning, statistics, econometrics]
+  fundamental:
+    strong: [dcf, discounted cash flow, management meetings, coverage initiation,
+             price target, financial model, channel checks, expert network,
+             earnings estimates, valuation, "stocks under coverage", long/short]
+    weak: [research, analysis, excel]
+  quantitative_dev:
+    strong: [pricing library, monte carlo pricer, exotic payoff, greeks,
+             stochastic calculus, derivatives pricing, copula, c++ pricing,
+             yield curve construction]
+    weak: [c++, c#, java]
+
+
+# ---------------------------------------------------------------------------
+# Credential glossary
+#
+# Resumes write "Series 7, 63 and 87" and assume the reader knows what those
+# are. Most people outside US broker-dealer compliance do not, and a licence
+# code in a search result is noise. Expanding each code to its registered name
+# is a lookup, so it is done here rather than asked of a model.
+#
+# `status` from the resume is preserved separately: a CFA charterholder and
+# someone who has passed Level III but lacks the work requirement are
+# different candidates, and this table does not flatten that.
+# ---------------------------------------------------------------------------
+credential_glossary:
+  CFA: Chartered Financial Analyst
+  FRM: Financial Risk Manager
+  CAIA: Chartered Alternative Investment Analyst
+  CPA: Certified Public Accountant
+  CFP: Certified Financial Planner
+  Series 7: General Securities Representative
+  Series 63: Uniform Securities Agent (State Law)
+  Series 65: Investment Adviser Representative
+  Series 79: Investment Banking Representative
+  Series 86: Research Analyst (Analysis)
+  Series 87: Research Analyst (Regulatory Administration)
+  SIE: Securities Industry Essentials
+
+
+# ---------------------------------------------------------------------------
+# Approach families
+#
+# The case brief frames the axis as "Fundamental vs. Systematic/Quantitative",
+# and that is the granularity a requisition is written at, so it is the
+# granularity the top-level filter offers.
+#
+# The finer distinction is kept underneath rather than discarded, because it
+# is real and it matters when hiring. In this corpus one candidate builds
+# multi-factor equity models and manages the book they drive; another builds a
+# C++ derivatives pricing library and never takes a position. Both belong in
+# "Systematic / Quantitative" for a first pass, and confusing them would be a
+# serious error for anyone actually filling a seat.
+#
+# Two levels, therefore: family for filtering, approach for judgement.
+# ---------------------------------------------------------------------------
+approach_families:
+  fundamental:
+    label: Fundamental
+    members: [fundamental]
+  systematic_quant:
+    label: Systematic / Quantitative
+    members: [systematic, quantitative_dev]
+  hybrid:
+    label: Hybrid
+    members: [hybrid]
+  unclear:
+    label: Unclear
+    members: [unclear]
+
+
+# ---------------------------------------------------------------------------
+# Software normalisation
+#
+# Resumes name the same tool several ways: "Bloomberg", "Bloomberg Terminal",
+# "BBG"; "Excel", "Microsoft Excel", "Excel with VBA". Left as written they
+# become separate filter options and separate bars in a chart, so a pool where
+# four people use Bloomberg looks like two people using two different things.
+#
+# Canonical name -> the spellings that map onto it. Matching is
+# case-insensitive and substring-aware, longest alias first, so "Excel with
+# VBA" resolves to Excel rather than being cut in half.
+# ---------------------------------------------------------------------------
+software_aliases:
+  Bloomberg: [bloomberg terminal, bloomberg professional, bloomberg, bbg]
+  FactSet: [factset, fact set]
+  Capital IQ: [s&p capital iq, capital iq, capiq, spgi capital iq]
+  Refinitiv: [refinitiv, thomson reuters eikon, eikon, datastream]
+  PitchBook: [pitchbook]
+  Excel: [microsoft excel, excel with vba, excel/vba, ms excel, excel]
+  PowerPoint: [microsoft powerpoint, ms powerpoint, powerpoint]
+  Word: [microsoft word, ms word, word]
+  Office: [microsoft office suite, microsoft office, ms office, office suite]
+  Python: [python]
+  R: [r programming, "r language", r]
+  SQL: [sql, t-sql, pl/sql]
+  VBA: [vba, visual basic]
+  "C++": ["c++", cpp]
+  "C#": ["c#", ".net", "c# / .net"]
+  Java: [java]
+  MATLAB: [matlab]
+  Tableau: [tableau]
+  "Power BI": [power bi, powerbi]
+  MongoDB: [mongodb]
+  WIND: [wind database, wind terminal, wind]
+  Aladdin: [blackrock aladdin, aladdin]

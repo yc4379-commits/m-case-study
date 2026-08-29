@@ -1,0 +1,256 @@
+# Job requisitions.
+#
+# The case brief asks for search "based on job requisitions", so a requisition
+# is a first-class object here rather than a set of dropdowns a user happens
+# to tick. Four are supplied as worked examples; the application also accepts
+# an ad-hoc one built in the sidebar.
+#
+# Provenance, stated plainly because it matters for how much weight these
+# carry: the dimensions (geography, approach, sector, experience) come from
+# the case brief itself. The wording and the shape of the requirements follow
+# the conventions of publicly posted junior investment-analyst roles, and the
+# tone of the Millennium Business Development job description this project was
+# written against. They are constructed examples, not scraped postings.
+#
+# The distinction that makes the matcher trustworthy runs through every entry:
+#
+#   hard  Constraints that DISQUALIFY. A candidate outside the region or the
+#         experience band is not a weaker match, they are not a match. Scoring
+#         them 72% and leaving them in the list is how ranking tools mislead.
+#   soft  Signals that RANK the candidates who already qualify.
+#
+# Collapsing both into one number is the reason most match scores cannot be
+# trusted; keeping them apart is what lets this system say "no one matches".
+
+requisitions:
+
+  # ------------------------------------------------------------------------
+  # The only requisition here taken from a real posting: Millennium
+  # REQ-21865, India Fundamental Equity Analyst, Mumbai. Requirements below
+  # are transcribed from that posting rather than written to fit the data,
+  # which is what makes it usable as an external check on the matcher --
+  # a requisition invented alongside the scoring logic can only confirm
+  # itself.
+  # ------------------------------------------------------------------------
+  - id: india_fundamental_equity
+    title: India Fundamental Equity Analyst
+    team: Mumbai · REQ-21865
+    source: Millennium posting (real)
+    summary: >-
+      Fundamental equity research analyst for the Mumbai office, working with
+      portfolio managers on India equity and expanding into South East Asia
+      and Australia. Financial modelling, valuation, corporate meetings and
+      channel checks, with training and mentorship from senior PMs.
+    hard:
+      regions: [APAC]
+      approach_families: [fundamental]
+      # "3-5 years of experience in sellside or buyside equity research,
+      # investment banking, or other relevant roles in finance" -- taken
+      # verbatim from the posting, not tuned to the candidate pool.
+      investment_years: {min: 3, max: 5}
+    soft:
+      sectors: {generalist: 1.0, healthcare: 0.7, technology: 0.7,
+                consumer: 0.7, industrials: 0.7, financials: 0.7, energy: 0.7}
+      firm_types:
+        sell_side: 1.0
+        investment_bank: 1.0
+        pod_shop: 1.0
+        multi_strategy_platform: 1.0
+        hedge_fund: 0.9
+        long_only: 0.9
+      requirements:
+        - fundamental research on India equity and regional markets
+        - build and maintain company financial models and perform valuation analysis
+        - attend corporate meetings, conduct channel checks and industry events
+        - monitor macroeconomic trends, industry dynamics and regulatory change
+        - contribute to idea generation through written and verbal research reports
+      credentials_preferred: [CFA]
+      software_preferred: [Bloomberg, FactSet, Excel, Capital IQ, Refinitiv]
+      methods_preferred: [financial modeling, valuation, DCF,
+                          comparable company analysis, channel checks]
+      prefer_platform_alum: true
+      prefer_buy_side: false
+
+  - id: us_tmt_fundamental_junior
+    title: US TMT - Fundamental Long/Short Analyst
+    team: Equities platform, New York
+    summary: >-
+      Junior analyst to support a fundamental long/short book covering
+      technology, media and telecom in US markets. Expect ownership of a
+      coverage list, earnings work and idea generation alongside the PM.
+    hard:
+      regions: [US]
+      approach_families: [fundamental]
+      investment_years: {min: 2, max: 6}
+    soft:
+      sectors: {technology: 1.0, media_telecom: 0.9, consumer: 0.4}
+      firm_types:
+        pod_shop: 1.0
+        multi_strategy_platform: 1.0
+        hedge_fund: 0.9
+        crossover: 0.8
+        long_only: 0.6
+        investment_bank: 0.5
+        sell_side: 0.5
+      requirements:
+        - stock coverage and earnings estimates for technology companies
+        - trading around catalysts and earnings events
+        - financial modelling, valuation and price targets
+        - meetings with company management and industry experts
+      credentials_preferred: [CFA]
+      software_preferred: [Bloomberg, FactSet, Excel, Capital IQ, Python]
+      methods_preferred: [financial modeling, DCF, valuation,
+                          earnings estimates, alternative data]
+      prefer_platform_alum: true
+      prefer_buy_side: true
+
+  - id: apac_healthcare_transition
+    title: APAC Healthcare - Sell-side to Buy-side Transition
+    team: Fundamental equity, Asia-Pacific
+    summary: >-
+      Experienced healthcare analyst from an Asia-Pacific research house,
+      moving to the buy side. Depth of coverage matters more than prior
+      buy-side tenure.
+    hard:
+      regions: [APAC]
+      approach_families: [fundamental]
+      investment_years: {min: 4, max: 14}
+      sectors_any: [healthcare]
+    soft:
+      sectors: {healthcare: 1.0}
+      firm_types:
+        sell_side: 1.0
+        investment_bank: 0.8
+        hedge_fund: 0.9
+        long_only: 0.8
+      requirements:
+        - coverage of pharmaceutical and healthcare companies
+        - published equity research with ratings and price targets
+        - institutional client relationships and corporate access
+        - breadth of names under active coverage
+      credentials_preferred: [CFA]
+      software_preferred: [Bloomberg, Excel, FactSet]
+      methods_preferred: [financial modeling, valuation, sector research,
+                          initiation reports]
+      prefer_platform_alum: false
+      prefer_buy_side: false
+
+  - id: eu_systematic_junior
+    title: Europe Systematic / Quantitative Researcher
+    team: Systematic strategies, London
+    summary: >-
+      Junior quantitative researcher for a systematic equity book. Signal
+      research, backtesting and production of live strategies. Strong
+      programming required.
+    hard:
+      regions: [Europe, APAC]
+      approach_families: [systematic_quant]
+      investment_years: {min: 1, max: 6}
+    soft:
+      sectors: {technology: 0.6, generalist: 0.5, macro_rates_fx: 0.5}
+      firm_types:
+        pod_shop: 1.0
+        multi_strategy_platform: 1.0
+        hedge_fund: 0.9
+        long_only: 0.7
+        investment_bank: 0.6
+      requirements:
+        - backtesting and evaluation of systematic trading strategies
+        - multi-factor models and signal construction
+        - programming in Python or C++ for research and production
+        - statistical analysis of large market datasets
+      software_preferred: [Python, C++, SQL, R, MATLAB, kdb]
+      methods_preferred: [backtesting, machine learning, statistical analysis,
+                          multi-factor model, performance attribution]
+      prefer_platform_alum: true
+      prefer_buy_side: false
+
+  - id: us_healthcare_crossover
+    title: US Healthcare - Public and Private Crossover
+    team: Crossover strategies, New York
+    summary: >-
+      Healthcare investor comfortable across public equities and private
+      growth rounds. Diligence-led, with direct company and board exposure.
+    hard:
+      regions: [US]
+      approach_families: [fundamental]
+      investment_years: {min: 5, max: 15}
+      sectors_any: [healthcare]
+    soft:
+      sectors: {healthcare: 1.0}
+      firm_types:
+        crossover: 1.0
+        hedge_fund: 0.9
+        pod_shop: 0.8
+        multi_strategy_platform: 0.8
+        alternative_manager: 0.8
+        investment_bank: 0.6
+      requirements:
+        - public long/short healthcare investing
+        - private growth and venture investments
+        - due diligence on therapeutics, medtech and diagnostics
+        - board observer or direct company involvement
+      credentials_preferred: []
+      software_preferred: [Bloomberg, Excel, Capital IQ, PitchBook]
+      methods_preferred: [due diligence, financial modeling, valuation,
+                          scenario analysis]
+      prefer_platform_alum: true
+      prefer_buy_side: true
+
+
+# Relative weights of the soft components. Exposed here so the ranking can be
+# argued about and adjusted without touching the matching code.
+soft_weights:
+  sector_fit: 0.25
+  requirement_fit: 0.25
+  skills_fit: 0.15
+  firm_type_fit: 0.12
+  coverage_depth: 0.08
+  credentials: 0.07
+  platform_alum: 0.04
+  buy_side: 0.04
+
+
+# Concept map used by the requirement matcher.
+#
+# Lexical similarity alone misses the paraphrases this domain runs on: a
+# requisition says "catalysts" where a resume says "earnings events", and
+# "coverage list" where a resume says "stocks under coverage". Neural sentence
+# embeddings would absorb that automatically.
+#
+# They are not used here, for two reasons. The practical one is that this
+# environment cannot reach the model host. The design one is that at ~200
+# candidate sentences a curated concept map performs comparably, adds no
+# 500MB dependency to a free-tier deployment, and is auditable: a bad match is
+# fixed by editing a line below rather than by hoping a model behaves
+# differently. Embeddings earn their place when the corpus outgrows curation,
+# which for this kind of vocabulary is in the low tens of thousands of
+# documents -- see `match.py` for the pluggable backend.
+concept_map:
+  catalyst: [earnings event, earnings, catalyst, event driven, quarterly results,
+             pre-announcement, guidance]
+  coverage: [under coverage, coverage list, names covered, stocks under coverage,
+             initiated on, active coverage, covering]
+  valuation: [dcf, discounted cash flow, sum-of-the-parts, comparable company,
+              price target, valuation, multiples]
+  primary_research: [management meetings, expert network, channel checks,
+                     industry experts, corporate access, company management,
+                     investor day, roadshow]
+  long_short: [long/short, long short, l/s, hedging, position sizing, shorting]
+  backtesting: [backtest, backtesting, historical simulation, out-of-sample,
+                performance attribution, sharpe]
+  factor_model: [multi-factor, factor model, alpha model, signal, systematic
+                 strategy, quantitative model]
+  programming: [python, c++, c#, java, sql, r, kdb, matlab]
+  private_markets: [series b, growth equity, venture, private, board observer,
+                    portfolio company, co-led, financing round]
+  publishing: [initiation report, research report, thematic report, published,
+               ratings, sector outlook, earnings report, written reports]
+  macro: [macroeconomic, macro, industry dynamics, regulatory, sector rotation,
+          policy, sectoral themes, market trends, industry trends]
+  financial_model: [financial model, financial models, financial modeling,
+                    financial modelling, earnings model, build models,
+                    comparable company, dcf, valuation analysis]
+  idea_generation: [idea generation, investment ideas, source ideas,
+                    investment recommendations, recommendations, stock picks,
+                    initiate coverage, generate ideas]

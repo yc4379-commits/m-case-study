@@ -1,0 +1,319 @@
+# Firm knowledge base
+#
+# This file encodes domain knowledge that is NOT present in any resume and
+# that a language model cannot be trusted to supply. No model reliably knows
+# that North53 Capital is a Millennium pod, that Cinctive is a multi-manager
+# platform, or that ICICI Securities is Indian sell-side. Where the model does
+# not know, it guesses -- and it does not tell you when it is guessing.
+#
+# Curated lookup replaces that guess with a fact we can audit and correct.
+#
+# A deliberate omission: there is no "prestige" or "tier" field. Ranking firms
+# by reputation encodes the curator's bias into every search, and reputation
+# is not what a requisition actually asks for. `type` captures the job-relevant
+# distinction factually -- a pod shop and a long-only fund demand different
+# skills, and that is checkable.
+#
+# Fields
+#   type    pod_shop | multi_strategy_platform | hedge_fund | crossover
+#           | long_only | sell_side | investment_bank | consulting
+#           | corporate | asset_owner | academic
+#   parent  Immediate parent platform, if the firm is a pod or subsidiary.
+#   region  Primary region of the office in this corpus.
+#   aliases Spelling variants seen in resumes. Matching is alias-aware because
+#           "J.P. Morgan Securities" and "JP Morgan Chase" are the same house.
+#   note    Why the classification is what it is, for the next maintainer.
+#   source  observed  = classification well established
+#           inferred  = deduced from resume context (synthetic/unknown firms)
+
+firms:
+
+  # --- Millennium and its pods -------------------------------------------
+  # The single highest-value lookup in this corpus. A BD team's most valuable
+  # candidate signal is "this person already worked here", and that fact is
+  # invisible unless pod names resolve to the parent platform.
+  Millennium Management:
+    type: multi_strategy_platform
+    region: US
+    aliases: [Millennium, Millennium Management LLC]
+    note: Multi-manager platform operating independent portfolio-manager pods.
+    source: observed
+
+  North53 Capital:
+    type: pod_shop
+    parent: Millennium Management
+    region: US
+    note: Portfolio-manager team operating on the Millennium platform.
+    source: observed
+
+  Vertex Capital:
+    type: pod_shop
+    parent: Millennium Management
+    region: US
+    note: Referenced as the platform book in the same role description.
+    source: inferred
+
+  # --- Other multi-manager / hedge funds ---------------------------------
+  Cinctive Capital Management:
+    type: multi_strategy_platform
+    region: US
+    aliases: [Cinctive Capital, Cinctive]
+    note: Multi-manager equity platform; comparable operating model to MLP.
+    source: observed
+
+  Coatue Management:
+    type: crossover
+    region: US
+    aliases: [Coatue]
+    note: Invests across public and private markets; TMT and healthcare heavy.
+    source: observed
+
+  Meridian Capital Partners:
+    type: hedge_fund
+    region: US
+    note: Greenwich-based fund in this corpus. Distinct from Meridian Capital
+      and Meridian Research Partners despite the shared first word -- see
+      knowledge_base.py for why substring matching is unsafe here.
+    source: inferred
+
+  Meridian Capital:
+    type: sell_side
+    region: India
+    note: Indian research house. NOT the Greenwich fund above.
+    source: inferred
+
+  Meridian Research Partners:
+    type: sell_side
+    region: India
+    note: Indian equity research. NOT either Meridian above.
+    source: inferred
+
+  # --- Long-only asset managers ------------------------------------------
+  Fidelity Asset Management:
+    type: long_only
+    region: US
+    aliases: [Fidelity, Fidelity Investments, Fidelity Management & Research]
+    source: observed
+
+  Vanguard Group:
+    type: long_only
+    region: US
+    aliases: [Vanguard, The Vanguard Group]
+    source: observed
+
+  J.P. Morgan Asset Management:
+    type: long_only
+    parent: JPMorgan Chase
+    region: US
+    aliases: [JP Morgan Asset Management, JPMorgan Asset Management]
+    source: observed
+
+  Axis Mutual Fund:
+    type: long_only
+    region: India
+    source: observed
+
+  Prism Asset Management:
+    type: long_only
+    region: India
+    aliases: [Prism Asset Management Pvt Ltd]
+    source: inferred
+
+  # --- Investment banks and sell-side research ---------------------------
+  Goldman Sachs:
+    type: investment_bank
+    region: US
+    aliases: [Goldman Sachs & Co, GS]
+    note: Both banking and equity research appear in this corpus; the role
+      title determines market_side, not the firm.
+    source: observed
+
+  JPMorgan Chase:
+    type: investment_bank
+    region: US
+    aliases: [J.P. Morgan, JP Morgan, J.P. Morgan Chase, J.P. Morgan Securities,
+              JPMorgan, JP Morgan Chase]
+    source: observed
+
+  Credit Suisse:
+    type: investment_bank
+    region: Europe
+    source: observed
+
+  BNP Paribas:
+    type: investment_bank
+    region: Europe
+    aliases: [BNP Paribas CIB, BNPP]
+    source: observed
+
+  Societe Generale:
+    type: investment_bank
+    region: Europe
+    aliases: [Société Générale, SGCIB, SGATS, "Société Générale - SGATS"]
+    source: observed
+
+  William Blair:
+    type: investment_bank
+    region: US
+    note: Middle-market bank with a substantial equity research franchise.
+    source: observed
+
+  Leerink Partners:
+    type: sell_side
+    region: US
+    note: Healthcare-specialist research and banking boutique.
+    source: observed
+
+  ICICI Securities:
+    type: sell_side
+    region: India
+    aliases: [ICICI Securities Limited, I-Sec]
+    source: observed
+
+  Kotak Securities:
+    type: sell_side
+    region: India
+    source: observed
+
+  Centrum Broking:
+    type: sell_side
+    region: India
+    aliases: [Centrum Broking Ltd]
+    source: observed
+
+  Anand Rathi:
+    type: sell_side
+    region: India
+    source: observed
+
+  Prism Financial Services:
+    type: sell_side
+    region: India
+    source: inferred
+
+  DataFlow Research India:
+    type: sell_side
+    region: India
+    aliases: [DataFlow Research India Pvt. Limited]
+    source: inferred
+
+  Jardine Lloyd Thompson:
+    type: sell_side
+    region: APAC
+    aliases: [JLT]
+    source: inferred
+
+  # --- Banks, consulting, corporate --------------------------------------
+  Bank of China:
+    type: investment_bank
+    region: APAC
+    aliases: [BOC, Bank of China (Hong Kong)]
+    source: observed
+
+  Bain & Company:
+    type: consulting
+    region: Global
+    aliases: [Bain, "BAIN & COMPANY"]
+    source: observed
+
+  Cipla Pharmaceuticals:
+    type: corporate
+    region: India
+    aliases: [Cipla]
+    source: observed
+
+  Reliance Infrastructure:
+    type: corporate
+    region: India
+    aliases: [Reliance Infrastructure Ltd]
+    source: observed
+
+  BioAnalytics Research India:
+    type: corporate
+    region: India
+    aliases: [BioAnalytics Research India Ltd]
+    source: inferred
+
+
+  # --- Added after the first manual verification pass ---------------------
+  # Every firm below appeared in `unresolved_firms` on the first run. An
+  # unresolved employer is not a cosmetic gap: without a type we cannot tell
+  # whether that experience was buy-side or sell-side, so the role silently
+  # drops out of every structured filter. Reviewing that column is the
+  # cheapest way to improve recall in the whole system.
+
+  Morgan Stanley:
+    type: investment_bank
+    region: US
+    aliases: [Morgan Stanley & Co, MS]
+    source: observed
+
+  Apollo Global Management:
+    type: alternative_manager
+    region: US
+    aliases: [Apollo, Apollo Global]
+    note: Alternative manager across private equity, credit and real assets.
+    source: observed
+
+  Magnetar Capital:
+    type: hedge_fund
+    region: US
+    aliases: [Magnetar Capital Management, Magnetar]
+    source: observed
+
+  Transparent Value:
+    type: long_only
+    region: US
+    note: Systematic long-only manager; later folded into Guggenheim.
+    source: observed
+
+  PwC:
+    type: consulting
+    region: Global
+    aliases: [PricewaterhouseCoopers, Price Waterhouse Coopers]
+    source: observed
+
+  Guaranteed Rate:
+    type: corporate
+    region: US
+    note: US mortgage lender; a trading desk there is corporate, not buy-side.
+    source: observed
+
+  Meridian Asia Capital:
+    type: hedge_fund
+    region: APAC
+    note: A FOURTH distinct "Meridian" in this corpus, alongside Meridian
+      Capital Partners (US), Meridian Capital (India) and Meridian Research
+      Partners (India). Any substring match on "Meridian" is wrong.
+    source: inferred
+
+  # Academic institutions. Typed so that a research assistantship is never
+  # mistaken for buy-side or sell-side experience.
+  Chinese University of Hong Kong:
+    type: academic
+    region: APAC
+    aliases: [CUHK, The Chinese University of Hong Kong]
+    source: observed
+
+  Mumbai Cancer Research Institute:
+    type: academic
+    region: APAC
+    aliases: [MCRI, "Mumbai Cancer Research Institute (MCRI)"]
+    source: inferred
+
+
+# Firm types that indicate direct capital deployment. Used to distinguish
+# candidates who have owned positions from those who have advised on them --
+# the single most common misread in research hiring.
+buy_side_types:
+  - pod_shop
+  - multi_strategy_platform
+  - hedge_fund
+  - crossover
+  - long_only
+  - asset_owner
+  - alternative_manager
+
+sell_side_types:
+  - sell_side
+  - investment_bank

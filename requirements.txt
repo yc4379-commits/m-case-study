@@ -1,0 +1,11 @@
+# Runtime dependencies for the deployed Streamlit app.
+#
+# Deliberately short. The app loads a pre-built JSON dataset and calls no
+# model, so none of the parsing stack -- anthropic, pydantic, python-docx,
+# pdfplumber -- is needed to serve it. Keeping them out of this file means a
+# faster cold start on a free-tier host and no API key anywhere near the
+# deployment. To rebuild the dataset, install requirements-dev.txt as well.
+streamlit>=1.35
+pandas>=2.0
+plotly>=5.20
+pyyaml>=6.0

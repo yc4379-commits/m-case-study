@@ -1,0 +1,11 @@
+# Additional dependencies for rebuilding the dataset from raw resumes:
+#   python src/build_dataset.py
+#
+# Install alongside requirements.txt. Requires ANTHROPIC_API_KEY in .env.
+-r requirements.txt
+anthropic>=0.40
+pydantic>=2.0
+python-docx>=1.1
+pdfplumber>=0.11
+python-dotenv>=1.0
+markdown>=3.5

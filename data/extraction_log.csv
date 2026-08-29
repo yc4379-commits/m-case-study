@@ -1,0 +1,11 @@
+source_file,file_type,char_count,table_count,table_share,textbox_count,textbox_chars,page_count,multi_column_detected,ligature_repairs,replacement_chars_remaining,warnings
+Chen_Li_Alex.docx,docx,4270,0,0.0,0,0,0,False,0,0,
+MARINA_SILVA_COSTA.docx,docx,3499,0,0.0,0,0,0,False,0,0,
+Marcus_ChenRodriguez_Resume.docx,docx,3407,0,0.0,0,0,0,False,0,0,
+Michael_Rodriguez_CFA.docx,docx,3608,1,0.034,0,0,0,False,0,0,
+Omar_ElHassan_202405.pdf,pdf,1639,0,0.0,0,0,1,True,35,2,"Multi-column layout detected - columns were separated before reading. Without this, sidebar content interleaves into the work-experience text. | 2 unrecoverable character(s) remain after ligature repair - source PDF has a damaged character map."
+Priya_Nakamura_sellside_healthcare_RLTM.docx,docx,5188,1,0.049,0,0,0,False,0,0,
+RYAN_PATEL__Resume.pdf,pdf,4953,0,0.0,0,0,2,False,0,0,
+Vikram_Shah.docx,docx,3880,0,0.0,0,0,0,False,0,0,
+Viktor_Sharat.docx,docx,3100,2,0.824,3,40,0,False,0,0,3 floating text box(es) recovered and hoisted to the top of the text; paragraph-and-table extraction alone would have missed this content entirely. | 82% of content came from tables - naive paragraph-only extraction would have lost most of this file.
+Zara_AlRashid.docx,docx,3401,7,0.164,0,0,0,False,0,0,
