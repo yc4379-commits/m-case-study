@@ -99,7 +99,11 @@ SEQ = ["#eef3f9", "#d5e1ef", "#b4c9e1", "#8badd0", "#5d8bba", "#2f5f98", "#123a6
 STATUS_GOOD = "#146c43"   # 5.4:1 on white, was 3.4:1
 STATUS_WARN = "#96622e"   # the bronze accent, not a browser amber
 STATUS_BAD = "#8f2c2c"
-QUALITY_COLOUR = {"high": STATUS_GOOD, "medium": STATUS_WARN, "low": STATUS_BAD}
+# Charts read as a single navy ramp: darker is better parsed. A green /
+# amber / red bar chart puts three saturated hues on one axis to encode one
+# ordered variable -- ordered data wants one hue and three lightnesses, which
+# is also the quieter, more expensive-looking answer.
+QUALITY_COLOUR = {"high": "#123a6f", "medium": "#5d8bba", "low": "#b4c9e1"}
 INK = "#0b1b2b"
 MUTED = "#64748b"
 GRID = "#e2e8f0"
@@ -231,6 +235,26 @@ st.markdown(
          because it is a caveat about the data, not a verdict on the person. */
       .pill-note {{ background: #faf5ef; border-color: #e8ded1;
                     color: #7a512a; font-weight: 600; }}
+      .pill-slate {{ background: #eef3f9; border-color: #d5e1ef;
+                     color: #2f5f98; }}
+      .pill-navy {{ background: #e9eef6; border-color: #cddbec;
+                    color: #123a6f; }}
+      .pill-bronze {{ background: #f8f3ec; border-color: #e8ded1;
+                      color: #7a512a; }}
+      /* The posting's requirement lines, nested under the dimension they
+         feed. A hairline bar per line, not a second chart. */
+      .reqlist {{ display: flex; flex-direction: column; gap: 4px;
+                  margin: 7px 0 0 0; padding-left: 11px;
+                  border-left: 1px solid {GRID}; }}
+      .reqline {{ display: flex; align-items: center; gap: 9px;
+                  font-size: 12px; color: #46586b; }}
+      .reqline i {{ display: block; height: 3px; border-radius: 2px;
+                    background: #8badd0; flex: none; max-width: 46px;
+                    min-width: 2px; }}
+      .reqline span {{ flex: 1; overflow: hidden; text-overflow: ellipsis;
+                       white-space: nowrap; }}
+      .reqline b {{ font-variant-numeric: tabular-nums; color: {INK};
+                    font-weight: 600; }}
       .sechead {{ font-size: 11.5px; font-weight: 700;
                   text-transform: uppercase; letter-spacing: .08em;
                   color: {INK}; margin: 16px 0 8px; display: flex;
@@ -252,7 +276,7 @@ st.markdown(
                 color: {INK}; font-variant-numeric: tabular-nums; }}
       .ldbar {{ height: 6px; background: #eff2f6; border-radius: 3px;
                 overflow: hidden; }}
-      .ldbar i {{ display: block; height: 100%; background: {SERIES_1}; }}
+      .ldbar i {{ display: block; height: 100%; background: #123a6f; }}
       .lddid {{ font-size: 12.5px; line-height: 1.5; color: #46586b; }}
       .ldrow-idle .ldlbl, .ldrow-idle .ldval {{ color: {MUTED};
                                                 font-weight: 500; }}
@@ -273,6 +297,32 @@ st.markdown(
       .recordtbl td {{ padding: 5px 8px; border-bottom: 1px solid {GRID};
                        vertical-align: top; }}
       .recordtbl td:first-child {{ color: {MUTED}; width: 42%; }}
+      /* The shortlist table: typeset, not gridded. */
+      .ctbl {{ border-collapse: separate; border-spacing: 0; width: 100%;
+               font-size: 12.5px; }}
+      .ctbl th {{ text-align: left; font-size: 9.5px; font-weight: 700;
+                  text-transform: uppercase; letter-spacing: .09em;
+                  color: {MUTED}; padding: 0 12px 7px 0;
+                  border-bottom: 1px solid {GRID}; white-space: nowrap; }}
+      .ctbl th.num, .ctbl td.num {{ text-align: right; padding-right: 0;
+                                    font-variant-numeric: tabular-nums; }}
+      .ctbl td {{ padding: 9px 12px 9px 0; border-bottom: 1px solid #eef1f5;
+                  vertical-align: middle; }}
+      .ctbl tr:last-child td {{ border-bottom: none; }}
+      .ctbl td.who {{ font-size: 13px; font-weight: 600; color: {INK};
+                      white-space: nowrap; }}
+      .ctbl td.sub {{ color: {MUTED}; }}
+      .ctbl td.gap {{ color: #7a512a; }}
+      .ctbl .fitcell {{ display: flex; flex-direction: column;
+                        align-items: flex-end; gap: 4px; }}
+      .ctbl .fitcell b {{ font-size: 13px; color: {INK}; }}
+      .ctbl .fitcell i {{ display: block; height: 3px; width: 48px;
+                          background: #eef1f5; border-radius: 2px;
+                          overflow: hidden; }}
+      .ctbl .fitcell i u {{ display: block; height: 100%;
+                            background: #123a6f; }}
+      .ctbl .dot {{ display: inline-block; width: 7px; height: 7px;
+                    border-radius: 4px; cursor: help; }}
       .postbl {{ border-collapse: collapse; width: 100%; font-size: 12px; }}
       .postbl th {{ text-align: left; color: {MUTED}; font-weight: 600;
                     padding: 5px 7px; border-bottom: 1px solid {GRID}; }}
@@ -370,8 +420,10 @@ st.markdown(
       div[data-testid="stButton"] > button {{
         border-radius: 999px; border: 1px solid {GRID}; background: {SURFACE};
         color: {MUTED}; font-weight: 500; padding: 4px 6px; min-height: 0;
+        white-space: nowrap; overflow: hidden;
       }}
-      div[data-testid="stButton"] > button p {{ font-size: 12.5px !important; }}
+      div[data-testid="stButton"] > button p {{ font-size: 12.5px !important;
+                                                white-space: nowrap; }}
       div[data-testid="stButton"] > button:hover {{
         border-color: #d9e1ea; background: #f7f9fc; color: {INK};
       }}
@@ -572,10 +624,9 @@ def distinctions(c: dict) -> list[str]:
         if cred.startswith("CFA"):
             out.append("CFA" if "Charterholder" in cred else "CFA candidate")
             break
-    covered = (c.get("extraction", {}).get("coverage") or {}).get(
-        "stocks_covered")
-    if covered and covered >= _COVERAGE_DEEP:
-        out.append(f"{covered} names covered")
+    # No coverage-count tag. "75 names covered" next to a name reads as a
+    # boast the candidate did not make -- and the number is already a
+    # headline metric on the profile, where it has a definition attached.
     if c.get("approach_family") in _RARE_APPROACHES:
         out.append(label_of(c.get("approach_family")))
     if len(c.get("languages") or []) >= 3:
@@ -629,6 +680,75 @@ def section(title: str, tip: str = "", container=None) -> None:
     )
 
 
+def _requirement_lines(reqs: list) -> str:
+    """The posting's own requirement lines, each with how well it matched.
+
+    This is the detail a recruiter actually argues with -- "it says sell-side
+    relationships and this resume never mentions them" -- so it belongs
+    directly under the dimension it produced, not in a separate list.
+    """
+    if not reqs:
+        return ""
+    out = []
+    for r in sorted(reqs, key=lambda x: -x.score):
+        label = (getattr(r, "label", "") or r.key.split("::")[-1]).strip()
+        label = label[0].upper() + label[1:] if label else label
+        out.append(
+            f"<div class='reqline'><i style='width:{max(r.score, 0.02):.0%}'>"
+            f"</i><span>{label}</span><b>{r.score:.0%}</b></div>"
+        )
+    return "<div class='reqlist'>" + "".join(out) + "</div>"
+
+
+def candidate_table(rows: list[dict], matches: dict) -> str:
+    """The shortlist as a typeset table rather than a data grid.
+
+    st.dataframe gives a spreadsheet: uniform 13px sans in every cell, a
+    scrollbar, resize handles, and no way to say which column matters. That
+    is the right control for exploring numbers and the wrong one for reading
+    a shortlist, which is a document -- someone scans it, screenshots it, or
+    pastes it into a mail.
+    typography carries the hierarchy instead: the name is the only semibold
+    thing in the row, Fit is a tabular number over a hairline, the gap is the
+    one bronze string on the screen, and record quality is a single dot. The
+    CSV button below is the escape hatch for anyone who genuinely wants to
+    sort and pivot.
+    """
+    head = (
+        "<tr><th>Candidate</th><th>Firm</th><th>Sectors</th>"
+        "<th class='num'>Investing</th><th class='num'>Fit</th>"
+        "<th>Gap</th><th class='num'>Record</th></tr>"
+    )
+    body = []
+    for c in rows:
+        m = matches.get(c["candidate_id"])
+        inv = c.get("years_investment_experience")
+        sectors = ", ".join(label_of(x) for x in c.get("sectors", [])) or "—"
+        if m:
+            fit = (f"<div class='fitcell'><b>{m.soft_score:.0%}</b>"
+                   f"<i><u style='width:{m.soft_score:.0%}'></u></i></div>")
+        else:
+            fit = "<span style='color:#cbd5e1'>—</span>"
+        if m and m.failed_hard:
+            gap = f"{m.failed_hard[0].label.lower()} {m.failed_hard[0].found}"
+        else:
+            gap = "<span style='color:#cbd5e1'>—</span>"
+        band = c["quality"]["band"]
+        dot = QUALITY_COLOUR.get(band, MUTED)
+        body.append(
+            f"<tr><td class='who'>{c['display_name']}</td>"
+            f"<td class='sub'>{c.get('current_firm') or '—'}</td>"
+            f"<td class='sub'>{sectors}</td>"
+            f"<td class='num sub'>{'—' if inv is None else f'{inv:g}y'}</td>"
+            f"<td class='num'>{fit}</td>"
+            f"<td class='gap'>{gap}</td>"
+            f"<td class='num'><span class='dot' style='background:{dot}' "
+            f"title='Parse confidence {band} {c["quality"]["score"]}'>"
+            f"</span></td></tr>"
+        )
+    return f"<table class='ctbl'>{head}{''.join(body)}</table>"
+
+
 def contribution_ledger(result) -> str:
     """One row per scoring dimension: weight, score, and what earned it.
 
@@ -643,8 +763,24 @@ def contribution_ledger(result) -> str:
     Omitting them is how a thin score passes for a complete one.
     """
     rows = []
-    active = [x for x in result.soft_criteria if x.weight > 0]
-    idle = [x for x in result.soft_criteria if x.weight <= 0]
+    # soft_criteria carries two different KINDS of entry: the weighted
+    # scoring dimensions, and one zero-weight entry per requirement line of
+    # the posting -- the detail behind the requirement-match dimension. The
+    # first version of this ledger treated both as dimensions, so five
+    # truncated "Req::Build Relationships With Company Managem — not
+    # measured" rows appeared, each claiming the role specified nothing to
+    # score against while in fact quoting the very thing it specified.
+    #
+    # Requirement lines now render nested under the dimension they feed, and
+    # "not measured" is reserved for a configured dimension the role gave
+    # nothing to score against.
+    _dims = set(store.weights)
+    reqs = [x for x in result.soft_criteria
+            if x.key not in _dims and x.key.lower().startswith("req")]
+    active = [x for x in result.soft_criteria
+              if x.weight > 0 and x.key in _dims]
+    idle = [x for x in result.soft_criteria
+            if x.weight <= 0 and x.key in _dims]
     for crit in sorted(active, key=lambda x: -x.weight):
         did = crit.found or "no signal found in this resume"
         rows.append(
@@ -654,7 +790,10 @@ def contribution_ledger(result) -> str:
             f"<span class='ldw'>{crit.weight:.0%} of Fit</span>"
             f"<span class='ldval'>{crit.score:.0%}</span></div>"
             f"<div class='ldbar'><i style='width:{crit.score:.0%}'></i></div>"
-            f"<div class='lddid'>{did}</div></div>"
+            f"<div class='lddid'>{did}</div>"
+            + (_requirement_lines(reqs) if "requirement" in crit.key.lower()
+               else "")
+            + "</div>"
         )
     for crit in idle:
         rows.append(
@@ -1012,6 +1151,7 @@ def facet_control(key: str, label: str, container) -> list[str]:
             f"{facet_label(key, v)}  ({_c.get(v, 0)})"),
         help=FILTER_HELP.get(key, ""),
         placeholder="Any",
+        key=f"facet_{key}",
     )
 
 
@@ -1024,29 +1164,52 @@ query = st.sidebar.text_input(
     help=FILTER_HELP["keyword"],
 )
 
-# One fold, not two. Two collapsed groups meant a selection could hide in
-# either of them while silently shrinking the list.
-with st.sidebar.expander("More filters", icon=":material/tune:"):
+# One fold, not two -- and it counts itself. A collapsed group that is
+# silently shrinking the list is the "why are there only three people"
+# support ticket, so the label carries the number of filters active inside
+# it, read from the previous run's widget state.
+_ADV = [
+    ("facet_market_side", lambda v: bool(v)),
+    ("facet_software_tools", lambda v: bool(v)),
+    ("facet_credentials_summary", lambda v: bool(v)),
+    ("adv_years", lambda v: bool(v) and (v[0] > 0 or v[1] < NO_LIMIT)),
+    ("adv_unknown", lambda v: v is False),
+    ("adv_alum", lambda v: v is True),
+    ("adv_quality", lambda v: v not in (None, "low")),
+    ("adv_prefer", lambda v: v is True),
+]
+_adv_n = sum(1 for k, test in _ADV
+             if k in st.session_state and test(st.session_state[k]))
+with st.sidebar.expander(
+    "Advanced filters" + (f"  ·  {_adv_n} active" if _adv_n else ""),
+    icon=":material/tune:", expanded=bool(_adv_n),
+):
+    st.caption(
+        "Dimensions the role does not decide. Eligibility is never set here."
+    )
     for key, label, _ in FACETS:
         if key not in PRIMARY:
             selections[key] = facet_control(key, label, st)
     years_span = st.slider(
         "Years of investment experience",
         0.0, NO_LIMIT, (0.0, NO_LIMIT), step=0.5, help=FILTER_HELP["years"],
+        key="adv_years",
     )
     include_unknown = st.checkbox(
         "Include candidates whose tenure could not be computed",
-        value=True, help=FILTER_HELP["unknown"],
+        value=True, help=FILTER_HELP["unknown"], key="adv_unknown",
     )
     only_alum = st.checkbox(
-        "Multi-manager platform alumni only", help=FILTER_HELP["alum"]
+        "Multi-manager platform alumni only", help=FILTER_HELP["alum"],
+        key="adv_alum",
     )
     min_quality = st.select_slider(
         "Minimum parse confidence", options=["low", "medium", "high"],
-        value="low", help=FILTER_HELP["quality"],
+        value="low", help=FILTER_HELP["quality"], key="adv_quality",
     )
     prefer_quality = st.checkbox(
-        "Rank well-parsed records first", help=FILTER_HELP["prefer_quality"]
+        "Rank well-parsed records first", help=FILTER_HELP["prefer_quality"],
+        key="adv_prefer",
     )
 
 
@@ -1240,7 +1403,7 @@ with tab_search:
         if exact:
             st.markdown(
                 f"<div class='statusline'><b style='color:{STATUS_GOOD}'>"
-                f"{len(exact)} shortlisted</b> · ranked by Fit; "
+                f"{len(exact)} qualified</b> · ranked by Fit; "
                 f"{len(near)} more are one gap away, listed after."
                 "</div>",
                 unsafe_allow_html=True,
@@ -1326,6 +1489,41 @@ with tab_search:
                 unsafe_allow_html=True,
             )
 
+        with st.expander("Table view and export",
+                         icon=":material/table:"):
+            rows = []
+            for c in ordered:
+                m = matches.get(c["candidate_id"])
+                rows.append({
+                    "Candidate": c["display_name"],
+                    "Fit": f"{m.soft_score:.0%}" if m else "",
+                    "Gap": (
+                        f"{m.failed_hard[0].label}: {m.failed_hard[0].found}"
+                        if m and m.failed_hard else ("—" if m else "")
+                    ),
+                    "Yrs investing": c.get("years_investment_experience"),
+                    "Yrs career": c.get("years_experience"),
+                    "Region": c.get("region") or "—",
+                    "Approach": label_of(c.get("approach_family")),
+                    "Sector": ", ".join(label_of(x) for x in c.get("sectors", [])),
+                    "Firm": c.get("current_firm") or "—",
+                    "Data": c["quality"]["band"],
+                })
+            frame = pd.DataFrame(rows)
+            st.markdown(candidate_table(ordered, matches),
+                        unsafe_allow_html=True)
+            st.caption(
+                "Region and approach are not columns here: the role fixes "
+                "both, so every row carried the same two words. The dot is "
+                "parse confidence — hover it."
+            )
+            st.download_button(
+                "Download shortlist (CSV)",
+                frame.to_csv(index=False).encode(),
+                file_name="shortlist.csv", mime="text/csv",
+                use_container_width=True,
+            )
+
         if requisition and len(ordered) > 1:
             with st.expander("Compare two candidates",
                              icon=":material/compare_arrows:"):
@@ -1382,15 +1580,18 @@ with tab_search:
             if m is None:
                 return f"**{c['display_name']}**\n\n:gray[{meta}]"
 
-            # Every row now has the same three zones in the same order --
-            # name and bar, metadata, verdict -- so two rows can be compared
-            # without reading either in full. Previously a row was a
-            # paragraph: bold name, an inline "Fit 84%", a coloured sentence
-            # and grey metadata, all at one size and one alignment.
-            cells = round(m.soft_score * 10)
-            bar = "█" * cells + "░" * (10 - cells)
-            head = (f"**{c['display_name']}** &nbsp; "
-                    f"`{bar}` **{m.soft_score:.0%}**")
+            # Every row has the same three zones in the same order -- name
+            # and score, metadata, verdict -- so two rows can be compared
+            # without reading either in full.
+            #
+            # The score used to carry a bar drawn in block characters. It did
+            # align down the column, and it looked like a progress meter from
+            # a terminal: eleven glyphs of visual noise next to a name. A
+            # monospace percentage aligns just as well, and the ordering of
+            # the list is already the ranking -- the bar was re-stating in
+            # ASCII what the sort order says for free.
+            head = (f"**{c['display_name']}** &nbsp;&nbsp;"
+                    f"`{m.soft_score:.0%}`")
 
             if m.is_exact:
                 strong = sorted(
@@ -1439,31 +1640,29 @@ with tab_search:
                     st.session_state[other_key] = None
 
             picked_a = picked_b = None
+            # Both groups fold. A pool of fifty qualified candidates buries
+            # the one-gap-away list below the fold, and a recruiter working
+            # the near misses wants the opposite -- so either side can be put
+            # away without leaving the screen.
             if exact_ids:
-                st.markdown(
-                    f"<div class='grouphead' style='color:{STATUS_GOOD}'>"
-                    f"Shortlist · {len(exact_ids)}</div>",
-                    unsafe_allow_html=True,
-                )
-                picked_a = st.radio(
-                    "Qualifying candidates", exact_ids,
-                    format_func=row_label, key="pick_exact",
-                    index=0, label_visibility="collapsed",
-                    on_change=_solo, args=("pick_exact", "pick_near"),
-                )
+                with st.expander(f"Qualified · {len(exact_ids)}",
+                                 expanded=True):
+                    picked_a = st.radio(
+                        "Qualifying candidates", exact_ids,
+                        format_func=row_label, key="pick_exact",
+                        index=0, label_visibility="collapsed",
+                        on_change=_solo, args=("pick_exact", "pick_near"),
+                    )
             if near_ids:
-                st.markdown(
-                    f"<div class='grouphead' style='color:{SERIES_2}'>"
-                    f"One gap away · {len(near_ids)}</div>",
-                    unsafe_allow_html=True,
-                )
-                picked_b = st.radio(
-                    "Candidates one gap away", near_ids,
-                    format_func=row_label, key="pick_near",
-                    index=0 if not exact_ids else None,
-                    label_visibility="collapsed",
-                    on_change=_solo, args=("pick_near", "pick_exact"),
-                )
+                with st.expander(f"One gap away · {len(near_ids)}",
+                                 expanded=True):
+                    picked_b = st.radio(
+                        "Candidates one gap away", near_ids,
+                        format_func=row_label, key="pick_near",
+                        index=0 if not exact_ids else None,
+                        label_visibility="collapsed",
+                        on_change=_solo, args=("pick_near", "pick_exact"),
+                    )
             chosen_id = picked_a or picked_b or (exact_ids + near_ids)[0]
         else:
             chosen_id = st.radio(
@@ -1473,40 +1672,6 @@ with tab_search:
                 label_visibility="collapsed",
             )
 
-        with st.expander("Table view and export",
-                         icon=":material/table:"):
-            rows = []
-            for c in ordered:
-                m = matches.get(c["candidate_id"])
-                rows.append({
-                    "Candidate": c["display_name"],
-                    "Fit": f"{m.soft_score:.0%}" if m else "",
-                    "Gap": (
-                        f"{m.failed_hard[0].label}: {m.failed_hard[0].found}"
-                        if m and m.failed_hard else ("—" if m else "")
-                    ),
-                    "Yrs investing": c.get("years_investment_experience"),
-                    "Yrs career": c.get("years_experience"),
-                    "Region": c.get("region") or "—",
-                    "Approach": label_of(c.get("approach_family")),
-                    "Sector": ", ".join(label_of(x) for x in c.get("sectors", [])),
-                    "Firm": c.get("current_firm") or "—",
-                    "Data": c["quality"]["band"],
-                })
-            frame = pd.DataFrame(rows)
-            st.dataframe(
-                frame, hide_index=True, use_container_width=True,
-                column_config={
-                    name: st.column_config.Column(help=COLUMN_HELP.get(name, ""))
-                    for name in frame.columns
-                },
-            )
-            st.download_button(
-                "Download shortlist (CSV)",
-                frame.to_csv(index=False).encode(),
-                file_name="shortlist.csv", mime="text/csv",
-                use_container_width=True,
-            )
 
 
     # -- Detail -----------------------------------------------------------
@@ -1613,11 +1778,16 @@ with tab_search:
         # exactly the pair a reader will conflate if both look like page nav.
         # So this is a pill row, visibly not a tab strip, and every label is
         # scoped to the person.
-        _views = ["Fit", "Profile", f"Resume issues ({_warn_n})", "Outreach",
+        _views = ["Fit", "Profile", f"Issues ({_warn_n})", "Outreach",
                   "Full record"]
         _vkey = f"view_{chosen_id}"
         st.session_state.setdefault(_vkey, 0)
-        _vcols = st.columns(len(_views))
+        # Columns weighted by label length, plus a spacer that absorbs the
+        # slack. Equal columns made every pill the width of the longest label
+        # and wrapped that one onto a second line, so one pill stood a row
+        # taller than its neighbours -- a switcher whose items are different
+        # sizes reads as a group of unrelated buttons.
+        _vcols = st.columns([max(len(v), 7) for v in _views] + [9])
         for _i, (_col, _name) in enumerate(zip(_vcols, _views)):
             if _col.button(
                 _name, key=f"{_vkey}_{_i}", use_container_width=True,
@@ -1760,18 +1930,16 @@ with tab_search:
             if not c.get("credentials_summary"):
                 st.caption("No professional credentials stated.")
 
-            def chips(label: str, values: list[str], colour: str = "") -> None:
-                # One neutral pill for every informational tag. Software was
-                # slate, methods bronze, languages violet: four small colour
-                # systems, none of them carrying meaning, because the label
-                # above each row already says what the row is. Colour is now
-                # reserved for judgement -- green clears, bronze is a gap,
-                # navy is chrome. The colour argument is kept so call sites
-                # read unchanged; it is deliberately ignored.
+            def chips(label: str, values: list[str], klass: str = "") -> None:
+                # Colour is back on the tags, but drawn from the palette
+                # rather than invented per row: three tints of the same two
+                # hues the charts use, at pill weight. The violet is what had
+                # to go, not the idea of colour -- it belonged to no other
+                # element on the screen.
                 st.markdown(
                     f"<div style='margin-top:9px;font-size:12px;"
                     f"color:{MUTED}'>{label}</div>" + (
-                        "".join(f"<span class='pill'>{v}</span>"
+                        "".join(f"<span class='pill {klass}'>{v}</span>"
                                 for v in values) if values else
                         f"<span style='color:{MUTED};font-size:12.5px'>"
                         "not stated</span>"
@@ -1779,11 +1947,10 @@ with tab_search:
                     unsafe_allow_html=True,
                 )
 
-            chips("Software and platforms", c.get("software_tools", []), SERIES_1)
-            chips("Analytical methods", c.get("methods", []), SERIES_2)
-            # Slate, not violet. A third hue on the third chip row was
-            # decoration -- the label already says which row is which.
-            chips("Languages", c.get("languages", []), MUTED)
+            chips("Software and platforms", c.get("software_tools", []),
+                  "pill-slate")
+            chips("Analytical methods", c.get("methods", []), "pill-bronze")
+            chips("Languages", c.get("languages", []), "pill-navy")
 
 
 
@@ -2123,7 +2290,7 @@ with tab_insights:
             if top_tools or top_creds:
                 labels = [k for k, _ in top_creds] + [k for k, _ in top_tools]
                 values = [v for _, v in top_creds] + [v for _, v in top_tools]
-                colours = [SERIES_2] * len(top_creds) + [SERIES_1] * len(top_tools)
+                colours = ["#123a6f"] * len(top_creds) + ["#8badd0"] * len(top_tools)
                 fig = go.Figure(go.Bar(
                     x=values, y=labels, orientation="h", marker_color=colours,
                     marker_line=dict(color=SURFACE, width=2),
@@ -2132,7 +2299,7 @@ with tab_insights:
                 fig.update_yaxes(showgrid=False, autorange="reversed")
                 fig.update_xaxes(showgrid=True, gridcolor=GRID, dtick=1)
                 st.plotly_chart(styled_chart(fig, 360), use_container_width=True)
-                st.caption("Bronze = credentials · slate = software.")
+                st.caption("Dark = credentials · light = software.")
 
 
 # ===========================================================================
@@ -2175,7 +2342,8 @@ with tab_quality:
     fig.update_yaxes(showgrid=False)
     st.plotly_chart(styled_chart(fig, 380), use_container_width=True)
     st.caption(
-        "Green ≥ 0.80, amber ≥ 0.55, red below. Scores are deductions from a "
+        "Darker is better parsed — high ≥ 0.80, medium ≥ 0.55, low below. "
+        "Scores are deductions from a "
         "clean parse: a missing name costs most, missing dates next, a "
         "formatting quirk nothing at all."
     )
