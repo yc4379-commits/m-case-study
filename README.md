@@ -136,10 +136,11 @@ reported ambiguous rather than resolved.
 
 ## Requisition matching
 
-Five requisitions ship with the app. One — *India Fundamental Equity Analyst*
-— is transcribed from a real Millennium posting (REQ-21865); the rest are
-constructed examples, labelled as such. That matters: a requisition invented
-alongside the scoring logic can only confirm itself.
+Three requisitions ship with the app — *India Fundamental Equity Analyst*
+(REQ-21865), *Quantitative Analyst, Quantitative Strategies* (REQ-29449) and
+*Quantitative Researcher, Cross-Asset QIS* (REQ-30350) — all transcribed from
+real Millennium postings rather than written to fit the data. That matters: a
+requisition invented alongside the scoring logic can only confirm itself.
 
 Against the real posting's 3–5 year requirement, **no candidate in this pool
 qualifies** — the three APAC fundamental analysts are all far too senior. The

@@ -254,6 +254,14 @@ class ResumeFlag(BaseModel):
         "formatting",
         "other",
     ] = Field(description="The kind of problem.")
+    severity: Literal["warning", "info"] = Field(
+        default="warning",
+        description=(
+            "Set by the pipeline, never by the model: 'info' marks a flag "
+            "kept for the record but judged benign -- by a deterministic "
+            "rule or by human review."
+        ),
+    )
     summary: str = Field(
         description=(
             "A SHORT keyword-led phrase, at most 10 words, that reads well in "

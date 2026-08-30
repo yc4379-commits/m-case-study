@@ -296,7 +296,8 @@ def _hard_criteria(
                 label="Investment experience",
                 kind="hard",
                 passed=passed,
-                required=f"{low}-{high} years",
+                required=(f"{low}+ years" if "max" not in band
+                          else f"{low}-{high} years"),
                 found=(
                     "not computable from this resume"
                     if years is None

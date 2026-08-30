@@ -232,3 +232,17 @@ software_aliases:
   MongoDB: [mongodb]
   WIND: [wind database, wind terminal, wind]
   Aladdin: [blackrock aladdin, aladdin]
+
+
+# US city -> 3-digit zip prefixes, for header sanity checks. Curated for the
+# cities that appear in resume headers; a city absent here is simply not
+# checked. Source: USPS zip prefix allocations.
+city_zip_prefixes:
+  boston: ["021", "022"]
+  new york: ["100", "101", "102", "103", "104"]
+  brooklyn: ["112"]
+  stamford: ["069"]
+  san francisco: ["941"]
+  chicago: ["606", "607", "608"]
+  miami: ["331", "332"]
+  west palm beach: ["334"]

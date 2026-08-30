@@ -2,15 +2,12 @@
 #
 # The case brief asks for search "based on job requisitions", so a requisition
 # is a first-class object here rather than a set of dropdowns a user happens
-# to tick. Four are supplied as worked examples; the application also accepts
-# an ad-hoc one built in the sidebar.
-#
-# Provenance, stated plainly because it matters for how much weight these
-# carry: the dimensions (geography, approach, sector, experience) come from
-# the case brief itself. The wording and the shape of the requirements follow
-# the conventions of publicly posted junior investment-analyst roles, and the
-# tone of the Millennium Business Development job description this project was
-# written against. They are constructed examples, not scraped postings.
+# to tick. All four requisitions below are transcribed from real postings --
+# three Millennium (REQ numbers retained) and one Point72 -- not written to
+# fit the candidate pool, which is what makes them usable as an external
+# check on the matcher: a requisition invented alongside the scoring logic
+# can only confirm itself. An earlier revision carried constructed examples;
+# they were removed once real postings were available.
 #
 # The distinction that makes the matcher trustworthy runs through every entry:
 #
@@ -25,177 +22,187 @@
 requisitions:
 
   # ------------------------------------------------------------------------
-  # The only requisition here taken from a real posting: Millennium
-  # REQ-21865, India Fundamental Equity Analyst, Mumbai. Requirements below
-  # are transcribed from that posting rather than written to fit the data,
-  # which is what makes it usable as an external check on the matcher --
-  # a requisition invented alongside the scoring logic can only confirm
-  # itself.
+  # Point72, Equity Analyst - US Healthcare Therapeutics. Fundamental
+  # Equities business; New York / Stamford / San Francisco / West Palm
+  # Beach. "1+ years of experience in equity research, investment banking,
+  # hedge fund, investment management, private equity or another relevant
+  # industry role" -- an open-ended band, encoded as min-only.
   # ------------------------------------------------------------------------
-  - id: india_fundamental_equity
-    title: India Fundamental Equity Analyst
-    team: Mumbai · REQ-21865
-    source: Millennium posting (real)
+  - id: p72_us_healthcare_therapeutics
+    title: Equity Analyst - US Healthcare Therapeutics
+    team: Point72 Fundamental Equities · New York
+    source: Point72 posting (real)
     summary: >-
-      Fundamental equity research analyst for the Mumbai office, working with
-      portfolio managers on India equity and expanding into South East Asia
-      and Australia. Financial modelling, valuation, corporate meetings and
-      channel checks, with training and mentorship from senior PMs.
-    hard:
-      regions: [APAC]
-      approach_families: [fundamental]
-      # "3-5 years of experience in sellside or buyside equity research,
-      # investment banking, or other relevant roles in finance" -- taken
-      # verbatim from the posting, not tuned to the candidate pool.
-      investment_years: {min: 3, max: 5}
-    soft:
-      sectors: {generalist: 1.0, healthcare: 0.7, technology: 0.7,
-                consumer: 0.7, industrials: 0.7, financials: 0.7, energy: 0.7}
-      firm_types:
-        sell_side: 1.0
-        investment_bank: 1.0
-        pod_shop: 1.0
-        multi_strategy_platform: 1.0
-        hedge_fund: 0.9
-        long_only: 0.9
-      requirements:
-        - fundamental research on India equity and regional markets
-        - build and maintain company financial models and perform valuation analysis
-        - attend corporate meetings, conduct channel checks and industry events
-        - monitor macroeconomic trends, industry dynamics and regulatory change
-        - contribute to idea generation through written and verbal research reports
-      credentials_preferred: [CFA]
-      software_preferred: [Bloomberg, FactSet, Excel, Capital IQ, Refinitiv]
-      methods_preferred: [financial modeling, valuation, DCF,
-                          comparable company analysis, channel checks]
-      prefer_platform_alum: true
-      prefer_buy_side: false
-
-  - id: us_tmt_fundamental_junior
-    title: US TMT - Fundamental Long/Short Analyst
-    team: Equities platform, New York
-    summary: >-
-      Junior analyst to support a fundamental long/short book covering
-      technology, media and telecom in US markets. Expect ownership of a
-      coverage list, earnings work and idea generation alongside the PM.
+      Fundamental equity analyst covering US healthcare therapeutics within
+      Point72's Fundamental Equities business. Financial models, forecasts
+      and valuation of public companies, fundamental research on companies
+      and subsectors, actionable recommendations presented directly to the
+      PM, conferences and sell-side relationships.
     hard:
       regions: [US]
       approach_families: [fundamental]
-      investment_years: {min: 2, max: 6}
+      sectors_any: [healthcare]
+      investment_years: {min: 1}
     soft:
-      sectors: {technology: 1.0, media_telecom: 0.9, consumer: 0.4}
+      sectors: {healthcare: 1.0}
       firm_types:
         pod_shop: 1.0
         multi_strategy_platform: 1.0
         hedge_fund: 0.9
         crossover: 0.8
-        long_only: 0.6
-        investment_bank: 0.5
-        sell_side: 0.5
+        long_only: 0.7
+        investment_bank: 0.6
+        sell_side: 0.6
       requirements:
-        - stock coverage and earnings estimates for technology companies
-        - trading around catalysts and earnings events
-        - financial modelling, valuation and price targets
-        - meetings with company management and industry experts
-      credentials_preferred: [CFA]
-      software_preferred: [Bloomberg, FactSet, Excel, Capital IQ, Python]
-      methods_preferred: [financial modeling, DCF, valuation,
-                          earnings estimates, alternative data]
+        - build and refine financial models, forecasts and valuation analyses
+        - fundamental research on companies, industries and subsectors
+        - develop and present actionable investment recommendations to the PM
+        - attend conferences and build sell-side relationships
+        - incorporate macroeconomic and industry developments into research
+      credentials_preferred: []
+      software_preferred: [Bloomberg, Excel, FactSet]
+      methods_preferred: [financial modeling, valuation, forecasting,
+                          fundamental research]
       prefer_platform_alum: true
       prefer_buy_side: true
 
-  - id: apac_healthcare_transition
-    title: APAC Healthcare - Sell-side to Buy-side Transition
-    team: Fundamental equity, Asia-Pacific
+  # ------------------------------------------------------------------------
+  # Millennium REQ-27950, US Healthcare Origination Associate, New York.
+  # A corporate-access seat, not an investing seat: the posting names no
+  # investment approach and no years band, so this requisition carries
+  # neither -- eligibility is region and sector knowledge, and the ranking
+  # leans on the requirement text.
+  # ------------------------------------------------------------------------
+  - id: mlm_us_healthcare_origination
+    title: US Healthcare Origination Associate
+    team: New York · REQ-27950
+    source: Millennium posting (real)
     summary: >-
-      Experienced healthcare analyst from an Asia-Pacific research house,
-      moving to the buy side. Depth of coverage matters more than prior
-      buy-side tenure.
+      Corporate access and corporate engagement for US healthcare, including
+      SMID therapeutics: building relationships with company management,
+      originating and coordinating meetings, running expert calls across
+      therapeutic areas, and producing healthcare content from filings,
+      transcripts and sell-side research. Prior exposure to equity research,
+      specialist sales, investment banking or investor relations is a plus;
+      life-sciences background preferred.
     hard:
-      regions: [APAC]
-      approach_families: [fundamental]
-      investment_years: {min: 4, max: 14}
+      regions: [US]
       sectors_any: [healthcare]
     soft:
       sectors: {healthcare: 1.0}
       firm_types:
         sell_side: 1.0
+        investment_bank: 0.9
+        multi_strategy_platform: 0.9
+        pod_shop: 0.8
+        hedge_fund: 0.7
+        long_only: 0.6
+      requirements:
+        - build relationships with company management teams and coordinate meetings
+        - corporate access, non-deal roadshows and conference participation
+        - run expert calls across therapeutic areas
+        - produce content from public filings, transcripts and sell-side research
+        - detailed meeting notes and summaries for originated meetings
+      credentials_preferred: []
+      software_preferred: [Bloomberg, Excel]
+      methods_preferred: [primary research, expert calls, corporate access]
+      prefer_platform_alum: true
+      prefer_buy_side: false
+
+  # ------------------------------------------------------------------------
+  # Millennium REQ-25042, Research Analyst Healthcare, Mumbai -- supporting
+  # a European Healthcare fundamental equity team from the Mumbai office.
+  # "4-5 years' experience ideally from sellside or buyside equity
+  # research"; healthcare knowledge is "preferred but not mandatory", so
+  # sector is deliberately NOT a hard constraint here -- transcribed as
+  # posted, not as convenient.
+  # ------------------------------------------------------------------------
+  - id: mlm_mumbai_healthcare_research
+    title: Research Analyst, Healthcare (Mumbai)
+    team: Mumbai · REQ-25042
+    source: Millennium posting (real)
+    summary: >-
+      Research analyst on a fundamental equity team covering European
+      healthcare, based in Mumbai. Forward-looking financial models kept
+      accurate to quarterly results and company commentary, automated
+      monitoring of estimates against actuals, and support for idea
+      generation with a Senior PM, building toward independent coverage.
+    hard:
+      regions: [APAC]
+      approach_families: [fundamental]
+      investment_years: {min: 4, max: 5}
+    soft:
+      sectors: {healthcare: 1.0, generalist: 0.5}
+      firm_types:
+        sell_side: 1.0
         investment_bank: 0.8
+        pod_shop: 1.0
+        multi_strategy_platform: 1.0
         hedge_fund: 0.9
         long_only: 0.8
       requirements:
-        - coverage of pharmaceutical and healthcare companies
-        - published equity research with ratings and price targets
-        - institutional client relationships and corporate access
-        - breadth of names under active coverage
+        - develop, refine and maintain forward-looking financial models
+        - reflect quarterly results, company commentary and market trends in models
+        - monitor and flag deviations in estimates versus actual performance
+        - fundamental research and idea generation with a senior portfolio manager
+        - prepare for company management meetings
       credentials_preferred: [CFA]
-      software_preferred: [Bloomberg, Excel, FactSet]
-      methods_preferred: [financial modeling, valuation, sector research,
-                          initiation reports]
-      prefer_platform_alum: false
+      software_preferred: [Bloomberg, Visible Alpha, Canalyst, Daloopa, Excel]
+      methods_preferred: [financial modeling, forecasting, valuation,
+                          fundamental research]
+      prefer_platform_alum: true
       prefer_buy_side: false
 
-  - id: eu_systematic_junior
-    title: Europe Systematic / Quantitative Researcher
-    team: Systematic strategies, London
+  # ------------------------------------------------------------------------
+  # Millennium REQ-29449, Quantitative Analyst, Quantitative Strategies,
+  # New York. A junior systematic-equity seat: sector-specific signals,
+  # company-level KPIs, alternative data, backtesting.
+  # ------------------------------------------------------------------------
+  - id: us_quant_analyst_strategies
+    title: Quantitative Analyst, Quantitative Strategies
+    team: New York · REQ-29449
+    source: Millennium posting (real)
     summary: >-
-      Junior quantitative researcher for a systematic equity book. Signal
-      research, backtesting and production of live strategies. Strong
-      programming required.
+      Quantitative analyst on a small systematic equity team, focused on
+      sector-specific signals, company-level KPIs and custom dataset
+      development. Direct exposure to the SPM across idea generation, data
+      work, signal research, model implementation and backtesting.
     hard:
-      regions: [Europe, APAC]
+      regions: [US]
       approach_families: [systematic_quant]
-      investment_years: {min: 1, max: 6}
+      # "1-3 years of experience in data science, data analytics,
+      # quantitative research, or a related role." The posting files this
+      # under "Preferred Experience", but the band defines the seat's
+      # seniority: a ten-year researcher is not a weaker fit for a 1-3 year
+      # seat, they are a different hire. Encoded hard; the near-miss list
+      # keeps anyone it excludes visible.
+      investment_years: {min: 1, max: 3}
     soft:
-      sectors: {technology: 0.6, generalist: 0.5, macro_rates_fx: 0.5}
+      # "Experience with sector-specific equity research, particularly in
+      # industrials, commodities, healthcare, or financials."
+      sectors: {industrials: 1.0, energy: 0.9, healthcare: 0.9,
+                financials: 0.9, generalist: 0.6, technology: 0.5}
       firm_types:
         pod_shop: 1.0
         multi_strategy_platform: 1.0
         hedge_fund: 0.9
+        sell_side: 0.7
+        investment_bank: 0.7
         long_only: 0.7
-        investment_bank: 0.6
       requirements:
-        - backtesting and evaluation of systematic trading strategies
-        - multi-factor models and signal construction
-        - programming in Python or C++ for research and production
-        - statistical analysis of large market datasets
-      software_preferred: [Python, C++, SQL, R, MATLAB, kdb]
+        - alpha research for systematic equity strategies with sector-specific signals
+        - company-level KPIs and custom dataset development
+        - collect and analyse structured and unstructured alternative datasets
+        - research, implementation and backtesting of signals
+        - apply statistical techniques to turn raw data into investable insights
+        - use LLMs or modern machine learning tools in research workflows
+      credentials_preferred: []
+      software_preferred: [Python]
       methods_preferred: [backtesting, machine learning, statistical analysis,
-                          multi-factor model, performance attribution]
+                          alternative data, signal construction]
       prefer_platform_alum: true
       prefer_buy_side: false
 
-  - id: us_healthcare_crossover
-    title: US Healthcare - Public and Private Crossover
-    team: Crossover strategies, New York
-    summary: >-
-      Healthcare investor comfortable across public equities and private
-      growth rounds. Diligence-led, with direct company and board exposure.
-    hard:
-      regions: [US]
-      approach_families: [fundamental]
-      investment_years: {min: 5, max: 15}
-      sectors_any: [healthcare]
-    soft:
-      sectors: {healthcare: 1.0}
-      firm_types:
-        crossover: 1.0
-        hedge_fund: 0.9
-        pod_shop: 0.8
-        multi_strategy_platform: 0.8
-        alternative_manager: 0.8
-        investment_bank: 0.6
-      requirements:
-        - public long/short healthcare investing
-        - private growth and venture investments
-        - due diligence on therapeutics, medtech and diagnostics
-        - board observer or direct company involvement
-      credentials_preferred: []
-      software_preferred: [Bloomberg, Excel, Capital IQ, PitchBook]
-      methods_preferred: [due diligence, financial modeling, valuation,
-                          scenario analysis]
-      prefer_platform_alum: true
-      prefer_buy_side: true
 
 
 # Relative weights of the soft components. Exposed here so the ranking can be
@@ -254,3 +261,13 @@ concept_map:
   idea_generation: [idea generation, investment ideas, source ideas,
                     investment recommendations, recommendations, stock picks,
                     initiate coverage, generate ideas]
+  alternative_data: [alternative data, alt data, web traffic, satellite,
+                     custom datasets, unstructured data, kpi, kpis,
+                     data scraping, scraped]
+  machine_learning: [machine learning, ml, llm, llms, statistical learning,
+                     deep learning, scikit-learn, nlp, neural network]
+  derivatives: [options, swaps, forwards, futures, volatility, tail hedging,
+                cross-asset, derivatives]
+  research_infra: [data pipeline, data pipelines, research infrastructure,
+                   etl, reproducible research, production code, backtesting
+                   tools]

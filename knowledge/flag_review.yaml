@@ -1,0 +1,34 @@
+# Human triage of individual flags.
+#
+# The model reports everything it notices; a reviewer then decides what is
+# actually a problem. That decision is knowledge, so it lives here rather
+# than in a deleted flag: each entry marks one specific flag benign, with
+# the reviewer's reasoning attached. At enrichment the matching flag is
+# downgraded to severity "info" -- still visible in the record, shown as a
+# note, excluded from the confidence penalty. Nothing is ever deleted,
+# because a triage decision should itself be auditable and reversible.
+#
+# match is a case-insensitive substring of the flag's summary.
+
+reviewed_benign:
+  - candidate: chen-li-alex
+    match: "Investment Intern listed under Bank of China"
+    note: >-
+      Internship attribution ambiguity; internships carry no weight in any
+      tenure figure, so nothing downstream depends on the answer.
+  - candidate: marina-silva-costa
+    match: "internship dates overlap with MBA"
+    note: >-
+      A summer internship inside an MBA program is the expected pattern,
+      not an anomaly -- the flag's own text says as much.
+  - candidate: marina-silva-costa
+    match: "'3.300' likely means 3,300"
+    note: >-
+      Non-US number formatting from a non-US candidate. Formatting
+      conventions track region, not quality; penalising them would encode
+      a regional bias.
+  - candidate: marcus-chen-rodriguez
+    match: "Email prefix mismatch with candidate name"
+    note: >-
+      A shortened or family-variant email handle is common; nothing else
+      in the record suggests the header name is wrong.

@@ -32,14 +32,18 @@ from __future__ import annotations
 import re
 from typing import Optional
 
+import yaml
+
 from checks import (
     check_contact,
+    check_credential_pairs,
+    check_location_zip,
     check_formatting,
     check_seniority,
     check_tenure_split,
     check_timeline,
 )
-from knowledge_base import KnowledgeBase, years_of_experience
+from knowledge_base import KNOWLEDGE_DIR, KnowledgeBase, years_of_experience
 from schema import Candidate, DataQuality, FirmLink, ResumeExtraction, ResumeFlag
 
 # Order used when merging flags, most consequential first, so the top of the
@@ -87,13 +91,11 @@ def _merge_flags(
     """
     merged = list(computed_flags)
     covered = {
-        (f.category, topic)
-        for f in computed_flags
-        if (topic := _flag_topic(f)) is not None
+        topic for f in computed_flags if (topic := _flag_topic(f)) is not None
     }
 
     for flag in model_flags:
-        if (flag.category, _flag_topic(flag)) in covered:
+        if _flag_topic(flag) in covered:
             continue
         tokens = _flag_tokens(flag)
         duplicate = False
@@ -118,10 +120,17 @@ def _merge_flags(
 # header and email" both mention email but are different findings, and only
 # the first is what the format check covers.
 _FLAG_TOPICS: dict[str, str] = {
-    "email": r"\bemail\b",
-    "phone": r"\bphone\b",
+    # Validity-scoped: "Email address malformed" matches, "Name mismatch
+    # between header and email" does not -- the first restates the computed
+    # contact check (which once slipped through because the model filed it
+    # under a different category), the second is a separate finding.
+    "email": r"email.*(malformed|missing|invalid|domain|suffix|format)"
+             r"|(malformed|missing|invalid).*email",
+    "phone": r"phone.*(malformed|missing|invalid|format|digits)"
+             r"|(malformed|missing|invalid).*phone",
     "gap": r"\bgaps?\b",
     "overlap": r"\boverlap|\bconcurrent\b",
+    "series_pair": r"\bseries\s*8[67]\b",
 }
 
 
@@ -265,6 +274,29 @@ def _employers(
 # What each kind of problem costs the confidence score. Weights are relative
 # judgements about how badly the issue damages a search result, kept in one
 # table so they can be argued about and tuned in isolation.
+def _apply_flag_review(flags, candidate_id):
+    """Downgrade flags a human reviewer has triaged as benign.
+
+    The review outcomes live in knowledge/flag_review.yaml with the
+    reviewer's reasoning; matching flags become severity "info" and carry
+    the note. Kept, not deleted -- triage must stay auditable.
+    """
+    path = KNOWLEDGE_DIR / "flag_review.yaml"
+    if not path.exists():
+        return flags
+    entries = (yaml.safe_load(path.read_text(encoding="utf-8"))
+               or {}).get("reviewed_benign", [])
+    for f in flags:
+        for entry in entries:
+            if (entry.get("candidate") == candidate_id
+                    and entry.get("match", "").lower() in f.summary.lower()):
+                f.severity = "info"
+                note = entry.get("note", "").strip()
+                if note:
+                    f.detail = f"{f.detail} Reviewer: {note}"
+    return flags
+
+
 _PENALTIES: dict[str, float] = {
     "no_name": 0.15,
     "no_positions": 0.40,
@@ -350,13 +382,14 @@ def assess_quality(
 
     # Each flag contributes by category, capped so that a resume with many
     # small notes is not pushed below one with a single disqualifying gap.
-    flag_cost = sum(_PENALTIES.get(f.category, 0.02) for f in flags)
+    flag_cost = sum(_PENALTIES.get(f.category, 0.02)
+                    for f in flags if f.severity == "warning")
     score -= min(0.25, flag_cost)
 
     score = round(max(0.0, min(1.0, score)), 2)
     band = "high" if score >= 0.80 else "medium" if score >= 0.55 else "low"
 
-    reasons = [f.summary for f in flags]
+    reasons = [f.summary for f in flags if f.severity == "warning"]
     if "full_name" in missing:
         reasons.insert(0, "Name taken from filename; never stated in the document")
 
@@ -443,6 +476,10 @@ def enrich(
     # --- flags: what the model read + what we computed ---------------------
     computed: list[ResumeFlag] = []
     computed += check_contact(extraction)
+    computed += check_credential_pairs(extraction)
+    computed += check_location_zip(
+        extraction, kb.taxonomy.get("city_zip_prefixes", {})
+    )
     computed += check_tenure_split(years, investment_years)
     computed += check_timeline(extraction)
     if extraction_report is not None:
@@ -465,15 +502,57 @@ def enrich(
     # version tagged them individually and silently missed three.
     computed = [f.model_copy(update={"source": "computed"}) for f in computed]
 
-    flags = _merge_flags(list(extraction.flags), computed)
-    flags.sort(key=lambda f: FLAG_PRIORITY.get(f.category, 9))
+    # The severity field rides in the extraction schema, so the model can
+    # see it and -- helpfully but wrongly -- sometimes sets it. Severity
+    # decides whether a flag costs confidence, and a nondeterministic model
+    # choosing what gets scored is the exact failure mode this pipeline
+    # exists to remove. Model flags all enter as warnings; only the
+    # deterministic checks and the human triage file may downgrade.
+    model_flags = [f.model_copy(update={"severity": "warning"})
+                   for f in extraction.flags]
+    # One deterministic downgrade, from reviewer feedback: "the location is
+    # not separately labelled as a current location" is pedantry whenever a
+    # location was in fact extracted -- the record has the answer, the flag
+    # only complains about the header's wording.
+    for f in model_flags:
+        if (f.category == "missing_data" and "location" in f.summary.lower()
+                and extraction.location_raw):
+            f.severity = "info"
+    flags = _merge_flags(model_flags, computed)
+    flags = _apply_flag_review(flags, _slug(extraction.full_name, source_file))
+    flags.sort(key=lambda f: (f.severity != "warning",
+                              FLAG_PRIORITY.get(f.category, 9)))
 
     # --- credentials, expanded -------------------------------------------
+    # An MBA is a degree, not a professional credential, but the model files
+    # it under credentials whenever a resume's layout does (one resume keeps
+    # "MBA" in a floating text box beside the name, far from any education
+    # section). Filed there for one candidate and under education for
+    # another, the credentials filter silently lies. So business-school
+    # degrees are normalised here instead: stripped from the credentials
+    # list and derived from EDUCATION for everyone, with PGDM -- the Indian
+    # postgraduate diploma that fills the MBA's role -- in the same bucket,
+    # because a filter that finds Marina's MBA but not Zara's PGDM would
+    # encode a regional bias as a feature.
+    _MBA_TOKENS = ("mba", "m.b.a", "master of business administration",
+                   "pgdm", "p.g.d.m")
+
+    def _is_mba(text: str) -> bool:
+        t = f" {text.lower().replace(',', ' ')} "
+        return any(f" {tok} " in t or t.strip().startswith(f"{tok} ")
+                   for tok in _MBA_TOKENS)
+
     credentials: list[str] = []
     for credential in extraction.credentials:
+        if _is_mba(credential.name):
+            continue
         full = kb.expand_credential(credential.name)
         label = f"{credential.name} - {full}" if full else credential.name
         credentials.append(f"{label} ({credential.status})" if credential.status else label)
+    if any(_is_mba(f"{d.degree or ''} {d.field_of_study or ''}")
+           for d in extraction.education) or any(
+           _is_mba(cr.name) for cr in extraction.credentials):
+        credentials.append("MBA / PGDM - Business school degree")
 
     stated_name = (extraction.full_name or "").strip()
 

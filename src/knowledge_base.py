@@ -312,9 +312,13 @@ class KnowledgeBase:
             return None
         low = title.lower()
         # Most senior first: "Senior Analyst" must not be caught by "analyst i".
+        # Word-boundary matching, not substring -- the same lesson the concept
+        # map taught: a substring version read the "intern" inside
+        # "Consumer INTERNet & Software" and called an 8.7-year analyst an
+        # intern.
         for band in ("portfolio_manager", "senior", "junior", "intern"):
             for pattern in self.taxonomy["title_hints"][band]:
-                if pattern.lower() in low:
+                if re.search(r"\b" + re.escape(pattern.lower()) + r"\b", low):
                     return band
         return None
 

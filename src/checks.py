@@ -332,6 +332,7 @@ def check_tenure_split(
     if investment == 0:
         return [
             ResumeFlag(
+            severity="info",
                 category="other",
                 summary=f"No investment experience: {total}y career, 0y investing",
                 detail=(
@@ -345,6 +346,7 @@ def check_tenure_split(
     if total - investment >= 2.0:
         return [
             ResumeFlag(
+            severity="info",
                 category="other",
                 summary=(
                     f"Career longer than investing tenure: {total}y vs "
@@ -372,12 +374,84 @@ def check_seniority(
     return [
         ResumeFlag(
             category="internal_contradiction",
-            summary=f"Title and tenure disagree: {title_hint} title, {band} tenure",
+            summary=f"Title reads {title_hint}, tenure is {band}",
             detail=(
-                f"The current title '{title}' implies a {title_hint} level, "
+                f"The current title '{title}' reads as {title_hint}-level, "
                 f"while {years} years of computed experience places the "
-                f"candidate in the {band} band. Titles are not comparable "
-                "across market sides, so this is surfaced rather than resolved."
+                f"candidate in the {band} band. Not necessarily a problem — "
+                "titles are not comparable across firms or market sides — "
+                "but worth a question in screening: why has the title not "
+                "progressed with the tenure?"
             ),
         )
     ]
+
+
+# --------------------------------------------------------------------------
+# Credential pairing
+# --------------------------------------------------------------------------
+
+def check_credential_pairs(extraction: ResumeExtraction) -> list[ResumeFlag]:
+    """Flag FINRA credentials whose required partner is missing.
+
+    The model once flagged a Series 87 as "an unusual license to list
+    alongside Series 7 and 63" -- plausible-sounding and wrong: 7 + 63 +
+    86/87 is the standard sell-side research analyst stack. The genuine
+    anomaly is different and perfectly mechanical: the research analyst
+    qualification is the 86/87 PAIR (86 analysis, 87 regulatory), so an 87
+    with no 86 usually means an omission or a typo. Membership of a known
+    pair is a set lookup, not a judgment call, so it moves out of the
+    model's hands and into code -- where the reasoning cannot drift.
+    """
+    names = " ".join(c.name.lower() for c in extraction.credentials)
+    held = set(re.findall(r"series\s*(\d+)", names))
+    flags: list[ResumeFlag] = []
+    for present, missing in (("87", "86"), ("86", "87")):
+        if present in held and missing not in held:
+            flags.append(ResumeFlag(
+                category="typo_or_spelling",
+                summary=f"Series {present} listed without its paired "
+                        f"Series {missing}",
+                detail="FINRA's research analyst qualification is the 86/87 "
+                       "pair -- 86 covers analysis, 87 the regulatory "
+                       "portion. Listing one without the other usually "
+                       "indicates an omission or a typo in the resume, not "
+                       "a partial qualification.",
+                quote=next((c.name for c in extraction.credentials
+                            if present in c.name), ""),
+                source="computed",
+            ))
+    return flags
+
+
+def check_location_zip(
+    extraction: ResumeExtraction, city_zip_prefixes: dict[str, list[str]]
+) -> list[ResumeFlag]:
+    """Flag a US header zip that does not belong to the stated city.
+
+    A reviewer caught "Boston, MA 01125" by eye -- a valid Massachusetts
+    zip, but a Springfield-area one, so state-level validation passes it
+    and only city knowledge catches it. City-to-zip-prefix is curated fact,
+    which puts it in the knowledge base and this check in code. Only cities
+    present in the table are checked; everything else stays silent rather
+    than guessing.
+    """
+    raw = extraction.location_raw or ""
+    m = re.search(r"([A-Za-z .]+?),\s*[A-Z]{2}\s+(\d{5})", raw)
+    if not m:
+        return []
+    city, zip_code = m.group(1).strip().lower(), m.group(2)
+    prefixes = city_zip_prefixes.get(city)
+    if not prefixes or any(zip_code.startswith(p) for p in prefixes):
+        return []
+    return [ResumeFlag(
+        category="typo_or_spelling",
+        summary=f"Zip code {zip_code} does not match {m.group(1).strip()}",
+        detail=(
+            f"The header reads '{raw}', but {zip_code} is not a "
+            f"{m.group(1).strip()} zip (expected prefixes: "
+            f"{', '.join(prefixes)}xx). Likely a typo; left as written."
+        ),
+        quote=raw,
+        source="computed",
+    )]
