@@ -148,6 +148,46 @@ st.markdown(
                         padding-top: 3px; }}
       .brandbar .ctx {{ margin-left: auto; font-size: 12px;
                         color: rgba(255,255,255,.75); padding-top: 0; }}
+      /* The view switcher lives in the masthead, not above the results:
+         Insights, Data quality and Method are views OVER the pool, one
+         level up from the working screen, and the reviewer read them as
+         siblings of the candidate list when they sat next to it. The tab
+         strip is lifted out of the page flow into the bar; the tab PANELS
+         stay exactly where they were. */
+      div[role="tablist"] {{
+        position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+        height: 50px; z-index: 1000003; background: transparent;
+        border-bottom: none !important; gap: 26px; align-items: center;
+        display: flex;
+      }}
+      div[role="tablist"] [data-testid="stTab"] {{
+        color: rgba(255,255,255,.62); background: transparent;
+        border-bottom: 2px solid transparent; padding: 4px 2px;
+      }}
+      div[role="tablist"] [data-testid="stTab"] p {{
+        font-size: 13px !important; font-weight: 500;
+        color: inherit !important;
+      }}
+      div[role="tablist"] [data-testid="stTab"]:hover {{ color: #fff; }}
+      div[role="tablist"] [data-testid="stTab"][aria-selected="true"] {{
+        color: #fff !important; border-bottom: 2px solid #fff;
+      }}
+      div[role="tablist"] [data-testid="stTab"][aria-selected="true"] p {{
+        font-weight: 600;
+      }}
+      /* Reopen control for a collapsed sidebar: it normally sits in the
+         strip the masthead now covers, which left no way back. */
+      [data-testid="stSidebarCollapsedControl"],
+      [data-testid="stExpandSidebarButton"] {{
+        position: fixed; top: 58px; left: 10px; z-index: 1000003;
+        visibility: visible !important;
+        background: {SURFACE}; border: 1px solid {GRID};
+        border-radius: 8px; padding: 2px;
+        box-shadow: 0 1px 4px rgba(11,27,43,.08);
+      }}
+      [data-testid="stExpandSidebarButton"] * {{
+        visibility: visible !important;
+      }}
       section[data-testid="stSidebar"] {{
         padding-top: 50px; background: #fff;
         border-right: 1px solid {GRID};
@@ -159,12 +199,6 @@ st.markdown(
       .stApp h5 {{ font-size: 11px !important; font-weight: 600;
                    text-transform: uppercase; letter-spacing: .08em;
                    color: {MUTED} !important; }}
-      .stTabs [data-baseweb="tab-list"] {{ gap: 20px;
-                                           border-bottom: 1px solid {GRID}; }}
-      .stTabs [data-baseweb="tab"] {{ font-weight: 500; font-size: 13.5px;
-                                      color: {MUTED}; padding: 0 2px; }}
-      .stTabs [aria-selected="true"] {{ color: {INK} !important;
-                                        font-weight: 600; }}
       [data-testid="stMetricValue"] {{ color: {INK}; font-weight: 650;
                                        font-size: 24px !important; }}
       [data-testid="stMetricLabel"] {{ color: {MUTED}; }}
@@ -246,9 +280,26 @@ st.markdown(
 # Data
 # ---------------------------------------------------------------------------
 
+_NAME_HONORIFICS = {"dr", "mr", "ms", "mrs", "prof"}
+
+
 @st.cache_data(show_spinner=False)
 def load_candidates() -> list[dict]:
-    return json.loads(DATA.read_text(encoding="utf-8")) if DATA.exists() else []
+    """Load the parsed dataset, normalising display names.
+
+    Honorifics come off at load time: a shortlist that addresses one
+    candidate as "Dr." and the rest by name reads as if the tool ranks
+    titles, and every view downstream inherits whatever this function
+    returns -- one strip here beats five strips in the rendering code.
+    """
+    rows = json.loads(DATA.read_text(encoding="utf-8")) if DATA.exists() else []
+    for c in rows:
+        parts = (c.get("display_name") or "").split()
+        while parts and parts[0].lower().rstrip(".") in _NAME_HONORIFICS:
+            parts.pop(0)
+        if parts:
+            c["display_name"] = " ".join(parts)
+    return rows
 
 
 @st.cache_resource(show_spinner=False)
@@ -1187,9 +1238,10 @@ with tab_search:
                     if crit.weight <= 0 or not crit.evidence:
                         continue
                     st.markdown(
-                        f"**{crit.label}** — {crit.found}  \n"
-                        f"<span style='color:{MUTED};font-size:12.5px'>"
-                        f"“{crit.evidence[:260]}”</span>",
+                        f"<div style='font-size:12.5px;margin:0 0 9px'>"
+                        f"<b>{crit.label}</b> — {crit.found}<br>"
+                        f"<span style='color:{MUTED}'>"
+                        f"“{crit.evidence[:260]}”</span></div>",
                         unsafe_allow_html=True,
                     )
 
