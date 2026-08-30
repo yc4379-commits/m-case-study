@@ -52,8 +52,7 @@
           "is_investment_role": false,
           "duration_months": null,
           "description": [
-            "Efficiently processed and analyzed over 200,000 historical Asian market firm-level data points using Python and R, conducting comprehensive statistical analysis for academic research.",
-            "Implemented advanced data processing techniques resulting in 25x improvement in research team computational efficiency.",
+            "Efficiently processed and analyzed over 200,000 historical Asian market firm-level data points using Python and R, conducting comprehensive statistical analysis for academic research. Implemented advanced data processing techniques resulting in 25x improvement in research team computational efficiency.",
             "Utilized Python and GIS mapping tools to analyze regional economic activity data from satellite imagery, generating 400+ analytical outputs including statistical reports and visualization packages for publication."
           ]
         },
@@ -121,36 +120,32 @@
       ],
       "credentials": [],
       "languages": [
-        "English",
-        "Chinese (Mandarin)",
-        "Chinese (Cantonese)"
+        "English (fluent)",
+        "Chinese (Mandarin: native, Cantonese: fluent)"
       ],
       "software_tools": [
         "Python",
         "R",
         "SQL",
-        "Excel",
-        "VBA",
-        "PowerPoint",
-        "Word",
+        "Microsoft Office Suite (Excel with VBA, PowerPoint, Word)",
         "Bloomberg Terminal",
         "WIND Database"
       ],
       "methods": [
-        "Multi-factor model",
-        "Backtesting",
-        "Performance attribution analysis",
-        "Machine learning",
+        "multi-factor quantitative model",
+        "backtesting",
+        "performance attribution analysis",
+        "machine learning",
         "DCF",
-        "Relative valuation",
-        "Statistical analysis"
+        "relative valuation models",
+        "statistical analysis"
       ],
       "investment_approach": {
         "value": "systematic",
         "keywords": [
-          "multi-factor quantitative model",
-          "Sharpe ratio 1.8+",
-          "backtesting"
+          "multi-factor model",
+          "backtesting",
+          "Sharpe ratio 1.8"
         ],
         "evidence": "Independently developed, constructed and actively managed a multi-factor quantitative model focusing on Greater China technology equities, achieving superior risk-adjusted returns with Sharpe ratio of 1.8+ over 12-month period.",
         "confidence": "high"
@@ -159,10 +154,10 @@
         "value": "buy_side",
         "keywords": [
           "portfolio managers",
-          "Investment Analyst",
-          "Bank of China"
+          "Bank of China",
+          "Investment Analyst"
         ],
-        "evidence": "Conduct comprehensive quantitative analysis on large-scale Asian equity datasets to provide statistical support for portfolio managers.",
+        "evidence": "provide statistical support for portfolio managers",
         "confidence": "medium"
       },
       "primary_sectors": [
@@ -179,7 +174,7 @@
           "value": "healthcare",
           "keywords": [
             "healthcare sectors",
-            "sub-industries"
+            "35+ companies"
           ],
           "evidence": "Performed comprehensive research on Asian technology and healthcare sectors, covering 15+ sub-industries and 35+ companies across Greater China markets.",
           "confidence": "medium"
@@ -189,8 +184,9 @@
         {
           "value": "equities",
           "keywords": [
-            "Greater China technology equities",
-            "Asian equity datasets"
+            "equities",
+            "multi-factor model",
+            "Greater China technology"
           ],
           "evidence": "Independently developed, constructed and actively managed a multi-factor quantitative model focusing on Greater China technology equities",
           "confidence": "high"
@@ -204,37 +200,78 @@
         ],
         "notable_firms_or_names": []
       },
+      "team_leadership": {
+        "value": "",
+        "keywords": [],
+        "evidence": "",
+        "confidence": "low"
+      },
+      "stated_metrics": [
+        {
+          "kind": "risk",
+          "figure": "Sharpe ratio of 1.8+",
+          "quote": "Independently developed, constructed and actively managed a multi-factor quantitative model focusing on Greater China technology equities, achieving superior risk-adjusted returns with Sharpe ratio of 1.8+ over 12-month period."
+        },
+        {
+          "kind": "other",
+          "figure": "200,000 historical Asian market firm-level data points",
+          "quote": "Efficiently processed and analyzed over 200,000 historical Asian market firm-level data points using Python and R, conducting comprehensive statistical analysis for academic research."
+        },
+        {
+          "kind": "other",
+          "figure": "25x improvement",
+          "quote": "Implemented advanced data processing techniques resulting in 25x improvement in research team computational efficiency."
+        },
+        {
+          "kind": "other",
+          "figure": "400+ analytical outputs",
+          "quote": "generating 400+ analytical outputs including statistical reports and visualization packages for publication."
+        },
+        {
+          "kind": "other",
+          "figure": "40% increase",
+          "quote": "Led organizational marketing efforts across CUHK campus, increasing membership by 40% and creating educational video content to expand community engagement and awareness."
+        }
+      ],
       "flags": [
         {
           "category": "date_anomaly",
           "severity": "warning",
-          "summary": "Overlapping roles: Investment Analyst and Master's degree",
-          "detail": "The Investment Analyst role at Bank of China (June 2021 - Sep 2023) overlaps with the MSc in Financial Technology at University of Hong Kong (Sept 2021 - Jul 2023), suggesting concurrent full-time study and work.",
+          "summary": "Investment Analyst overlaps with Investment Intern",
+          "detail": "The Investment Analyst role (Jun 2021 - Sep 2023) overlaps with the Investment Intern role (Dec 2019 - May 2021) and both appear to be at the same firm heading (Bank of China) with a gap of one month between them but the analyst start date overlaps the intern end date is fine, however the analyst start date (June 2021) precedes the intern end date (May 2021) narrowly - check for consistency.",
           "quote": "Investment Analyst June.2021 – Sep.2023",
           "source": "model"
         },
         {
           "category": "date_anomaly",
           "severity": "warning",
-          "summary": "Investment Intern dates overlap with Bachelor's degree",
-          "detail": "The Investment Intern role (Dec 2019 - May 2021) overlaps with the Bachelor's degree (Sept 2017 - Jul 2021) and also overlaps with the Research Assistant role (Mar 2019 - Mar 2021) at a different employer.",
-          "quote": "Investment Intern Dec.2019 – May.2021",
+          "summary": "Master's degree overlaps with full-time Investment Analyst role",
+          "detail": "The MSc in Financial Technology (Sept 2021 - Jul 2023) overlaps almost entirely with the Investment Analyst position at Bank of China (Jun 2021 - Sep 2023), suggesting full-time study concurrent with full-time employment.",
+          "quote": "Master of Science in Financial Technology Sept.2021 – Jul.2023",
           "source": "model"
         },
         {
-          "category": "internal_contradiction",
+          "category": "attribution_ambiguity",
           "severity": "warning",
-          "summary": "Investment Intern listed under Bank of China but unclear employer",
-          "detail": "The 'Investment Intern' position appears directly under 'Bank of China' heading with no separate employer name, but given the overlapping dates with Research Assistant role at a different institution, it is ambiguous whether this intern role was also at Bank of China.",
+          "summary": "Investment Intern position firm not explicitly restated",
+          "detail": "The 'Investment Intern' role is listed directly under the 'Bank of China' heading with no separate employer name, but it is unclear if this intern role was also at Bank of China or elsewhere given the overlapping dates with the Research Assistant role at CUHK.",
           "quote": "Investment Intern Dec.2019 – May.2021",
           "source": "model"
         },
         {
           "category": "date_anomaly",
           "severity": "warning",
-          "summary": "Multiple overlapping roles Dec 2019-Mar 2021",
-          "detail": "Investment Intern (Dec 2019-May 2021) and Research Assistant (Mar 2019-Mar 2021) at Chinese University of Hong Kong overlap substantially, and both overlap with Bachelor's degree study period.",
+          "summary": "Investment Intern overlaps with CUHK Research Assistant role",
+          "detail": "The Investment Intern role (Dec 2019 - May 2021) overlaps with the Research Assistant role at Chinese University of Hong Kong (Mar 2019 - Mar 2021), both presented as concurrent full engagements.",
           "quote": "Research Assistant (Economics Area) Mar.2019 – Mar.2021",
+          "source": "model"
+        },
+        {
+          "category": "typo_or_spelling",
+          "severity": "warning",
+          "summary": "Email uses unconventional capitalization",
+          "detail": "Email begins with a capital letter which is unusual formatting, though not necessarily an error.",
+          "quote": "Alex_chen2024@gmail.com",
           "source": "model"
         }
       ]
@@ -331,29 +368,25 @@
     ],
     "credentials_summary": [],
     "languages": [
-      "English",
-      "Chinese (Mandarin)",
-      "Chinese (Cantonese)"
+      "English (fluent)",
+      "Chinese (Mandarin: native, Cantonese: fluent)"
     ],
     "software_tools": [
       "Python",
       "R",
       "SQL",
-      "Excel",
-      "VBA",
-      "PowerPoint",
-      "Word",
+      "Office",
       "Bloomberg",
       "WIND"
     ],
     "methods": [
-      "Multi-factor model",
-      "Backtesting",
-      "Performance attribution analysis",
-      "Machine learning",
+      "multi-factor quantitative model",
+      "backtesting",
+      "performance attribution analysis",
+      "machine learning",
       "DCF",
-      "Relative valuation",
-      "Statistical analysis"
+      "relative valuation models",
+      "statistical analysis"
     ],
     "employers": [
       "Bank of China (full-time, intern)",
@@ -374,11 +407,19 @@
         "source": "computed"
       },
       {
-        "category": "internal_contradiction",
+        "category": "attribution_ambiguity",
         "severity": "info",
-        "summary": "Investment Intern listed under Bank of China but unclear employer",
-        "detail": "The 'Investment Intern' position appears directly under 'Bank of China' heading with no separate employer name, but given the overlapping dates with Research Assistant role at a different institution, it is ambiguous whether this intern role was also at Bank of China. Reviewer: Internship attribution ambiguity; internships carry no weight in any tenure figure, so nothing downstream depends on the answer.",
+        "summary": "Investment Intern position firm not explicitly restated",
+        "detail": "The 'Investment Intern' role is listed directly under the 'Bank of China' heading with no separate employer name, but it is unclear if this intern role was also at Bank of China or elsewhere given the overlapping dates with the Research Assistant role at CUHK. Reviewer: Internship attribution ambiguity; internships carry no weight in any tenure figure, so nothing downstream depends on the answer.",
         "quote": "Investment Intern Dec.2019 – May.2021",
+        "source": "model"
+      },
+      {
+        "category": "typo_or_spelling",
+        "severity": "info",
+        "summary": "Email uses unconventional capitalization",
+        "detail": "Email begins with a capital letter which is unusual formatting, though not necessarily an error. Reviewer: Capitalisation in an email address is cosmetic; addresses are case-insensitive in practice and nothing else is inconsistent.",
+        "quote": "Alex_chen2024@gmail.com",
         "source": "model"
       }
     ],
@@ -399,10 +440,10 @@
       "full_name": "MARINA SILVA COSTA",
       "email": "marina.costa.finance@gmail.com",
       "phone": "+44 (785) 429-1673",
-      "location_raw": "Boston, USA / London, United Kingdom",
+      "location_raw": "London, United Kingdom",
       "positions": [
         {
-          "firm": "Vanguard Group",
+          "firm": "VANGUARD GROUP",
           "title": "Equity Research Analyst",
           "location": "Boston, USA / London, United Kingdom",
           "start_date": "2021-08",
@@ -416,7 +457,7 @@
           ]
         },
         {
-          "firm": "Vanguard Group",
+          "firm": "VANGUARD GROUP",
           "title": "Equity Research Summer Analyst",
           "location": "Boston, USA / London, United Kingdom",
           "start_date": "2020-06",
@@ -430,7 +471,7 @@
           ]
         },
         {
-          "firm": "Bain & Company",
+          "firm": "BAIN & COMPANY",
           "title": "Business Analyst",
           "location": "Sao Paulo, Brazil",
           "start_date": "2016",
@@ -451,18 +492,32 @@
             "Managed progress of 200+ initiatives in a large-scale lean manufacturing engagement for an aerospace player, by coordinating work of directors and managers of the company",
             "Led launch of McKinsey's first case competition, receiving 3.300 applications to an in-person event that mobilized +50 consultants from McKinsey Brazil"
           ]
+        },
+        {
+          "firm": "CJE-FF",
+          "title": "Manager",
+          "location": "Sao Paulo, Brazil",
+          "start_date": null,
+          "end_date": null,
+          "is_current": false,
+          "employment_type": "student_organization",
+          "is_investment_role": false,
+          "duration_months": null,
+          "description": [
+            "Manager of CJE-FF – a student-run equity fund – and the Investment Committee"
+          ]
         }
       ],
       "education": [
         {
-          "institution": "MIT Sloan School of Management",
+          "institution": "MIT SLOAN SCHOOL OF MANAGEMENT",
           "degree": "MBA",
           "field_of_study": "Business Administration",
           "start_year": 2019,
           "graduation_year": 2021
         },
         {
-          "institution": "Fundacao Getulio Vargas",
+          "institution": "FUNDACAO GETULIO VARGAS",
           "degree": "BS",
           "field_of_study": "Economics",
           "start_year": 2013,
@@ -478,20 +533,19 @@
       "software_tools": [
         "Python",
         "R",
-        "Excel",
-        "VBA"
+        "Advanced Excel/VBA"
       ],
       "methods": [
         "financial modeling",
         "fundamental research",
-        "proprietary studies",
-        "dynamic pricing modeling"
+        "dynamic pricing tool"
       ],
       "investment_approach": {
         "value": "fundamental",
         "keywords": [
           "fundamental research",
-          "financial modeling"
+          "financial modeling",
+          "investment recommendations"
         ],
         "evidence": "Develops investment recommendations on publicly traded companies through fundamental research including financial modeling and proprietary studies",
         "confidence": "high"
@@ -502,7 +556,7 @@
           "Vanguard Group",
           "Equity Research Analyst"
         ],
-        "evidence": "VANGUARD GROUP",
+        "evidence": "Equity Research Analyst",
         "confidence": "medium"
       },
       "primary_sectors": [
@@ -510,8 +564,8 @@
           "value": "healthcare",
           "keywords": [
             "healthcare",
-            "Latam",
-            "EMEA"
+            "consumer discretionary",
+            "telecom"
           ],
           "evidence": "focused on healthcare, consumer discretionary an telecom companies operating primarily in emerging Latam and EMEA",
           "confidence": "high"
@@ -519,7 +573,8 @@
         {
           "value": "consumer",
           "keywords": [
-            "consumer discretionary"
+            "consumer discretionary",
+            "retail"
           ],
           "evidence": "focused on healthcare, consumer discretionary an telecom companies operating primarily in emerging Latam and EMEA",
           "confidence": "high"
@@ -527,7 +582,7 @@
         {
           "value": "media_telecom",
           "keywords": [
-            "telecom companies"
+            "telecom"
           ],
           "evidence": "focused on healthcare, consumer discretionary an telecom companies operating primarily in emerging Latam and EMEA",
           "confidence": "high"
@@ -547,42 +602,75 @@
       "coverage": {
         "stocks_covered": null,
         "geographies_covered": [
-          "Latam",
+          "Latin America",
           "EMEA"
         ],
         "notable_firms_or_names": []
       },
+      "team_leadership": {
+        "value": "",
+        "keywords": [],
+        "evidence": "",
+        "confidence": "low"
+      },
+      "stated_metrics": [
+        {
+          "kind": "other",
+          "figure": "35 main product categories, across 4 distribution channels and 180+ regional markets",
+          "quote": "Built a dynamic pricing tool for a major consumer electronics company, to recommend price adjustments for each of the 35 main product categories, across 4 distribution channels and 180+ regional markets"
+        },
+        {
+          "kind": "performance",
+          "figure": "~4 percentage points of gross margin improvement",
+          "quote": "Implemented strategic sourcing transformation at major grocery chain, leading cross-functional teams of 3-4 client members in each product category to deliver ~4 percentage points of gross margin improvement"
+        },
+        {
+          "kind": "other",
+          "figure": "200+ initiatives",
+          "quote": "Managed progress of 200+ initiatives in a large-scale lean manufacturing engagement for an aerospace player, by coordinating work of directors and managers of the company"
+        },
+        {
+          "kind": "other",
+          "figure": "3.300 applications",
+          "quote": "Led launch of McKinsey's first case competition, receiving 3.300 applications to an in-person event that mobilized +50 consultants from McKinsey Brazil"
+        },
+        {
+          "kind": "other",
+          "figure": "740",
+          "quote": "Standardized tests: GMAT, score 740 (taken in 2019)"
+        }
+      ],
       "flags": [
         {
           "category": "internal_contradiction",
           "severity": "warning",
-          "summary": "Case competition attributed to both McKinsey and Bain",
-          "detail": "The bullet describes 'Led launch of McKinsey's first case competition... consultants from McKinsey Brazil' under the Bain & Company employer heading, which is inconsistent.",
+          "summary": "Case competition attributed to McKinsey while under Bain heading",
+          "detail": "The bullet about launching 'McKinsey's first case competition' and mobilizing 'consultants from McKinsey Brazil' appears under the Bain & Company work experience section, suggesting either a copy-paste error or misattribution.",
           "quote": "Led launch of McKinsey's first case competition, receiving 3.300 applications to an in-person event that mobilized +50 consultants from McKinsey Brazil",
+          "source": "model"
+        },
+        {
+          "category": "date_anomaly",
+          "severity": "warning",
+          "summary": "Overlap between Bain employment and MBA summer internship",
+          "detail": "The Vanguard summer internship (June-August 2020) falls within the MIT Sloan MBA program dates (Aug 2019 - May 2021), which is expected for a summer internship, but the Bain tenure listed as ending in 2019 leaves ambiguity on exact months versus MBA start in August 2019.",
+          "quote": "Business Analyst 2016 - 2019",
           "source": "model"
         },
         {
           "category": "typo_or_spelling",
           "severity": "warning",
-          "summary": "Misspelling: 'an telecom' instead of 'and telecom'",
-          "detail": "Likely a typo where 'and' was intended.",
+          "summary": "Typo 'an' instead of 'and'",
+          "detail": "Minor typo in role description likely meant to say 'and telecom companies'.",
           "quote": "consumer discretionary an telecom companies",
           "source": "model"
         },
         {
-          "category": "date_anomaly",
-          "severity": "info",
-          "summary": "Summer internship dates overlap with MBA program",
-          "detail": "The Equity Research Summer Analyst role (June-August 2020) falls within the stated MBA period (August 2019 - May 2021), which is expected for a summer internship but worth noting.",
-          "quote": "Equity Research Summer Analyst June/2020 - August/2020",
-          "source": "model"
-        },
-        {
-          "category": "formatting",
-          "severity": "info",
-          "summary": "Inconsistent number formatting: '3.300' likely means 3,300",
-          "detail": "European-style decimal formatting used for a number that appears to represent 3,300 applications, which could be misread.",
-          "quote": "receiving 3.300 applications",
+          "category": "missing_data",
+          "severity": "warning",
+          "summary": "No location listed for education entries' city consistency check",
+          "detail": "No major missing data issues otherwise, but exact months are missing for Bain & Company and CJE-FF roles, limiting precise tenure calculation.",
+          "quote": "Business Analyst 2016 - 2019",
           "source": "model"
         }
       ]
@@ -590,9 +678,9 @@
     "display_name": "MARINA SILVA COSTA",
     "name_source": "resume",
     "region": "Europe",
-    "location": "Boston, USA / London, United Kingdom",
+    "location": "London, United Kingdom",
     "coverage_markets": [
-      "Latam",
+      "Latin America",
       "EMEA"
     ],
     "coverage_markets_source": "stated",
@@ -603,7 +691,7 @@
     "is_junior_range": true,
     "firms": [
       {
-        "raw": "Vanguard Group",
+        "raw": "VANGUARD GROUP",
         "canonical": "Vanguard Group",
         "firm_type": "long_only",
         "parent": null,
@@ -612,7 +700,7 @@
         "note": null
       },
       {
-        "raw": "Vanguard Group",
+        "raw": "VANGUARD GROUP",
         "canonical": "Vanguard Group",
         "firm_type": "long_only",
         "parent": null,
@@ -621,12 +709,21 @@
         "note": null
       },
       {
-        "raw": "Bain & Company",
+        "raw": "BAIN & COMPANY",
         "canonical": "Bain & Company",
         "firm_type": "consulting",
         "parent": null,
         "region": "Global",
         "resolution": "exact",
+        "note": null
+      },
+      {
+        "raw": "CJE-FF",
+        "canonical": null,
+        "firm_type": null,
+        "parent": null,
+        "region": null,
+        "resolution": "unresolved",
         "note": null
       }
     ],
@@ -661,59 +758,59 @@
     "software_tools": [
       "Python",
       "R",
-      "Excel",
-      "VBA"
+      "Excel"
     ],
     "methods": [
       "financial modeling",
       "fundamental research",
-      "proprietary studies",
-      "dynamic pricing modeling"
+      "dynamic pricing tool"
     ],
     "employers": [
       "Vanguard Group (full-time, intern)",
       "Bain & Company (full-time)"
     ],
-    "non_professional_affiliations": [],
+    "non_professional_affiliations": [
+      "CJE-FF (student organization)"
+    ],
     "flags": [
       {
         "category": "internal_contradiction",
         "severity": "warning",
-        "summary": "Case competition attributed to both McKinsey and Bain",
-        "detail": "The bullet describes 'Led launch of McKinsey's first case competition... consultants from McKinsey Brazil' under the Bain & Company employer heading, which is inconsistent.",
+        "summary": "Case competition attributed to McKinsey while under Bain heading",
+        "detail": "The bullet about launching 'McKinsey's first case competition' and mobilizing 'consultants from McKinsey Brazil' appears under the Bain & Company work experience section, suggesting either a copy-paste error or misattribution.",
         "quote": "Led launch of McKinsey's first case competition, receiving 3.300 applications to an in-person event that mobilized +50 consultants from McKinsey Brazil",
         "source": "model"
       },
       {
         "category": "date_anomaly",
         "severity": "warning",
-        "summary": "Employment gap: 2y 2m before Vanguard Group",
-        "detail": "No recorded role between 2019-06 and 2021-08, ending before Equity Research Analyst at Vanguard Group began. The resume does not explain the interval.",
+        "summary": "Employment gap: 2y 2m before VANGUARD GROUP",
+        "detail": "No recorded role between 2019-06 and 2021-08, ending before Equity Research Analyst at VANGUARD GROUP began. The resume does not explain the interval.",
         "quote": "",
         "source": "computed"
       },
       {
         "category": "typo_or_spelling",
         "severity": "warning",
-        "summary": "Misspelling: 'an telecom' instead of 'and telecom'",
-        "detail": "Likely a typo where 'and' was intended.",
+        "summary": "Typo 'an' instead of 'and'",
+        "detail": "Minor typo in role description likely meant to say 'and telecom companies'.",
         "quote": "consumer discretionary an telecom companies",
         "source": "model"
       },
       {
         "category": "date_anomaly",
         "severity": "info",
-        "summary": "Summer internship dates overlap with MBA program",
-        "detail": "The Equity Research Summer Analyst role (June-August 2020) falls within the stated MBA period (August 2019 - May 2021), which is expected for a summer internship but worth noting. Reviewer: A summer internship inside an MBA program is the expected pattern, not an anomaly -- the flag's own text says as much.",
-        "quote": "Equity Research Summer Analyst June/2020 - August/2020",
+        "summary": "Overlap between Bain employment and MBA summer internship",
+        "detail": "The Vanguard summer internship (June-August 2020) falls within the MIT Sloan MBA program dates (Aug 2019 - May 2021), which is expected for a summer internship, but the Bain tenure listed as ending in 2019 leaves ambiguity on exact months versus MBA start in August 2019. Reviewer: A summer internship inside an MBA program is the expected pattern, not an anomaly -- the flag's own text says as much.",
+        "quote": "Business Analyst 2016 - 2019",
         "source": "model"
       },
       {
-        "category": "formatting",
+        "category": "missing_data",
         "severity": "info",
-        "summary": "Inconsistent number formatting: '3.300' likely means 3,300",
-        "detail": "European-style decimal formatting used for a number that appears to represent 3,300 applications, which could be misread. Reviewer: Non-US number formatting from a non-US candidate. Formatting conventions track region, not quality; penalising them would encode a regional bias.",
-        "quote": "receiving 3.300 applications",
+        "summary": "No location listed for education entries' city consistency check",
+        "detail": "No major missing data issues otherwise, but exact months are missing for Bain & Company and CJE-FF roles, limiting precise tenure calculation.",
+        "quote": "Business Analyst 2016 - 2019",
         "source": "model"
       },
       {
@@ -726,12 +823,12 @@
       }
     ],
     "quality": {
-      "score": 0.88,
+      "score": 0.8,
       "band": "high",
       "reasons": [
-        "Case competition attributed to both McKinsey and Bain",
-        "Employment gap: 2y 2m before Vanguard Group",
-        "Misspelling: 'an telecom' instead of 'and telecom'"
+        "Case competition attributed to McKinsey while under Bain heading",
+        "Employment gap: 2y 2m before VANGUARD GROUP",
+        "Typo 'an' instead of 'and'"
       ],
       "missing_fields": [],
       "unverified_quotes": []
@@ -814,6 +911,30 @@
             "Recognized for outstanding performance with invitation to Healthcare Investment Banking recruiting committee for 2013 summer analyst class",
             "Executed 8 transactions with combined deal value of $12B+ across M&A, IPOs, and follow-on offerings"
           ]
+        },
+        {
+          "firm": "Crimson Capital Partners",
+          "title": "Investment Committee",
+          "location": null,
+          "start_date": null,
+          "end_date": null,
+          "is_current": false,
+          "employment_type": "student_organization",
+          "is_investment_role": false,
+          "duration_months": null,
+          "description": []
+        },
+        {
+          "firm": "Harvard Undergraduate Business Association",
+          "title": "President",
+          "location": null,
+          "start_date": null,
+          "end_date": null,
+          "is_current": false,
+          "employment_type": "student_organization",
+          "is_investment_role": false,
+          "duration_months": null,
+          "description": []
         }
       ],
       "education": [
@@ -839,14 +960,14 @@
         "Financial modeling",
         "Due diligence",
         "Corporate valuation",
-        "Investment underwriting"
+        "Underwriting"
       ],
       "investment_approach": {
         "value": "fundamental",
         "keywords": [
           "due diligence",
-          "board observer",
-          "investment recommendations"
+          "portfolio companies",
+          "board observer"
         ],
         "evidence": "Led due diligence on 12 potential investments with total transaction value of $2.1B across public and private healthcare opportunities",
         "confidence": "high"
@@ -854,7 +975,6 @@
       "market_side": {
         "value": "buy_side",
         "keywords": [
-          "Coatue Management",
           "multi-strategy platform",
           "investment portfolio"
         ],
@@ -865,11 +985,11 @@
         {
           "value": "healthcare",
           "keywords": [
-            "Healthcare Analyst",
-            "Life Sciences Tools & Diagnostics",
-            "MedTech"
+            "Life Sciences Tools",
+            "MedTech",
+            "Therapeutics"
           ],
-          "evidence": "Healthcare Analyst, Investment Team",
+          "evidence": "Provided comprehensive sector coverage across Life Sciences Tools & Diagnostics, MedTech, Therapeutics & Services",
           "confidence": "high"
         }
       ],
@@ -877,8 +997,8 @@
         {
           "value": "equities",
           "keywords": [
-            "public equities",
-            "long/short",
+            "public long/short",
+            "private growth/venture",
             "healthcare portfolio"
           ],
           "evidence": "Managed public (long/short) and private (growth/venture) healthcare investment portfolio at $40B multi-strategy platform",
@@ -902,37 +1022,90 @@
           "GeneTech Analytics"
         ]
       },
+      "team_leadership": {
+        "value": "",
+        "keywords": [],
+        "evidence": "",
+        "confidence": "low"
+      },
+      "stated_metrics": [
+        {
+          "kind": "performance",
+          "figure": "340bps",
+          "quote": "Generated 340bps of outperformance versus healthcare sector benchmarks with 85% hit rate on long recommendations"
+        },
+        {
+          "kind": "other",
+          "figure": "85% hit rate",
+          "quote": "Generated 340bps of outperformance versus healthcare sector benchmarks with 85% hit rate on long recommendations"
+        },
+        {
+          "kind": "aum",
+          "figure": "$40B",
+          "quote": "Managed public (long/short) and private (growth/venture) healthcare investment portfolio at $40B multi-strategy platform"
+        },
+        {
+          "kind": "other",
+          "figure": "$150M",
+          "quote": "having sourced and co-led the latter's $150M Series B financing round"
+        },
+        {
+          "kind": "other",
+          "figure": "$2.1B",
+          "quote": "Led due diligence on 12 potential investments with total transaction value of $2.1B across public and private healthcare opportunities"
+        },
+        {
+          "kind": "aum",
+          "figure": "$18B",
+          "quote": "Responsible for investment diligence, underwriting & asset management for $18B platform's $4.2B strategy focused on structured credit, growth equity and royalty financings in public and private companies"
+        },
+        {
+          "kind": "aum",
+          "figure": "$4.2B",
+          "quote": "Responsible for investment diligence, underwriting & asset management for $18B platform's $4.2B strategy focused on structured credit, growth equity and royalty financings in public and private companies"
+        },
+        {
+          "kind": "performance",
+          "figure": "280bps",
+          "quote": "Generated 280bps of outperformance versus healthcare benchmarks across 9 active investments during tenure"
+        },
+        {
+          "kind": "other",
+          "figure": "$12B+",
+          "quote": "Executed 8 transactions with combined deal value of $12B+ across M&A, IPOs, and follow-on offerings"
+        }
+      ],
       "flags": [
         {
           "category": "typo_or_spelling",
           "severity": "warning",
           "summary": "Email missing domain suffix",
-          "detail": "Email address 'rchen@hotmail' is missing a top-level domain such as .com.",
-          "quote": "rchen@hotmail",
-          "source": "model"
-        },
-        {
-          "category": "internal_contradiction",
-          "severity": "warning",
-          "summary": "Email prefix mismatch with candidate name",
-          "detail": "Email 'rchen' does not match the candidate's stated name 'Marcus Chen-Rodriguez', suggesting a possible transcription error or reused personal email.",
-          "quote": "rchen@hotmail",
+          "detail": "The email address 'rchen@hotmail' lacks a top-level domain such as '.com'.",
+          "quote": "Email: rchen@hotmail",
           "source": "model"
         },
         {
           "category": "date_anomaly",
           "severity": "warning",
-          "summary": "Employment gap between Credit Suisse and Goldman Sachs",
-          "detail": "Credit Suisse role ended March 2015 but Goldman Sachs Associate role did not start until April 2017, leaving roughly a two-year unexplained gap.",
+          "summary": "Overlapping Goldman Sachs roles with gap before",
+          "detail": "There is an employment gap between Credit Suisse (ending March 2015) and Goldman Sachs Associate role (starting April 2017), roughly two years unaccounted for.",
           "quote": "Analyst, Healthcare Investment Banking Group June 2013 – March 2015",
           "source": "model"
         },
         {
-          "category": "missing_data",
-          "severity": "info",
-          "summary": "No location listed separately from employer city",
-          "detail": "Candidate's personal current location is inferred only from the most recent employer's city (New York, NY), not explicitly stated as a residence.",
-          "quote": "Coatue Management New York, NY",
+          "category": "internal_contradiction",
+          "severity": "warning",
+          "summary": "Repeated identical metrics across two Goldman titles",
+          "detail": "The same '280bps outperformance across 9 active investments' bullet appears under both the Senior Associate and Associate roles at Goldman Sachs, suggesting duplicated or unclear attribution between the two stints.",
+          "quote": "Generated 280bps of outperformance versus healthcare benchmarks across 9 active investments during tenure",
+          "source": "model"
+        },
+        {
+          "category": "formatting",
+          "severity": "warning",
+          "summary": "Student activities embedded in education section",
+          "detail": "Campus engagement entries (Crimson Capital Partners, Harvard Undergraduate Business Association) are listed under EDUCATION rather than a separate activities section, requiring reclassification as student organizations rather than professional roles.",
+          "quote": "Campus engagement: Crimson Capital Partners (Investment Committee), Harvard Undergraduate Business Association (President)",
           "source": "model"
         }
       ]
@@ -986,6 +1159,24 @@
         "region": "Europe",
         "resolution": "exact",
         "note": null
+      },
+      {
+        "raw": "Crimson Capital Partners",
+        "canonical": null,
+        "firm_type": null,
+        "parent": null,
+        "region": null,
+        "resolution": "unresolved",
+        "note": null
+      },
+      {
+        "raw": "Harvard Undergraduate Business Association",
+        "canonical": null,
+        "firm_type": null,
+        "parent": null,
+        "region": null,
+        "resolution": "unresolved",
+        "note": null
       }
     ],
     "current_firm": "Coatue Management",
@@ -1014,15 +1205,26 @@
       "Financial modeling",
       "Due diligence",
       "Corporate valuation",
-      "Investment underwriting"
+      "Underwriting"
     ],
     "employers": [
       "Coatue Management (full-time)",
       "Goldman Sachs (full-time)",
       "Credit Suisse (full-time)"
     ],
-    "non_professional_affiliations": [],
+    "non_professional_affiliations": [
+      "Crimson Capital Partners (student organization)",
+      "Harvard Undergraduate Business Association (student organization)"
+    ],
     "flags": [
+      {
+        "category": "internal_contradiction",
+        "severity": "warning",
+        "summary": "Repeated identical metrics across two Goldman titles",
+        "detail": "The same '280bps outperformance across 9 active investments' bullet appears under both the Senior Associate and Associate roles at Goldman Sachs, suggesting duplicated or unclear attribution between the two stints.",
+        "quote": "Generated 280bps of outperformance versus healthcare benchmarks across 9 active investments during tenure",
+        "source": "model"
+      },
       {
         "category": "date_anomaly",
         "severity": "warning",
@@ -1040,26 +1242,19 @@
         "source": "computed"
       },
       {
-        "category": "internal_contradiction",
+        "category": "formatting",
         "severity": "info",
-        "summary": "Email prefix mismatch with candidate name",
-        "detail": "Email 'rchen' does not match the candidate's stated name 'Marcus Chen-Rodriguez', suggesting a possible transcription error or reused personal email. Reviewer: A shortened or family-variant email handle is common; nothing else in the record suggests the header name is wrong.",
-        "quote": "rchen@hotmail",
-        "source": "model"
-      },
-      {
-        "category": "missing_data",
-        "severity": "info",
-        "summary": "No location listed separately from employer city",
-        "detail": "Candidate's personal current location is inferred only from the most recent employer's city (New York, NY), not explicitly stated as a residence.",
-        "quote": "Coatue Management New York, NY",
+        "summary": "Student activities embedded in education section",
+        "detail": "Campus engagement entries (Crimson Capital Partners, Harvard Undergraduate Business Association) are listed under EDUCATION rather than a separate activities section, requiring reclassification as student organizations rather than professional roles. Reviewer: A common resume layout choice, not an inconsistency; the activities are correctly excluded from tenure either way.",
+        "quote": "Campus engagement: Crimson Capital Partners (Investment Committee), Harvard Undergraduate Business Association (President)",
         "source": "model"
       }
     ],
     "quality": {
-      "score": 0.94,
+      "score": 0.8,
       "band": "high",
       "reasons": [
+        "Repeated identical metrics across two Goldman titles",
         "Employment gap: 2y 1m before Goldman Sachs",
         "Email address malformed"
       ],
@@ -1117,7 +1312,7 @@
           "end_date": "2019-04",
           "is_current": false,
           "employment_type": "professional",
-          "is_investment_role": false,
+          "is_investment_role": true,
           "duration_months": null,
           "description": [
             "Contributed fundamental research for clients on various HY, XO and IG credits as a junior desk analyst by building three-statement valuation models to pitch relative value ideas and drive desk revenue across coverage of 10+ names",
@@ -1185,7 +1380,7 @@
       "education": [
         {
           "institution": "University of Michigan, Ross School of Business",
-          "degree": "Bachelor of Science in Business",
+          "degree": "BS",
           "field_of_study": "Finance",
           "start_year": null,
           "graduation_year": 2017
@@ -1199,17 +1394,17 @@
         },
         {
           "name": "Series 7",
-          "status": "active",
+          "status": "registered",
           "year": null
         },
         {
           "name": "Series 63",
-          "status": "active",
+          "status": "registered",
           "year": null
         },
         {
           "name": "Series 87",
-          "status": "active",
+          "status": "registered",
           "year": null
         }
       ],
@@ -1225,25 +1420,25 @@
         "Advanced Financial Modeling",
         "Statistical Analysis",
         "Hypothesis Testing",
-        "Valuation Analysis",
-        "Three-statement valuation models"
+        "DCF/valuation analysis",
+        "three-statement valuation models"
       ],
       "investment_approach": {
         "value": "fundamental",
         "keywords": [
-          "stock coverage",
-          "earnings estimates",
+          "management meetings",
+          "valuation analysis",
           "research reports"
         ],
-        "evidence": "Covered 20+ names across TMT sector providing quarterly earnings estimates and research reports",
+        "evidence": "Met directly with management teams as a part of investment process to assess corporate strategy & initiatives",
         "confidence": "high"
       },
       "market_side": {
         "value": "buy_side",
         "keywords": [
-          "portfolio review committee",
-          "AUM mutual fund",
-          "equity allocation"
+          "mutual fund",
+          "AUM",
+          "portfolio review committee"
         ],
         "evidence": "Contributed to weekly portfolio review committee and investment process meetings to determine equity allocation across $1-2 billion AUM mutual fund",
         "confidence": "high"
@@ -1263,9 +1458,18 @@
           "value": "media_telecom",
           "keywords": [
             "TMT sector",
-            "consumer internet companies"
+            "coverage"
           ],
           "evidence": "Covered 20+ names across TMT sector providing quarterly earnings estimates and research reports",
+          "confidence": "medium"
+        },
+        {
+          "value": "credit",
+          "keywords": [
+            "HY, XO, IG credits",
+            "corporate bonds"
+          ],
+          "evidence": "Contributed fundamental research for clients on various HY, XO and IG credits as a junior desk analyst",
           "confidence": "medium"
         }
       ],
@@ -1273,9 +1477,9 @@
         {
           "value": "equities",
           "keywords": [
+            "equity research",
             "TMT sector",
-            "earnings estimates",
-            "equity research"
+            "earnings estimates"
           ],
           "evidence": "Covered 20+ names across TMT sector providing quarterly earnings estimates and research reports",
           "confidence": "high"
@@ -1283,9 +1487,9 @@
         {
           "value": "credit",
           "keywords": [
-            "HY",
-            "XO",
-            "IG credits"
+            "HY, XO, IG credits",
+            "corporate bonds",
+            "market making"
           ],
           "evidence": "Contributed fundamental research for clients on various HY, XO and IG credits as a junior desk analyst",
           "confidence": "high"
@@ -1294,23 +1498,86 @@
       "coverage": {
         "stocks_covered": 20,
         "geographies_covered": [],
-        "notable_firms_or_names": []
+        "notable_firms_or_names": [
+          "Fidelity Asset Management",
+          "William Blair",
+          "Guaranteed Rate",
+          "Magnetar Capital Management"
+        ]
       },
+      "team_leadership": {
+        "value": "",
+        "keywords": [],
+        "evidence": "",
+        "confidence": "low"
+      },
+      "stated_metrics": [
+        {
+          "kind": "aum",
+          "figure": "$1-2 billion AUM",
+          "quote": "Contributed to weekly portfolio review committee and investment process meetings to determine equity allocation across $1-2 billion AUM mutual fund"
+        },
+        {
+          "kind": "other",
+          "figure": "20+ names",
+          "quote": "Initiated on 20+ names across TMT sector through diligence on public filings, industry experts and valuation analysis"
+        },
+        {
+          "kind": "other",
+          "figure": "20+ names",
+          "quote": "Covered 20+ names across TMT sector providing quarterly earnings estimates and research reports"
+        },
+        {
+          "kind": "other",
+          "figure": "10+ consumer internet companies",
+          "quote": "Wrote coverage initiation reports and built IPO syndicate models from scratch on 10+ consumer internet companies"
+        },
+        {
+          "kind": "other",
+          "figure": "70+ page report",
+          "quote": "Published a differentiated 70+ page report on 3D printing industry highlighting 29 competitors with extensive discussion of technology, products, pricing and financial performance; researched forward looking manufacturing trends"
+        },
+        {
+          "kind": "other",
+          "figure": "29 competitors",
+          "quote": "Published a differentiated 70+ page report on 3D printing industry highlighting 29 competitors with extensive discussion of technology, products, pricing and financial performance; researched forward looking manufacturing trends"
+        },
+        {
+          "kind": "other",
+          "figure": "100+ corporate bonds daily",
+          "quote": "Priced 100+ corporate bonds daily for inventory RUNZ on Bloomberg and ALLQ quoted markets"
+        },
+        {
+          "kind": "other",
+          "figure": "up to $500m",
+          "quote": "Responsible for odd lot market making in High yield, Investment Grade and Hybrid securities up to $500m"
+        },
+        {
+          "kind": "other",
+          "figure": "10+ names",
+          "quote": "Contributed fundamental research for clients on various HY, XO and IG credits as a junior desk analyst by building three-statement valuation models to pitch relative value ideas and drive desk revenue across coverage of 10+ names"
+        },
+        {
+          "kind": "other",
+          "figure": "exceeding $30M",
+          "quote": "Structured, pooled and delivered residential mortgage loans weekly exceeding $30M into agency and non-agency securitization products"
+        }
+      ],
       "flags": [
         {
           "category": "date_anomaly",
           "severity": "warning",
-          "summary": "Gap between internship and next role",
-          "detail": "Magnetar Capital internship ended August 2016 but next role (Guaranteed Rate) did not start until July 2017, leaving a gap likely covered by final year of school, but no explanation given.",
-          "quote": "Magnetar Capital Management, Summer Intern– Evanston, IL May 2016-August 2016",
+          "summary": "Employment dates overlap slightly with education timeline",
+          "detail": "Guaranteed Rate role started July 2017, same year as May 2017 graduation, which is consistent, but Ross Investment Banking Club (student org) ran through May 2017 overlapping full-time internship-level activity is not flagged as issue; however CFA Level III passage year (2021) during full-time William Blair employment is plausible and not contradictory.",
+          "quote": "CFA Charterholder: Passed Level III in June 2021",
           "source": "model"
         },
         {
           "category": "other",
           "severity": "warning",
-          "summary": "Fixed income role classified as non-investment support",
-          "detail": "Jr. Desk Analyst role involves market making and sales/trading support rather than independent investment decision-making, though it includes research elements.",
-          "quote": "Jr. Desk Analyst",
+          "summary": "FINRA licenses listed as historical, not current",
+          "detail": "Series 7, 63, 87 licenses are described as held 'during equity research tenure', implying they may no longer be active, which could be worth clarifying.",
+          "quote": "FINRA: Registered Representative and active holder of Series 7, 63 and 87 licenses during equity research tenure",
           "source": "model"
         }
       ]
@@ -1324,7 +1591,7 @@
     ],
     "coverage_markets_source": "inferred",
     "years_experience": 8.7,
-    "years_investment_experience": 7.0,
+    "years_investment_experience": 8.0,
     "seniority_band": "mid",
     "investment_seniority_band": "mid",
     "is_junior_range": false,
@@ -1409,7 +1676,8 @@
     "market_side": "buy_side",
     "sectors": [
       "technology",
-      "media_telecom"
+      "media_telecom",
+      "credit"
     ],
     "asset_classes": [
       "equities",
@@ -1417,9 +1685,9 @@
     ],
     "credentials_summary": [
       "CFA - Chartered Financial Analyst (Charterholder)",
-      "Series 7 - General Securities Representative (active)",
-      "Series 63 - Uniform Securities Agent (State Law) (active)",
-      "Series 87 - Research Analyst (Regulatory Administration) (active)"
+      "Series 7 - General Securities Representative (registered)",
+      "Series 63 - Uniform Securities Agent (State Law) (registered)",
+      "Series 87 - Research Analyst (Regulatory Administration) (registered)"
     ],
     "languages": [],
     "software_tools": [
@@ -1433,8 +1701,8 @@
       "Advanced Financial Modeling",
       "Statistical Analysis",
       "Hypothesis Testing",
-      "Valuation Analysis",
-      "Three-statement valuation models"
+      "DCF/valuation analysis",
+      "three-statement valuation models"
     ],
     "employers": [
       "Fidelity Asset Management (full-time)",
@@ -1450,9 +1718,9 @@
       {
         "category": "date_anomaly",
         "severity": "warning",
-        "summary": "Gap between internship and next role",
-        "detail": "Magnetar Capital internship ended August 2016 but next role (Guaranteed Rate) did not start until July 2017, leaving a gap likely covered by final year of school, but no explanation given.",
-        "quote": "Magnetar Capital Management, Summer Intern– Evanston, IL May 2016-August 2016",
+        "summary": "Employment dates overlap slightly with education timeline",
+        "detail": "Guaranteed Rate role started July 2017, same year as May 2017 graduation, which is consistent, but Ross Investment Banking Club (student org) ran through May 2017 overlapping full-time internship-level activity is not flagged as issue; however CFA Level III passage year (2021) during full-time William Blair employment is plausible and not contradictory.",
+        "quote": "CFA Charterholder: Passed Level III in June 2021",
         "source": "model"
       },
       {
@@ -1474,9 +1742,9 @@
       {
         "category": "other",
         "severity": "warning",
-        "summary": "Fixed income role classified as non-investment support",
-        "detail": "Jr. Desk Analyst role involves market making and sales/trading support rather than independent investment decision-making, though it includes research elements.",
-        "quote": "Jr. Desk Analyst",
+        "summary": "FINRA licenses listed as historical, not current",
+        "detail": "Series 7, 63, 87 licenses are described as held 'during equity research tenure', implying they may no longer be active, which could be worth clarifying.",
+        "quote": "FINRA: Registered Representative and active holder of Series 7, 63 and 87 licenses during equity research tenure",
         "source": "model"
       }
     ],
@@ -1484,10 +1752,10 @@
       "score": 0.9,
       "band": "high",
       "reasons": [
-        "Gap between internship and next role",
+        "Employment dates overlap slightly with education timeline",
         "Series 87 listed without its paired Series 86",
         "Zip code 01125 does not match Boston",
-        "Fixed income role classified as non-investment support"
+        "FINRA licenses listed as historical, not current"
       ],
       "missing_fields": [],
       "unverified_quotes": []
@@ -1541,7 +1809,7 @@
           "end_date": "2021-08",
           "is_current": false,
           "employment_type": "internship",
-          "is_investment_role": true,
+          "is_investment_role": false,
           "duration_months": null,
           "description": [
             "Development and back testing of momentum-based trading strategies",
@@ -1591,21 +1859,21 @@
       ],
       "methods": [
         "Monte Carlo",
+        "Backtesting",
+        "Neural Network / gradient descent",
         "Stochastic calculus",
         "Probability theory",
         "Statistics",
-        "Backtesting",
-        "Neural Network",
-        "Gradient descent"
+        "Modern Portfolio Theory"
       ],
       "investment_approach": {
         "value": "quantitative_dev",
         "keywords": [
-          "quantitative development",
           "pricing library",
-          "C++"
+          "C++",
+          "quantitative development"
         ],
-        "evidence": "R&D Front Office Fixed Income team, quantitative development in the pricing library (C++)",
+        "evidence": "R&D Front Office Fixed Income team, quantitative development in the pricing\nlibrary (C++)",
         "confidence": "high"
       },
       "market_side": {
@@ -1615,35 +1883,42 @@
           "trading desks"
         ],
         "evidence": "Quantitative Developer ― BNP Paribas CIB Paris, France",
-        "confidence": "high"
+        "confidence": "medium"
       },
       "primary_sectors": [
         {
-          "value": "macro_rates_fx",
+          "value": "financials",
           "keywords": [
             "Fixed Income",
             "pricing library"
           ],
-          "evidence": "R&D Front Office Fixed Income team, quantitative development in the pricing library (C++)",
-          "confidence": "medium"
+          "evidence": "R&D Front Office Fixed Income team, quantitative development in the pricing\nlibrary (C++)",
+          "confidence": "low"
         }
       ],
       "asset_classes": [
         {
           "value": "rates",
           "keywords": [
-            "yield curve",
-            "fixed income"
+            "Fixed Income",
+            "yield curve"
           ],
-          "evidence": "Performance optimization of yield curve construction algorithms",
+          "evidence": "R&D Front Office Fixed Income team, quantitative development in the pricing\nlibrary (C++)",
+          "confidence": "high"
+        },
+        {
+          "value": "credit",
+          "keywords": [
+            "Gaussian copula model"
+          ],
+          "evidence": "Introduction of a new model (one factor Gaussian copula model)",
           "confidence": "medium"
         },
         {
           "value": "derivatives",
           "keywords": [
             "exotic payoff",
-            "local spread option",
-            "Greeks computation"
+            "spread option"
           ],
           "evidence": "Implement a new exotic payoff (local spread option)",
           "confidence": "high"
@@ -1657,37 +1932,52 @@
           "Société Générale - SGATS (SGCIB)"
         ]
       },
+      "team_leadership": {
+        "value": "",
+        "keywords": [],
+        "evidence": "",
+        "confidence": "low"
+      },
+      "stated_metrics": [],
       "flags": [
         {
           "category": "date_anomaly",
           "severity": "warning",
-          "summary": "Internship overlaps with full-time role start",
-          "detail": "The internship at BNP Paribas CIB is listed from April 2022 to August 2022, overlapping with the Quantitative Developer role stated as starting May 2022 at the same firm.",
-          "quote": "Since May 2022 ... Internship - April 2022 to August 2022",
+          "summary": "Overlapping internship and full-time role dates",
+          "detail": "The BNP Paribas Quantitative Developer role is stated as starting May 2022 while the internship listed beneath it runs from April 2022 to August 2022, overlapping with the full-time start date.",
+          "quote": "Since May 2022\n...\nInternship - April 2022 to August 2022",
           "source": "model"
         },
         {
           "category": "date_anomaly",
-          "severity": "info",
-          "summary": "Master's degree overlaps with engineering diploma and internship",
-          "detail": "The Master's degree (Sept 2021 - Sept 2022) and Diplôme d'Ingénieur (Sept 2019 - Sept 2022) run concurrently, and both overlap with the Société Générale internship (June-August 2021) and BNP Paribas roles (2022), typical of a sandwich/apprenticeship program but worth noting.",
+          "severity": "warning",
+          "summary": "Master's degree overlaps engineering diploma dates",
+          "detail": "The Master's degree at Universite Lyon (Sept 2021 - Sept 2022) overlaps entirely with the INSA Lyon Diplôme d'Ingénieur (Sept 2019 - Sept 2022), though this may reflect a dual-degree program.",
           "quote": "From September 2021 to September 2022",
           "source": "model"
         },
         {
           "category": "typo_or_spelling",
           "severity": "warning",
-          "summary": "Garbled characters in skills section header",
-          "detail": "The 'Quantitative skills' header appears corrupted with unusual characters.",
-          "quote": "Quanÿve skills",
+          "summary": "Garbled characters in skills heading",
+          "detail": "The 'Quantitative skills' heading appears corrupted with unusual characters.",
+          "quote": "Quan��ve skills",
           "source": "model"
         },
         {
           "category": "typo_or_spelling",
-          "severity": "info",
-          "summary": "Misspelling 'strategie' instead of 'strategy'",
-          "detail": "Word appears misspelled in academic projects section.",
+          "severity": "warning",
+          "summary": "Misspelling 'strategie'",
+          "detail": "The word 'strategie' appears to be a misspelling of 'strategy'.",
           "quote": "Backtester application for a systematic strategie (C#)",
+          "source": "model"
+        },
+        {
+          "category": "formatting",
+          "severity": "warning",
+          "summary": "Stray '(C#)' fragment at end of resume",
+          "detail": "A dangling '(C#)' appears after the Quantitative skills section with no clear association.",
+          "quote": "(C#)",
           "source": "model"
         }
       ]
@@ -1746,10 +2036,11 @@
     "approach_family": "systematic_quant",
     "market_side": "sell_side",
     "sectors": [
-      "macro_rates_fx"
+      "financials"
     ],
     "asset_classes": [
       "rates",
+      "credit",
       "derivatives"
     ],
     "credentials_summary": [],
@@ -1769,12 +2060,12 @@
     ],
     "methods": [
       "Monte Carlo",
+      "Backtesting",
+      "Neural Network / gradient descent",
       "Stochastic calculus",
       "Probability theory",
       "Statistics",
-      "Backtesting",
-      "Neural Network",
-      "Gradient descent"
+      "Modern Portfolio Theory"
     ],
     "employers": [
       "BNP Paribas (full-time, intern)",
@@ -1785,32 +2076,32 @@
       {
         "category": "date_anomaly",
         "severity": "warning",
-        "summary": "Internship overlaps with full-time role start",
-        "detail": "The internship at BNP Paribas CIB is listed from April 2022 to August 2022, overlapping with the Quantitative Developer role stated as starting May 2022 at the same firm.",
-        "quote": "Since May 2022 ... Internship - April 2022 to August 2022",
+        "summary": "Overlapping internship and full-time role dates",
+        "detail": "The BNP Paribas Quantitative Developer role is stated as starting May 2022 while the internship listed beneath it runs from April 2022 to August 2022, overlapping with the full-time start date.",
+        "quote": "Since May 2022\n...\nInternship - April 2022 to August 2022",
         "source": "model"
       },
       {
         "category": "date_anomaly",
         "severity": "warning",
-        "summary": "Master's degree overlaps with engineering diploma and internship",
-        "detail": "The Master's degree (Sept 2021 - Sept 2022) and Diplôme d'Ingénieur (Sept 2019 - Sept 2022) run concurrently, and both overlap with the Société Générale internship (June-August 2021) and BNP Paribas roles (2022), typical of a sandwich/apprenticeship program but worth noting.",
+        "summary": "Master's degree overlaps engineering diploma dates",
+        "detail": "The Master's degree at Universite Lyon (Sept 2021 - Sept 2022) overlaps entirely with the INSA Lyon Diplôme d'Ingénieur (Sept 2019 - Sept 2022), though this may reflect a dual-degree program.",
         "quote": "From September 2021 to September 2022",
         "source": "model"
       },
       {
         "category": "typo_or_spelling",
         "severity": "warning",
-        "summary": "Garbled characters in skills section header",
-        "detail": "The 'Quantitative skills' header appears corrupted with unusual characters.",
-        "quote": "Quanÿve skills",
+        "summary": "Garbled characters in skills heading",
+        "detail": "The 'Quantitative skills' heading appears corrupted with unusual characters.",
+        "quote": "Quan��ve skills",
         "source": "model"
       },
       {
         "category": "typo_or_spelling",
         "severity": "warning",
-        "summary": "Misspelling 'strategie' instead of 'strategy'",
-        "detail": "Word appears misspelled in academic projects section.",
+        "summary": "Misspelling 'strategie'",
+        "detail": "The word 'strategie' appears to be a misspelling of 'strategy'.",
         "quote": "Backtester application for a systematic strategie (C#)",
         "source": "model"
       },
@@ -1831,6 +2122,14 @@
         "source": "computed"
       },
       {
+        "category": "formatting",
+        "severity": "warning",
+        "summary": "Stray '(C#)' fragment at end of resume",
+        "detail": "A dangling '(C#)' appears after the Quantitative skills section with no clear association.",
+        "quote": "(C#)",
+        "source": "model"
+      },
+      {
         "category": "other",
         "severity": "info",
         "summary": "No investment experience: 4.2y career, 0y investing",
@@ -1840,15 +2139,16 @@
       }
     ],
     "quality": {
-      "score": 0.88,
+      "score": 0.83,
       "band": "high",
       "reasons": [
-        "Internship overlaps with full-time role start",
-        "Master's degree overlaps with engineering diploma and internship",
-        "Garbled characters in skills section header",
-        "Misspelling 'strategie' instead of 'strategy'",
+        "Overlapping internship and full-time role dates",
+        "Master's degree overlaps engineering diploma dates",
+        "Garbled characters in skills heading",
+        "Misspelling 'strategie'",
         "2 corrupted character(s) unrecoverable",
-        "Two-column layout"
+        "Two-column layout",
+        "Stray '(C#)' fragment at end of resume"
       ],
       "missing_fields": [],
       "unverified_quotes": []
@@ -1906,7 +2206,7 @@
           "is_investment_role": true,
           "duration_months": null,
           "description": [
-            "Started my journey as a Lead Analyst at Anand Rathi with 17 pharma companies under direct coverage. Portfolio consisted of a blend of large and mid-cap companies.",
+            "Started my journey as a Lead Analyst at Anand Rathi with 17 pharma companies under direct coverage. Portfolio consisted of a blend of large and mid-cap companies..",
             "Periodically update clients on corporate actions, news flow related to companies and events/updates pertaining to Healthcare sector globally",
             "Arranged corporate meetings/road shows, connect senior management of companies with key investors."
           ]
@@ -1922,8 +2222,7 @@
           "is_investment_role": true,
           "duration_months": null,
           "description": [
-            "Focused approach towards analyzing and recommending differentiated and undervalued investment opportunities to institutional clients.",
-            "Developed comprehensive sectoral themes and provided regular updates on regulatory, competitive, and market dynamics to help clients make informed investment decisions.",
+            "Focused approach towards analyzing and recommending differentiated and undervalued investment opportunities to institutional clients. Developed comprehensive sectoral themes and provided regular updates on regulatory, competitive, and market dynamics to help clients make informed investment decisions.",
             "Built extensive domain expertise in the pharmaceutical sector and consistently published high-quality research including initiation reports, sector outlook pieces, quarterly earnings analysis, and thematic investment reports.",
             "Companies under direct coverage include MediCore Pharmaceuticals, Apex Lifesciences, BioGenex Labs, Zenith Therapeutics, Prism Pharma, VitalMed Industries, GlobalCare India, InnovaPharm Solutions, LifeTech Laboratories, Precision Biopharma, NexGen Medicines, and Quantum Healthcare Limited.",
             "Supported senior analyst coverage of large-cap pharmaceutical companies through financial modeling, competitive analysis, and research report preparation for blue-chip healthcare names.",
@@ -1959,7 +2258,7 @@
           "duration_months": null,
           "description": [
             "Analysed companies by reading financials & press release published by company, thoroughly understand the dynamics of the sector covered and understand the key drivers affecting a particular company for building better quality models.",
-            "Write earnings report for a company based on the outcome of the models build. Tracking companies in the portfolio on a daily basis for related news & events and making adjustments to the models if some fundamental changes occur which affect the company's key drivers of earnings and make adjustments for corporate actions completed by company in the portfolio.",
+            "Write earnings report for a company based on the outcome of the models build. Tracking companies in the portfolio on a daily basis for related news & events and making adjustments to the models if some fundamental changes occur which affect the company’s key drivers of earnings and make adjustments for corporate actions completed by company in the portfolio.",
             "My portfolio consisted of 25 US and European large-cap pharmaceutical companies like Gilead Sciences, Zimmer Biomet Holding, Hospital Corporation of America, GSK and Meda AB."
           ]
         }
@@ -2006,19 +2305,15 @@
       "software_tools": [],
       "methods": [
         "financial modeling",
-        "value investing analysis",
-        "sector outlook research",
-        "quarterly earnings analysis",
-        "competitive analysis",
-        "initiation reports",
-        "RBP probability modeling"
+        "comparable company analysis",
+        "value investing analysis"
       ],
       "investment_approach": {
         "value": "fundamental",
         "keywords": [
           "financial models",
-          "company management interaction",
-          "research reports"
+          "company management",
+          "ratio analysis"
         ],
         "evidence": "Build up financial models by getting details from interaction with company management and in depth analysis of various ratios and other financial parameters.",
         "confidence": "high"
@@ -2028,7 +2323,7 @@
         "keywords": [
           "institutional clients",
           "research analyst",
-          "sell-side coverage"
+          "coverage"
         ],
         "evidence": "Focused approach towards analyzing and recommending differentiated and undervalued investment opportunities to institutional clients.",
         "confidence": "high"
@@ -2038,7 +2333,8 @@
           "value": "healthcare",
           "keywords": [
             "healthcare sector",
-            "pharmaceutical value chain"
+            "pharma",
+            "hospital"
           ],
           "evidence": "I have been covering the healthcare sector for 9years, currently employed with ICICI Securities.",
           "confidence": "high"
@@ -2093,61 +2389,94 @@
           "Quantum Healthcare Limited"
         ]
       },
+      "team_leadership": {
+        "value": "",
+        "keywords": [],
+        "evidence": "",
+        "confidence": "low"
+      },
+      "stated_metrics": [
+        {
+          "kind": "other",
+          "figure": "25 healthcare stocks",
+          "quote": "Coverage includes 25 healthcare stocks spread across different sub segments of healthcare / pharmaceutical value chain."
+        },
+        {
+          "kind": "other",
+          "figure": "32 companies",
+          "quote": "Extensive coverage of 32 companies spread across all segments (pharma, hospital, diagnostics and medical devices) of the listed Indian healthcare universe."
+        },
+        {
+          "kind": "other",
+          "figure": "22 companies",
+          "quote": "Formal coverage includes 22 companies across the healthcare value chain."
+        },
+        {
+          "kind": "other",
+          "figure": "17 pharma companies",
+          "quote": "Started my journey as a Lead Analyst at Anand Rathi with 17 pharma companies under direct coverage."
+        },
+        {
+          "kind": "other",
+          "figure": "25 US and European large-cap pharmaceutical companies",
+          "quote": "My portfolio consisted of 25 US and European large-cap pharmaceutical companies like Gilead Sciences, Zimmer Biomet Holding, Hospital Corporation of America, GSK and Meda AB."
+        }
+      ],
       "flags": [
         {
           "category": "internal_contradiction",
           "severity": "warning",
-          "summary": "Coverage count inconsistent: 25 vs 32 vs 22 vs 17",
-          "detail": "The profile overview states 25 healthcare stocks under coverage, but the ICICI Securities role bullet states 32 companies, JP Morgan states 22, and Jardine Lloyd Thompson states 17 - these figures are inconsistent across the resume.",
+          "summary": "Coverage count inconsistent: 25 vs 32 stocks",
+          "detail": "Profile overview states coverage of 25 healthcare stocks, but the ICICI Securities role describes coverage of 32 companies.",
           "quote": "Coverage includes 25 healthcare stocks spread across different sub segments",
           "source": "model"
         },
         {
-          "category": "attribution_ambiguity",
+          "category": "internal_contradiction",
           "severity": "warning",
-          "summary": "Jardine Lloyd Thompson bullet references 'Anand Rathi' employer",
-          "detail": "The position is listed under Jardine Lloyd Thompson but the bullet text says 'Started my journey as a Lead Analyst at Anand Rathi', naming a different employer than the heading.",
-          "quote": "Started my journey as a Lead Analyst at Anand Rathi with 17 pharma companies under direct coverage",
+          "summary": "Employer name mismatch: Jardine Lloyd Thompson vs Anand Rathi",
+          "detail": "The position heading names Jardine Lloyd Thompson as employer, but the bullet text refers to starting as Lead Analyst at Anand Rathi, a different firm.",
+          "quote": "Started my journey as a Lead Analyst at Anand Rathi with 17 pharma companies under direct coverage.",
           "source": "model"
         },
         {
           "category": "date_anomaly",
           "severity": "warning",
-          "summary": "Typo in end date 'Mayr'23' for J.P. Morgan Chase role",
-          "detail": "The end date for the J.P. Morgan Chase role is written as 'Mayr'23' which appears to be a typo for 'May'23'.",
-          "quote": "Sep’21 to Mayr’23",
+          "summary": "End date typo: 'Mayr'23'",
+          "detail": "The end date for the J.P. Morgan Chase role is written as 'Mayr'23', an apparent typo for May'23.",
+          "quote": "J.P. Morgan Chase – Lead Healthcare Analyst –Sep’21 to Mayr’23",
           "source": "model"
         },
         {
           "category": "typo_or_spelling",
           "severity": "warning",
-          "summary": "Missing space in '9years'",
-          "detail": "The profile text reads '9years' without a space between the number and the word.",
+          "summary": "Typo '9years' missing space",
+          "detail": "Profile overview text has a spacing/typo error.",
           "quote": "I have been covering the healthcare sector for 9years",
+          "source": "model"
+        },
+        {
+          "category": "formatting",
+          "severity": "warning",
+          "summary": "Extraneous recruiter agency text embedded in resume",
+          "detail": "The text 'RED LANE TALENT MANAGEMENT' appears mid-document, suggesting this is a recruiter/agency watermark rather than resume content.",
+          "quote": "RED LANE TALENT MANAGEMENT",
           "source": "model"
         },
         {
           "category": "missing_data",
           "severity": "warning",
-          "summary": "No email or phone number provided",
-          "detail": "The resume contains no contact details such as email address or phone number.",
+          "summary": "No contact details provided",
+          "detail": "Resume lacks email, phone number, and location information.",
           "quote": "",
           "source": "model"
         },
         {
           "category": "date_anomaly",
           "severity": "warning",
-          "summary": "Date format inconsistency 'Oct'15 to Dec'16'",
-          "detail": "Morgan Stanley role uses apostrophe-based date shorthand consistent with rest of resume, but overall duration (Oct'15-Dec'16, ~14 months) seems short given detailed responsibilities described.",
-          "quote": "Morgan Stanley - Equity Research Analyst - Oct’15 to Dec'16",
-          "source": "model"
-        },
-        {
-          "category": "formatting",
-          "severity": "warning",
-          "summary": "Recruiter agency branding embedded in resume body",
-          "detail": "The text 'RED LANE TALENT MANAGEMENT' appears twice within the resume body, suggesting this is a recruiter-modified document rather than original candidate content.",
-          "quote": "RED LANE TALENT MANAGEMENT",
+          "summary": "Double period typo in bullet text",
+          "detail": "Minor punctuation error found in Jardine Lloyd Thompson bullet.",
+          "quote": "Portfolio consisted of a blend of large and mid-cap companies..",
           "source": "model"
         }
       ]
@@ -2249,12 +2578,8 @@
     "software_tools": [],
     "methods": [
       "financial modeling",
-      "value investing analysis",
-      "sector outlook research",
-      "quarterly earnings analysis",
-      "competitive analysis",
-      "initiation reports",
-      "RBP probability modeling"
+      "comparable company analysis",
+      "value investing analysis"
     ],
     "employers": [
       "ICICI Securities (full-time)",
@@ -2269,33 +2594,33 @@
       {
         "category": "internal_contradiction",
         "severity": "warning",
-        "summary": "Coverage count inconsistent: 25 vs 32 vs 22 vs 17",
-        "detail": "The profile overview states 25 healthcare stocks under coverage, but the ICICI Securities role bullet states 32 companies, JP Morgan states 22, and Jardine Lloyd Thompson states 17 - these figures are inconsistent across the resume.",
+        "summary": "Coverage count inconsistent: 25 vs 32 stocks",
+        "detail": "Profile overview states coverage of 25 healthcare stocks, but the ICICI Securities role describes coverage of 32 companies.",
         "quote": "Coverage includes 25 healthcare stocks spread across different sub segments",
         "source": "model"
       },
       {
-        "category": "date_anomaly",
+        "category": "internal_contradiction",
         "severity": "warning",
-        "summary": "Typo in end date 'Mayr'23' for J.P. Morgan Chase role",
-        "detail": "The end date for the J.P. Morgan Chase role is written as 'Mayr'23' which appears to be a typo for 'May'23'.",
-        "quote": "Sep’21 to Mayr’23",
+        "summary": "Employer name mismatch: Jardine Lloyd Thompson vs Anand Rathi",
+        "detail": "The position heading names Jardine Lloyd Thompson as employer, but the bullet text refers to starting as Lead Analyst at Anand Rathi, a different firm.",
+        "quote": "Started my journey as a Lead Analyst at Anand Rathi with 17 pharma companies under direct coverage.",
         "source": "model"
       },
       {
         "category": "date_anomaly",
         "severity": "warning",
-        "summary": "Date format inconsistency 'Oct'15 to Dec'16'",
-        "detail": "Morgan Stanley role uses apostrophe-based date shorthand consistent with rest of resume, but overall duration (Oct'15-Dec'16, ~14 months) seems short given detailed responsibilities described.",
-        "quote": "Morgan Stanley - Equity Research Analyst - Oct’15 to Dec'16",
+        "summary": "End date typo: 'Mayr'23'",
+        "detail": "The end date for the J.P. Morgan Chase role is written as 'Mayr'23', an apparent typo for May'23.",
+        "quote": "J.P. Morgan Chase – Lead Healthcare Analyst –Sep’21 to Mayr’23",
         "source": "model"
       },
       {
-        "category": "attribution_ambiguity",
+        "category": "date_anomaly",
         "severity": "warning",
-        "summary": "Jardine Lloyd Thompson bullet references 'Anand Rathi' employer",
-        "detail": "The position is listed under Jardine Lloyd Thompson but the bullet text says 'Started my journey as a Lead Analyst at Anand Rathi', naming a different employer than the heading.",
-        "quote": "Started my journey as a Lead Analyst at Anand Rathi with 17 pharma companies under direct coverage",
+        "summary": "Double period typo in bullet text",
+        "detail": "Minor punctuation error found in Jardine Lloyd Thompson bullet.",
+        "quote": "Portfolio consisted of a blend of large and mid-cap companies..",
         "source": "model"
       },
       {
@@ -2315,34 +2640,43 @@
         "source": "computed"
       },
       {
+        "category": "missing_data",
+        "severity": "warning",
+        "summary": "No contact details provided",
+        "detail": "Resume lacks email, phone number, and location information.",
+        "quote": "",
+        "source": "model"
+      },
+      {
         "category": "typo_or_spelling",
         "severity": "warning",
-        "summary": "Missing space in '9years'",
-        "detail": "The profile text reads '9years' without a space between the number and the word.",
+        "summary": "Typo '9years' missing space",
+        "detail": "Profile overview text has a spacing/typo error.",
         "quote": "I have been covering the healthcare sector for 9years",
         "source": "model"
       },
       {
         "category": "formatting",
         "severity": "warning",
-        "summary": "Recruiter agency branding embedded in resume body",
-        "detail": "The text 'RED LANE TALENT MANAGEMENT' appears twice within the resume body, suggesting this is a recruiter-modified document rather than original candidate content.",
+        "summary": "Extraneous recruiter agency text embedded in resume",
+        "detail": "The text 'RED LANE TALENT MANAGEMENT' appears mid-document, suggesting this is a recruiter/agency watermark rather than resume content.",
         "quote": "RED LANE TALENT MANAGEMENT",
         "source": "model"
       }
     ],
     "quality": {
-      "score": 0.66,
+      "score": 0.65,
       "band": "medium",
       "reasons": [
-        "Coverage count inconsistent: 25 vs 32 vs 22 vs 17",
-        "Typo in end date 'Mayr'23' for J.P. Morgan Chase role",
-        "Date format inconsistency 'Oct'15 to Dec'16'",
-        "Jardine Lloyd Thompson bullet references 'Anand Rathi' employer",
+        "Coverage count inconsistent: 25 vs 32 stocks",
+        "Employer name mismatch: Jardine Lloyd Thompson vs Anand Rathi",
+        "End date typo: 'Mayr'23'",
+        "Double period typo in bullet text",
         "No email address",
         "No phone number",
-        "Missing space in '9years'",
-        "Recruiter agency branding embedded in resume body"
+        "No contact details provided",
+        "Typo '9years' missing space",
+        "Extraneous recruiter agency text embedded in resume"
       ],
       "missing_fields": [
         "location",
@@ -2430,16 +2764,16 @@
         },
         {
           "firm": "J.P.Mogan",
-          "title": "Summer Analyst – Healthcare Investment Banking",
+          "title": "Analyst – Healthcare Investment Banking (Summer Analyst)",
           "location": "New York, NY",
-          "start_date": "2016",
-          "end_date": "2016",
+          "start_date": "2016-06",
+          "end_date": "2016-08",
           "is_current": false,
           "employment_type": "internship",
           "is_investment_role": false,
           "duration_months": null,
           "description": [
-            "Summer 2016 internship at J.P. Morgan Healthcare Investment Banking"
+            "Summer 2016 internship prior to full-time analyst role"
           ]
         },
         {
@@ -2476,8 +2810,8 @@
       "education": [
         {
           "institution": "Columbia Business School, Columbia University",
-          "degree": "Bachelor of Science in Business",
-          "field_of_study": "Finance and International Business, Minor in Statistics",
+          "degree": "Bachelor of Science",
+          "field_of_study": "Business: Concentration in Finance and International Business, Minor in Statistics",
           "start_year": 2013,
           "graduation_year": 2017
         }
@@ -2487,29 +2821,30 @@
       "software_tools": [],
       "methods": [
         "DCF",
-        "comparable companies analysis",
-        "LBO analysis",
+        "comparable companies",
+        "LBO",
         "precedent transactions",
         "operating model",
-        "financial modeling",
-        "due diligence"
+        "due diligence",
+        "fundamental analysis"
       ],
       "investment_approach": {
         "value": "fundamental",
         "keywords": [
-          "fundamental analyses",
-          "management meetings",
-          "company diligence"
+          "fundamental long/short",
+          "C-Suite meetings",
+          "DCF",
+          "management meetings"
         ],
-        "evidence": "Presented new investment ideas based on fundamental analyses, primary research, industry events/conferences, sector expert consultations, and company management meetings",
+        "evidence": "managing the only long short fundamental equity portfolio at Meridian Capital Partners",
         "confidence": "high"
       },
       "market_side": {
         "value": "buy_side",
         "keywords": [
-          "long short",
-          "fundamental equity portfolio",
-          "investment professional"
+          "Investment Professional",
+          "long short portfolio",
+          "Meridian Capital Partners"
         ],
         "evidence": "Primary investor responsible for managing the only long short fundamental equity portfolio at Meridian Capital Partners",
         "confidence": "high"
@@ -2519,8 +2854,7 @@
           "value": "consumer",
           "keywords": [
             "Consumer",
-            "TMT",
-            "portfolio"
+            "TMT"
           ],
           "evidence": "Investment Analyst, Consumer & TMT – North53 Capital",
           "confidence": "high"
@@ -2528,8 +2862,7 @@
         {
           "value": "technology",
           "keywords": [
-            "Technology portfolio",
-            "Consumer"
+            "Technology portfolio"
           ],
           "evidence": "Principal analyst responsible for managing the Consumer and Technology portfolio within the $4.2bn gross portfolio for Vertex Capital",
           "confidence": "high"
@@ -2537,10 +2870,9 @@
         {
           "value": "healthcare",
           "keywords": [
-            "Healthcare",
-            "private equity"
+            "Healthcare Investment Banking"
           ],
-          "evidence": "Evaluated and executed private equity investments across the Business & Technology Services, Consumer, and Healthcare industries",
+          "evidence": "Analyst – Healthcare Investment Banking",
           "confidence": "high"
         }
       ],
@@ -2548,9 +2880,8 @@
         {
           "value": "equities",
           "keywords": [
-            "long short",
-            "fundamental equity",
-            "portfolio"
+            "long short equity",
+            "fundamental portfolio"
           ],
           "evidence": "managing the only long short fundamental equity portfolio at Meridian Capital Partners",
           "confidence": "high"
@@ -2560,45 +2891,82 @@
         "stocks_covered": null,
         "geographies_covered": [],
         "notable_firms_or_names": [
+          "Vertex Capital",
+          "North53 Capital",
           "Strategic Safety Solutions",
           "MedTech Manufacturing",
           "BioPharm Corp",
           "Oncology Therapeutics Inc",
           "Blackstone Life Sciences",
-          "Clinical Research Partners",
-          "Vertex Capital"
+          "Clinical Research Partners"
         ]
       },
+      "team_leadership": {
+        "value": "Led 140+ members (student fraternity)",
+        "keywords": [
+          "140+ members",
+          "President"
+        ],
+        "evidence": "Led 140+ members and organized signature events across Columbia Business School, earning Outstanding Organization Award among 30+ student groups",
+        "confidence": "medium"
+      },
+      "stated_metrics": [
+        {
+          "kind": "aum",
+          "figure": "$4.2bn gross portfolio",
+          "quote": "Principal analyst responsible for managing the Consumer and Technology portfolio within the $4.2bn gross portfolio for Vertex Capital"
+        },
+        {
+          "kind": "other",
+          "figure": "$8.5bn acquisition",
+          "quote": "Exclusive financial advisor – BioPharm Corp's $8.5bn acquisition of Oncology Therapeutics Inc"
+        },
+        {
+          "kind": "other",
+          "figure": "65+ students",
+          "quote": "65+ students have completed certification programs and secured employment in technology and manufacturing sectors throughout the Maharashtra region"
+        },
+        {
+          "kind": "other",
+          "figure": "140+ members",
+          "quote": "Led 140+ members and organized signature events across Columbia Business School, earning Outstanding Organization Award among 30+ student groups"
+        },
+        {
+          "kind": "other",
+          "figure": "400+ active alumni",
+          "quote": "Managed relationships with 400+ active alumni and coordinated 3 professional networking events per semester, increasing alumni engagement by 65%"
+        }
+      ],
       "flags": [
         {
           "category": "typo_or_spelling",
           "severity": "warning",
-          "summary": "Employer name misspelled: 'J.P.Mogan'",
-          "detail": "The employer is almost certainly J.P. Morgan but is spelled 'J.P.Mogan' in the header, and later referenced correctly as 'J.P. Morgan' in bullet text, indicating a typo.",
+          "summary": "Employer name misspelled 'J.P.Mogan'",
+          "detail": "The resume writes 'J.P.Mogan' instead of 'J.P. Morgan', which is also referenced correctly elsewhere in the same section ('J.P. Morgan').",
           "quote": "J.P.Mogan New York, NY",
+          "source": "model"
+        },
+        {
+          "category": "date_anomaly",
+          "severity": "warning",
+          "summary": "Summer 2016 internship separated from 2017-2019 role with gap",
+          "detail": "The J.P. Morgan entry lists 'Summer 2016; Jul 2017 – Jul 2019' as a single line, implying a nearly one-year gap between the summer internship and full-time start not explained in the text.",
+          "quote": "Analyst – Healthcare Investment Banking Summer 2016; Jul 2017 – Jul 2019",
           "source": "model"
         },
         {
           "category": "internal_contradiction",
           "severity": "warning",
-          "summary": "Portfolio firm name inconsistent: North53 Capital vs Vertex Capital",
-          "detail": "The role heading names 'North53 Capital' but the first bullet refers to managing a portfolio 'for Vertex Capital', an unexplained discrepancy in employer/entity naming.",
-          "quote": "Investment Analyst, Consumer & TMT – North53 Capital",
+          "summary": "Portfolio attributed to 'Vertex Capital' under Millennium Management heading",
+          "detail": "The bullet describes managing a portfolio 'for Vertex Capital' while the position header names 'Millennium Management' and 'North53 Capital' as the employer, creating ambiguity about which entity actually employed the candidate.",
+          "quote": "Principal analyst responsible for managing the Consumer and Technology portfolio within the $4.2bn gross portfolio for Vertex Capital",
           "source": "model"
         },
         {
-          "category": "date_anomaly",
-          "severity": "warning",
-          "summary": "Overlapping dates: J.P. Morgan internship and full-time role",
-          "detail": "The J.P. Morgan entry lists 'Summer 2016; Jul 2017 – Jul 2019' combined under one heading, but these represent two distinct stints (internship and full-time) that should be clearly separated; the summer 2016 internship likely overlapped with undergraduate study (Sep 2013 – May 2017).",
-          "quote": "Analyst – Healthcare Investment Banking Summer 2016; Jul 2017 – Jul 2019",
-          "source": "model"
-        },
-        {
-          "category": "date_anomaly",
+          "category": "formatting",
           "severity": "info",
-          "summary": "Volunteer role start overlaps full-time IB internship/study",
-          "detail": "Global Education Alliance co-founder role is listed as starting Jan 2017, which overlaps with the candidate's undergraduate studies (ending May 2017) and precedes the full-time J.P. Morgan role starting Jul 2017.",
+          "summary": "Volunteer role listed as 'Present' alongside current full-time role",
+          "detail": "The Global Education Alliance Co-Founder role is listed as ongoing since Jan 2017 concurrently with full-time positions at Apollo, Millennium, and Meridian, which is plausible for a volunteer/side venture but worth noting as an overlapping commitment.",
           "quote": "Co-Founder Jan 2017 – Present",
           "source": "model"
         }
@@ -2711,12 +3079,12 @@
     "software_tools": [],
     "methods": [
       "DCF",
-      "comparable companies analysis",
-      "LBO analysis",
+      "comparable companies",
+      "LBO",
       "precedent transactions",
       "operating model",
-      "financial modeling",
-      "due diligence"
+      "due diligence",
+      "fundamental analysis"
     ],
     "employers": [
       "Meridian Capital Partners (full-time)",
@@ -2732,9 +3100,9 @@
       {
         "category": "internal_contradiction",
         "severity": "warning",
-        "summary": "Portfolio firm name inconsistent: North53 Capital vs Vertex Capital",
-        "detail": "The role heading names 'North53 Capital' but the first bullet refers to managing a portfolio 'for Vertex Capital', an unexplained discrepancy in employer/entity naming.",
-        "quote": "Investment Analyst, Consumer & TMT – North53 Capital",
+        "summary": "Portfolio attributed to 'Vertex Capital' under Millennium Management heading",
+        "detail": "The bullet describes managing a portfolio 'for Vertex Capital' while the position header names 'Millennium Management' and 'North53 Capital' as the employer, creating ambiguity about which entity actually employed the candidate.",
+        "quote": "Principal analyst responsible for managing the Consumer and Technology portfolio within the $4.2bn gross portfolio for Vertex Capital",
         "source": "model"
       },
       {
@@ -2746,19 +3114,19 @@
         "source": "computed"
       },
       {
-        "category": "date_anomaly",
+        "category": "typo_or_spelling",
         "severity": "warning",
-        "summary": "Overlapping dates: J.P. Morgan internship and full-time role",
-        "detail": "The J.P. Morgan entry lists 'Summer 2016; Jul 2017 – Jul 2019' combined under one heading, but these represent two distinct stints (internship and full-time) that should be clearly separated; the summer 2016 internship likely overlapped with undergraduate study (Sep 2013 – May 2017).",
-        "quote": "Analyst – Healthcare Investment Banking Summer 2016; Jul 2017 – Jul 2019",
+        "summary": "Employer name misspelled 'J.P.Mogan'",
+        "detail": "The resume writes 'J.P.Mogan' instead of 'J.P. Morgan', which is also referenced correctly elsewhere in the same section ('J.P. Morgan').",
+        "quote": "J.P.Mogan New York, NY",
         "source": "model"
       },
       {
-        "category": "typo_or_spelling",
+        "category": "formatting",
         "severity": "warning",
-        "summary": "Employer name misspelled: 'J.P.Mogan'",
-        "detail": "The employer is almost certainly J.P. Morgan but is spelled 'J.P.Mogan' in the header, and later referenced correctly as 'J.P. Morgan' in bullet text, indicating a typo.",
-        "quote": "J.P.Mogan New York, NY",
+        "summary": "Volunteer role listed as 'Present' alongside current full-time role",
+        "detail": "The Global Education Alliance Co-Founder role is listed as ongoing since Jan 2017 concurrently with full-time positions at Apollo, Millennium, and Meridian, which is plausible for a volunteer/side venture but worth noting as an overlapping commitment.",
+        "quote": "Co-Founder Jan 2017 – Present",
         "source": "model"
       },
       {
@@ -2771,13 +3139,13 @@
       }
     ],
     "quality": {
-      "score": 0.84,
+      "score": 0.88,
       "band": "high",
       "reasons": [
-        "Portfolio firm name inconsistent: North53 Capital vs Vertex Capital",
+        "Portfolio attributed to 'Vertex Capital' under Millennium Management heading",
         "Employment gap: 0y 7m before Meridian Capital Partners",
-        "Overlapping dates: J.P. Morgan internship and full-time role",
-        "Employer name misspelled: 'J.P.Mogan'"
+        "Employer name misspelled 'J.P.Mogan'",
+        "Volunteer role listed as 'Present' alongside current full-time role"
       ],
       "missing_fields": [],
       "unverified_quotes": []
@@ -2875,7 +3243,7 @@
       "education": [
         {
           "institution": "Northwestern University - Kellogg School of Management",
-          "degree": "BS",
+          "degree": "Bachelor of Science",
           "field_of_study": "Business Administration",
           "start_year": null,
           "graduation_year": 2014
@@ -2909,7 +3277,7 @@
         "keywords": [
           "fundamental research",
           "management meetings",
-          "financial models"
+          "DCF"
         ],
         "evidence": "Source investment ideas through fundamental research, financial KPI analysis, alternative data tracking, and macroeconomic trend analysis across covered sectors",
         "confidence": "high"
@@ -2918,7 +3286,8 @@
         "value": "buy_side",
         "keywords": [
           "portfolio managers",
-          "long/short equity strategy"
+          "long/short equity",
+          "Cinctive Capital Management"
         ],
         "evidence": "Work directly with portfolio managers to deploy long/short equity strategy across ~75 Technology/Media stocks under coverage",
         "confidence": "high"
@@ -2927,19 +3296,18 @@
         {
           "value": "technology",
           "keywords": [
-            "cloud infrastructure",
-            "enterprise software",
-            "digital advertising"
+            "cloud computing",
+            "digital advertising",
+            "Technology/Media"
           ],
-          "evidence": "Coverage includes leading technology companies across cloud infrastructure, e-commerce platforms, digital advertising, streaming services, enterprise software, mobility platforms, online marketplaces, social media, and digital entertainment sectors",
+          "evidence": "long/short equity strategy across ~75 Technology/Media stocks under coverage (with primary focus on cloud computing and digital advertising sectors)",
           "confidence": "high"
         },
         {
           "value": "media_telecom",
           "keywords": [
             "Internet & Interactive Entertainment",
-            "digital advertising",
-            "streaming services"
+            "media"
           ],
           "evidence": "Equity Research, U.S. Internet & Interactive Entertainment – Associate",
           "confidence": "high"
@@ -2950,9 +3318,9 @@
           "value": "equities",
           "keywords": [
             "long/short equity",
-            "stocks under coverage"
+            "Technology/Media stocks"
           ],
-          "evidence": "deploy long/short equity strategy across ~75 Technology/Media stocks under coverage",
+          "evidence": "long/short equity strategy across ~75 Technology/Media stocks under coverage",
           "confidence": "high"
         }
       ],
@@ -2963,20 +3331,58 @@
         ],
         "notable_firms_or_names": []
       },
+      "team_leadership": {
+        "value": "",
+        "keywords": [],
+        "evidence": "",
+        "confidence": "low"
+      },
+      "stated_metrics": [
+        {
+          "kind": "other",
+          "figure": "~75 Technology/Media stocks",
+          "quote": "deploy long/short equity strategy across ~75 Technology/Media stocks under coverage (with primary focus on cloud computing and digital advertising sectors)"
+        },
+        {
+          "kind": "other",
+          "figure": "40+ stocks",
+          "quote": "Supporting coverage of technology and media sectors for Institutional Investor ranked equity analyst team covering 40+ stocks with over $4.5 trillion in combined market capitalization"
+        },
+        {
+          "kind": "aum",
+          "figure": "$4.5 trillion",
+          "quote": "Supporting coverage of technology and media sectors for Institutional Investor ranked equity analyst team covering 40+ stocks with over $4.5 trillion in combined market capitalization"
+        },
+        {
+          "kind": "other",
+          "figure": "eight investment banking transactions",
+          "quote": "Supported IPO due diligence for eight investment banking transactions, contributing to pre-marketing investor education, financial model construction, valuation analysis, and research coverage initiation"
+        },
+        {
+          "kind": "other",
+          "figure": "120+ Portfolio Managers and Research Analysts across 180+ external research providers",
+          "quote": "Coordinated research vendor relationships for 120+ Portfolio Managers and Research Analysts across 180+ external research providers, implementing process improvements following regulatory changes"
+        },
+        {
+          "kind": "other",
+          "figure": "50+ active investment strategies",
+          "quote": "Analyzed assets under management and capital flows with Chief Investment Officers to determine optimal capacity targets and strategic positioning across 50+ active investment strategies"
+        }
+      ],
       "flags": [
         {
           "category": "formatting",
           "severity": "warning",
           "summary": "Duplicate education entry for Northwestern",
-          "detail": "Northwestern University - Kellogg School of Management appears twice, once with degree details and once without additional information.",
+          "detail": "Northwestern University - Kellogg School of Management is listed twice under EDUCATION with the same graduation date, once with degree detail and once without.",
           "quote": "Northwestern University - Kellogg School of Management, Evanston, IL Graduated May 2014",
           "source": "model"
         },
         {
           "category": "other",
           "severity": "warning",
-          "summary": "Undergraduate listed under 'Kellogg School of Management'",
-          "detail": "Kellogg School of Management is Northwestern's graduate business school, but the entry lists a Bachelor of Science degree, which is unusual since Kellogg does not typically confer undergraduate degrees.",
+          "summary": "Kellogg School of Management typically graduate-only",
+          "detail": "Kellogg School of Management is Northwestern's business school, generally associated with graduate (MBA) programs, but the resume states a Bachelor of Science was earned there, which is unusual and worth verifying.",
           "quote": "Northwestern University - Kellogg School of Management, Evanston, IL Graduated May 2014 Bachelor of Science in Business Administration",
           "source": "model"
         }
@@ -3097,15 +3503,15 @@
         "category": "formatting",
         "severity": "warning",
         "summary": "Duplicate education entry for Northwestern",
-        "detail": "Northwestern University - Kellogg School of Management appears twice, once with degree details and once without additional information.",
+        "detail": "Northwestern University - Kellogg School of Management is listed twice under EDUCATION with the same graduation date, once with degree detail and once without.",
         "quote": "Northwestern University - Kellogg School of Management, Evanston, IL Graduated May 2014",
         "source": "model"
       },
       {
         "category": "other",
         "severity": "warning",
-        "summary": "Undergraduate listed under 'Kellogg School of Management'",
-        "detail": "Kellogg School of Management is Northwestern's graduate business school, but the entry lists a Bachelor of Science degree, which is unusual since Kellogg does not typically confer undergraduate degrees.",
+        "summary": "Kellogg School of Management typically graduate-only",
+        "detail": "Kellogg School of Management is Northwestern's business school, generally associated with graduate (MBA) programs, but the resume states a Bachelor of Science was earned there, which is unusual and worth verifying.",
         "quote": "Northwestern University - Kellogg School of Management, Evanston, IL Graduated May 2014 Bachelor of Science in Business Administration",
         "source": "model"
       },
@@ -3123,7 +3529,7 @@
       "band": "high",
       "reasons": [
         "Duplicate education entry for Northwestern",
-        "Undergraduate listed under 'Kellogg School of Management'"
+        "Kellogg School of Management typically graduate-only"
       ],
       "missing_fields": [],
       "unverified_quotes": []
@@ -3231,13 +3637,13 @@
         },
         {
           "firm": "Reliance Infrastructure Ltd.",
-          "title": "Project Analyst (Concurrent Project)",
+          "title": "Project Intern",
           "location": null,
           "start_date": null,
           "end_date": null,
           "is_current": false,
           "employment_type": "internship",
-          "is_investment_role": false,
+          "is_investment_role": true,
           "duration_months": 2,
           "description": [
             "Concurrent Project (8 weeks): Strategic market analysis of Indian Renewable Energy Companies."
@@ -3279,43 +3685,46 @@
           "name": "CFA",
           "status": "Level 3 completed",
           "year": null
+        },
+        {
+          "name": "MBA",
+          "status": "",
+          "year": null
         }
       ],
       "languages": [],
       "software_tools": [],
       "methods": [
         "Sector report writing",
-        "Company fundamentals analysis",
-        "Equity coverage initiation",
-        "Machine learning biomarker research"
+        "Company fundamental analysis",
+        "Machine Learning (biomarker discovery)"
       ],
       "investment_approach": {
         "value": "fundamental",
         "keywords": [
-          "management meetings",
-          "stock coverage",
-          "sector reports"
+          "company fundamentals",
+          "sector report",
+          "coverage"
         ],
-        "evidence": "conducted meetings with various stakeholders (management teams, buy-side analysts) to provide strategic inputs to senior fund managers",
+        "evidence": "Applied sector-agnostic investment approach focusing on company fundamentals regardless of market capitalization constraints",
         "confidence": "high"
       },
       "market_side": {
         "value": "sell_side",
         "keywords": [
-          "ICICI Securities",
-          "research analyst",
-          "institutional clients"
+          "Research Analyst",
+          "Axis Mutual Fund",
+          "buy-side analysts"
         ],
-        "evidence": "Maintained active coverage of 42 stocks across multiple sectors.",
-        "confidence": "high"
+        "evidence": "Organization | Axis Mutual Fund (US$1.2 billion+) | Duration | 2 months\nDesignation | Research Analyst",
+        "confidence": "medium"
       },
       "primary_sectors": [
         {
           "value": "healthcare",
           "keywords": [
             "Pharmaceuticals",
-            "healthcare fund",
-            "digital health"
+            "Healthcare fund portfolio"
           ],
           "evidence": "Covering Pharmaceuticals and Specialty Chemicals",
           "confidence": "high"
@@ -3332,10 +3741,10 @@
         {
           "value": "industrials",
           "keywords": [
-            "infrastructure sector",
-            "Logistics"
+            "Logistics",
+            "Alcobev"
           ],
-          "evidence": "Also published detailed analysis on Indian infrastructure sector",
+          "evidence": "Covered Healthcare, Oil&Gas, Logistics and Alcobev",
           "confidence": "medium"
         }
       ],
@@ -3344,8 +3753,8 @@
           "value": "equities",
           "keywords": [
             "stocks",
-            "equity analysis",
-            "coverage"
+            "coverage",
+            "equities"
           ],
           "evidence": "Maintained active coverage of 42 stocks across multiple sectors.",
           "confidence": "high"
@@ -3366,61 +3775,94 @@
           "Reliance Infrastructure Ltd."
         ]
       },
+      "team_leadership": {
+        "value": "",
+        "keywords": [],
+        "evidence": "",
+        "confidence": "low"
+      },
+      "stated_metrics": [
+        {
+          "kind": "aum",
+          "figure": "US$1.2 billion+",
+          "quote": "Organization | Axis Mutual Fund (US$1.2 billion+) | Duration | 2 months"
+        },
+        {
+          "kind": "other",
+          "figure": "38 companies",
+          "quote": "Tracked 38 companies within the healthcare fund portfolio and conducted meetings with various stakeholders"
+        },
+        {
+          "kind": "other",
+          "figure": "~120 pages",
+          "quote": "Completed comprehensive sector report on renewable energy (~120 pages) within 3 months of joining and began receiving institutional votes within first quarter."
+        },
+        {
+          "kind": "other",
+          "figure": "42 stocks",
+          "quote": "Maintained active coverage of 42 stocks across multiple sectors."
+        },
+        {
+          "kind": "other",
+          "figure": "3 years",
+          "quote": "Advanced from research associate to lead analyst within 3 years."
+        }
+      ],
       "flags": [
         {
           "category": "missing_data",
           "severity": "warning",
-          "summary": "No dates provided for any position",
-          "detail": "All positions list durations (e.g., '2 months', '8 years 10 months') rather than start/end dates, making a timeline and gap analysis impossible.",
-          "quote": "Duration | 2 months",
+          "summary": "No contact details provided",
+          "detail": "Resume lacks an email address, phone number, and location for the candidate.",
+          "quote": "",
           "source": "model"
         },
         {
           "category": "missing_data",
           "severity": "warning",
-          "summary": "No contact information present",
-          "detail": "No email, phone number, or location is given anywhere in the resume.",
-          "quote": "",
-          "source": "model"
-        },
-        {
-          "category": "attribution_ambiguity",
-          "severity": "warning",
-          "summary": "Unclear whether MCRI role is concurrent or sequential",
-          "detail": "The 8-month MCRI research role is listed under 'Others' without clear placement relative to other roles, making chronology unclear.",
-          "quote": "8 months of research experience at Mumbai Cancer Research Institute (MCRI) as a Research Associate",
+          "summary": "No start/end dates for any position",
+          "detail": "All roles list only a duration in months/years rather than specific start and end dates, making tenure timeline and gaps uncomputable.",
+          "quote": "Duration | 2 months",
           "source": "model"
         },
         {
           "category": "internal_contradiction",
           "severity": "warning",
-          "summary": "Stock coverage counts differ between roles",
-          "detail": "Axis Mutual Fund states 38 companies tracked while ICICI Securities states 42 stocks covered; both are plausible but should be noted as distinct figures rather than conflated.",
-          "quote": "Tracked 38 companies within the healthcare fund portfolio",
-          "source": "model"
-        },
-        {
-          "category": "formatting",
-          "severity": "warning",
-          "summary": "Name has trailing hyphen artifact",
-          "detail": "The candidate's name appears with a trailing hyphen before 'MBA', suggesting a formatting or OCR artifact.",
-          "quote": "Viktor Sharat-",
-          "source": "model"
-        },
-        {
-          "category": "date_anomaly",
-          "severity": "warning",
-          "summary": "CFA Level 3 completion date not stated",
-          "detail": "The resume states CFA Level 3 was completed but gives no year, and no charter status (charterholder vs. candidate) is specified.",
+          "summary": "CFA status ambiguous: Level 3 completed vs charterholder",
+          "detail": "The resume states CFA Level 3 was 'successfully completed' but does not clarify if the candidate is a full charterholder (which also requires work experience), creating ambiguity about credential status.",
           "quote": "Successfully completed Chartered Financial Analyst Level 3 (CFA, USA)",
           "source": "model"
         },
         {
           "category": "attribution_ambiguity",
           "severity": "warning",
-          "summary": "Concurrent project role unclear on employer relationship",
-          "detail": "The Reliance Infrastructure 'Concurrent Project' is listed under Key Projects without clarifying if it was a formal internship or academic project done alongside another role.",
+          "summary": "Summer internship project firm attribution unclear",
+          "detail": "The 'Summer Internship Project' bullet names Prism Asset Management as the firm but does not specify a job title, making the role classification an inference.",
+          "quote": "Summer Internship Project (3 Months): Prism Asset Management Pvt Ltd. Comprehensive equity analysis of Indian Technology Sector",
+          "source": "model"
+        },
+        {
+          "category": "attribution_ambiguity",
+          "severity": "warning",
+          "summary": "Concurrent project role/title unclear",
+          "detail": "The Reliance Infrastructure entry is listed as a 'Concurrent Project' without a stated job title, and it is unclear if this overlapped with a full-time role given no dates are provided.",
           "quote": "Concurrent Project (8 weeks): Reliance Infrastructure Ltd. Strategic market analysis of Indian Renewable Energy Companies.",
+          "source": "model"
+        },
+        {
+          "category": "date_anomaly",
+          "severity": "warning",
+          "summary": "No calendar years given for work history",
+          "detail": "Without start/end years for any position, chronological ordering and potential employment gaps cannot be verified.",
+          "quote": "",
+          "source": "model"
+        },
+        {
+          "category": "other",
+          "severity": "warning",
+          "summary": "Low PGDM academic result noted",
+          "detail": "The PGDM result of 2.5/4 is notably low and may warrant recruiter attention.",
+          "quote": "PGDM | Mumbai Institute of Management Studies and Research | University of Mumbai | 2015 | 2.5/4",
           "source": "model"
         }
       ]
@@ -3533,9 +3975,8 @@
     "software_tools": [],
     "methods": [
       "Sector report writing",
-      "Company fundamentals analysis",
-      "Equity coverage initiation",
-      "Machine learning biomarker research"
+      "Company fundamental analysis",
+      "Machine Learning (biomarker discovery)"
     ],
     "employers": [
       "Axis Mutual Fund (full-time)",
@@ -3552,33 +3993,25 @@
       {
         "category": "internal_contradiction",
         "severity": "warning",
-        "summary": "Stock coverage counts differ between roles",
-        "detail": "Axis Mutual Fund states 38 companies tracked while ICICI Securities states 42 stocks covered; both are plausible but should be noted as distinct figures rather than conflated.",
-        "quote": "Tracked 38 companies within the healthcare fund portfolio",
+        "summary": "CFA status ambiguous: Level 3 completed vs charterholder",
+        "detail": "The resume states CFA Level 3 was 'successfully completed' but does not clarify if the candidate is a full charterholder (which also requires work experience), creating ambiguity about credential status.",
+        "quote": "Successfully completed Chartered Financial Analyst Level 3 (CFA, USA)",
         "source": "model"
       },
       {
         "category": "date_anomaly",
         "severity": "warning",
-        "summary": "CFA Level 3 completion date not stated",
-        "detail": "The resume states CFA Level 3 was completed but gives no year, and no charter status (charterholder vs. candidate) is specified.",
-        "quote": "Successfully completed Chartered Financial Analyst Level 3 (CFA, USA)",
+        "summary": "No calendar years given for work history",
+        "detail": "Without start/end years for any position, chronological ordering and potential employment gaps cannot be verified.",
+        "quote": "",
         "source": "model"
       },
       {
         "category": "attribution_ambiguity",
         "severity": "warning",
-        "summary": "Unclear whether MCRI role is concurrent or sequential",
-        "detail": "The 8-month MCRI research role is listed under 'Others' without clear placement relative to other roles, making chronology unclear.",
-        "quote": "8 months of research experience at Mumbai Cancer Research Institute (MCRI) as a Research Associate",
-        "source": "model"
-      },
-      {
-        "category": "attribution_ambiguity",
-        "severity": "warning",
-        "summary": "Concurrent project role unclear on employer relationship",
-        "detail": "The Reliance Infrastructure 'Concurrent Project' is listed under Key Projects without clarifying if it was a formal internship or academic project done alongside another role.",
-        "quote": "Concurrent Project (8 weeks): Reliance Infrastructure Ltd. Strategic market analysis of Indian Renewable Energy Companies.",
+        "summary": "Summer internship project firm attribution unclear",
+        "detail": "The 'Summer Internship Project' bullet names Prism Asset Management as the firm but does not specify a job title, making the role classification an inference.",
+        "quote": "Summer Internship Project (3 Months): Prism Asset Management Pvt Ltd. Comprehensive equity analysis of Indian Technology Sector",
         "source": "model"
       },
       {
@@ -3600,17 +4033,17 @@
       {
         "category": "missing_data",
         "severity": "warning",
-        "summary": "No dates provided for any position",
-        "detail": "All positions list durations (e.g., '2 months', '8 years 10 months') rather than start/end dates, making a timeline and gap analysis impossible.",
-        "quote": "Duration | 2 months",
+        "summary": "No contact details provided",
+        "detail": "Resume lacks an email address, phone number, and location for the candidate.",
+        "quote": "",
         "source": "model"
       },
       {
         "category": "missing_data",
         "severity": "warning",
-        "summary": "No contact information present",
-        "detail": "No email, phone number, or location is given anywhere in the resume.",
-        "quote": "",
+        "summary": "No start/end dates for any position",
+        "detail": "All roles list only a duration in months/years rather than specific start and end dates, making tenure timeline and gaps uncomputable.",
+        "quote": "Duration | 2 months",
         "source": "model"
       },
       {
@@ -3630,29 +4063,28 @@
         "source": "computed"
       },
       {
-        "category": "formatting",
+        "category": "other",
         "severity": "warning",
-        "summary": "Name has trailing hyphen artifact",
-        "detail": "The candidate's name appears with a trailing hyphen before 'MBA', suggesting a formatting or OCR artifact.",
-        "quote": "Viktor Sharat-",
+        "summary": "Low PGDM academic result noted",
+        "detail": "The PGDM result of 2.5/4 is notably low and may warrant recruiter attention.",
+        "quote": "PGDM | Mumbai Institute of Management Studies and Research | University of Mumbai | 2015 | 2.5/4",
         "source": "model"
       }
     ],
     "quality": {
-      "score": 0.45,
+      "score": 0.46,
       "band": "low",
       "reasons": [
-        "Stock coverage counts differ between roles",
-        "CFA Level 3 completion date not stated",
-        "Unclear whether MCRI role is concurrent or sequential",
-        "Concurrent project role unclear on employer relationship",
+        "CFA status ambiguous: Level 3 completed vs charterholder",
+        "No calendar years given for work history",
+        "Summer internship project firm attribution unclear",
         "No email address",
         "No phone number",
-        "No dates provided for any position",
-        "No contact information present",
+        "No contact details provided",
+        "No start/end dates for any position",
         "3 floating text box(es)",
         "82% of content inside tables",
-        "Name has trailing hyphen artifact"
+        "Low PGDM academic result noted"
       ],
       "missing_fields": [
         "position_dates",
@@ -3773,7 +4205,7 @@
         {
           "institution": "K.J. Somaiya Medical College, Mumbai",
           "degree": "M.B.B.S",
-          "field_of_study": "Medicine",
+          "field_of_study": null,
           "start_year": null,
           "graduation_year": 2010
         },
@@ -3809,12 +4241,12 @@
       ],
       "methods": [
         "Perceptual Mapping (MDS)",
-        "competitive positioning strategy"
+        "sector thematic reports"
       ],
       "investment_approach": {
         "value": "fundamental",
         "keywords": [
-          "equity research ratings",
+          "equity research",
           "price targets",
           "stocks under coverage"
         ],
@@ -3825,8 +4257,7 @@
         "value": "sell_side",
         "keywords": [
           "equity research",
-          "brokerage commission revenue",
-          "institutional investors"
+          "brokerage commission"
         ],
         "evidence": "Generate investment ideas and publish equity research ratings with price targets on Indian healthcare sector companies across 28 stocks under coverage",
         "confidence": "high"
@@ -3836,8 +4267,7 @@
           "value": "healthcare",
           "keywords": [
             "Pharmaceuticals",
-            "Healthcare",
-            "Indian healthcare sector"
+            "Healthcare"
           ],
           "evidence": "Lead Analyst – Pharmaceuticals and Healthcare",
           "confidence": "high"
@@ -3850,14 +4280,15 @@
             "equity research",
             "stocks under coverage"
           ],
-          "evidence": "Generate investment ideas and publish equity research ratings with price targets on Indian healthcare sector companies across 28 stocks under coverage",
+          "evidence": "publish equity research ratings with price targets on Indian healthcare sector companies across 28 stocks under coverage",
           "confidence": "high"
         }
       ],
       "coverage": {
         "stocks_covered": 28,
         "geographies_covered": [
-          "India"
+          "India",
+          "United States"
         ],
         "notable_firms_or_names": [
           "Axis Mutual Fund",
@@ -3871,18 +4302,57 @@
           "Invesco MF",
           "Sundaram MF",
           "Leerink Partners",
-          "Cipla Pharmaceuticals",
           "J.P. Morgan Securities",
-          "Kotak Securities"
+          "Kotak Securities",
+          "Cipla Pharmaceuticals"
         ]
       },
+      "team_leadership": {
+        "value": "",
+        "keywords": [],
+        "evidence": "",
+        "confidence": "low"
+      },
+      "stated_metrics": [
+        {
+          "kind": "other",
+          "figure": "28 stocks",
+          "quote": "publish equity research ratings with price targets on Indian healthcare sector companies across 28 stocks under coverage"
+        },
+        {
+          "kind": "performance",
+          "figure": "35% increase in brokerage commission revenue",
+          "quote": "Investment recommendation adopted by major institutional client resulting in 35% increase in brokerage commission revenue"
+        },
+        {
+          "kind": "other",
+          "figure": "99.92 percentile",
+          "quote": "Scored 99.92 percentile in Quantitative Aptitude in CAT-2009"
+        }
+      ],
       "flags": [
         {
           "category": "date_anomaly",
           "severity": "warning",
           "summary": "J.P. Morgan role has fragmented, non-contiguous dates",
-          "detail": "The J.P. Morgan Securities position lists dates as 'Sep-'13, Dec-'13 & Nov-'14' which is unusual and does not present a clear continuous tenure or duration.",
-          "quote": "Sep-'13, Dec-'13 & Nov-‘14",
+          "detail": "The J.P. Morgan Securities position lists dates as 'Sep-'13, Dec-'13 & Nov-'14' which is unusual and does not follow a normal continuous employment format, making tenure uncomputable.",
+          "quote": "Sep-’13, Dec-’13 & Nov-‘14",
+          "source": "model"
+        },
+        {
+          "category": "date_anomaly",
+          "severity": "warning",
+          "summary": "Employment gap between Cipla internship and J.P. Morgan role",
+          "detail": "There is a gap between the Cipla internship ending May 2011 and the J.P. Morgan role starting Sep 2013, with no employment listed in between.",
+          "quote": "Apr-’11 to May-’11",
+          "source": "model"
+        },
+        {
+          "category": "attribution_ambiguity",
+          "severity": "warning",
+          "summary": "DataFlow bullet references Leerink Partners, a different firm",
+          "detail": "A bullet under the DataFlow Research India heading mentions being a member of a team 'at Leerink Partners', which is inconsistent with the stated employer heading.",
+          "quote": "Member, U.S. Healthcare Services ER team (Institutional Investor (II) Runner up) at Leerink Partners",
           "source": "model"
         },
         {
@@ -3894,27 +4364,19 @@
           "source": "model"
         },
         {
-          "category": "internal_contradiction",
-          "severity": "warning",
-          "summary": "Candidate holds MBBS medical degree but works in equity research",
-          "detail": "The candidate obtained an M.B.B.S degree in 2010 but subsequently pursued a PGDM in Finance and moved entirely into equity research; no clinical practice is mentioned, which is plausible but notable.",
-          "quote": "M.B.B.S | K.J. Somaiya Medical College, Mumbai | 63.87%",
-          "source": "model"
-        },
-        {
           "category": "formatting",
           "severity": "warning",
-          "summary": "Garbled section labels in professional experience",
-          "detail": "Some position entries have overlapping/garbled labels such as 'Responsibilities Key achievements' or 'Project scope Key achievements' suggesting formatting was lost or merged during transcription.",
-          "quote": "Formulated competitive positioning strategy & communication tactics as a result of which Calpol T Key achievements had overtaken more than 90 brands",
+          "summary": "Duplicate/misplaced 'Key achievements' labels",
+          "detail": "Several role sections have malformed or duplicated subheadings such as 'Responsibilities Key achievements' or 'Project scope' followed by bullets without clear separation.",
+          "quote": "DataFlow Research India Pvt. Limited, Noida Manager – Equity Research May-'15 to Mar- ‘18\nResponsibilities\nKey achievements",
           "source": "model"
         },
         {
-          "category": "attribution_ambiguity",
+          "category": "other",
           "severity": "warning",
-          "summary": "DataFlow Research bullet references different employer Leerink Partners",
-          "detail": "Under DataFlow Research India Pvt. Limited, a bullet mentions being a team member 'at Leerink Partners', which is a different firm than the heading, creating ambiguity about which employer the achievement belongs to.",
-          "quote": "Member, U.S. Healthcare Services ER team (Institutional Investor (II) Runner up) at Leerink Partners",
+          "summary": "MBBS medical degree unusual for equity research career",
+          "detail": "Candidate holds an M.B.B.S degree and uses 'Dr.' title but pursued a career entirely in equity research rather than medicine, worth noting though not necessarily a problem.",
+          "quote": "M.B.B.S | K.J. Somaiya Medical College, Mumbai | 63.87%",
           "source": "model"
         }
       ]
@@ -3924,7 +4386,8 @@
     "region": "APAC",
     "location": "Noida",
     "coverage_markets": [
-      "India"
+      "India",
+      "United States"
     ],
     "coverage_markets_source": "stated",
     "years_experience": 10.6,
@@ -4024,7 +4487,7 @@
     ],
     "methods": [
       "Perceptual Mapping (MDS)",
-      "competitive positioning strategy"
+      "sector thematic reports"
     ],
     "employers": [
       "Meridian Research Partners (full-time)",
@@ -4037,14 +4500,6 @@
     "non_professional_affiliations": [],
     "flags": [
       {
-        "category": "internal_contradiction",
-        "severity": "warning",
-        "summary": "Candidate holds MBBS medical degree but works in equity research",
-        "detail": "The candidate obtained an M.B.B.S degree in 2010 but subsequently pursued a PGDM in Finance and moved entirely into equity research; no clinical practice is mentioned, which is plausible but notable.",
-        "quote": "M.B.B.S | K.J. Somaiya Medical College, Mumbai | 63.87%",
-        "source": "model"
-      },
-      {
         "category": "date_anomaly",
         "severity": "warning",
         "summary": "Employment gap: 0y 6m before Prism Financial Services",
@@ -4056,15 +4511,15 @@
         "category": "date_anomaly",
         "severity": "warning",
         "summary": "J.P. Morgan role has fragmented, non-contiguous dates",
-        "detail": "The J.P. Morgan Securities position lists dates as 'Sep-'13, Dec-'13 & Nov-'14' which is unusual and does not present a clear continuous tenure or duration.",
-        "quote": "Sep-'13, Dec-'13 & Nov-‘14",
+        "detail": "The J.P. Morgan Securities position lists dates as 'Sep-'13, Dec-'13 & Nov-'14' which is unusual and does not follow a normal continuous employment format, making tenure uncomputable.",
+        "quote": "Sep-’13, Dec-’13 & Nov-‘14",
         "source": "model"
       },
       {
         "category": "attribution_ambiguity",
         "severity": "warning",
-        "summary": "DataFlow Research bullet references different employer Leerink Partners",
-        "detail": "Under DataFlow Research India Pvt. Limited, a bullet mentions being a team member 'at Leerink Partners', which is a different firm than the heading, creating ambiguity about which employer the achievement belongs to.",
+        "summary": "DataFlow bullet references Leerink Partners, a different firm",
+        "detail": "A bullet under the DataFlow Research India heading mentions being a member of a team 'at Leerink Partners', which is inconsistent with the stated employer heading.",
         "quote": "Member, U.S. Healthcare Services ER team (Institutional Investor (II) Runner up) at Leerink Partners",
         "source": "model"
       },
@@ -4095,24 +4550,32 @@
       {
         "category": "formatting",
         "severity": "warning",
-        "summary": "Garbled section labels in professional experience",
-        "detail": "Some position entries have overlapping/garbled labels such as 'Responsibilities Key achievements' or 'Project scope Key achievements' suggesting formatting was lost or merged during transcription.",
-        "quote": "Formulated competitive positioning strategy & communication tactics as a result of which Calpol T Key achievements had overtaken more than 90 brands",
+        "summary": "Duplicate/misplaced 'Key achievements' labels",
+        "detail": "Several role sections have malformed or duplicated subheadings such as 'Responsibilities Key achievements' or 'Project scope' followed by bullets without clear separation.",
+        "quote": "DataFlow Research India Pvt. Limited, Noida Manager – Equity Research May-'15 to Mar- ‘18\nResponsibilities\nKey achievements",
+        "source": "model"
+      },
+      {
+        "category": "other",
+        "severity": "warning",
+        "summary": "MBBS medical degree unusual for equity research career",
+        "detail": "Candidate holds an M.B.B.S degree and uses 'Dr.' title but pursued a career entirely in equity research rather than medicine, worth noting though not necessarily a problem.",
+        "quote": "M.B.B.S | K.J. Somaiya Medical College, Mumbai | 63.87%",
         "source": "model"
       }
     ],
     "quality": {
-      "score": 0.58,
+      "score": 0.62,
       "band": "medium",
       "reasons": [
-        "Candidate holds MBBS medical degree but works in equity research",
         "Employment gap: 0y 6m before Prism Financial Services",
         "J.P. Morgan role has fragmented, non-contiguous dates",
-        "DataFlow Research bullet references different employer Leerink Partners",
+        "DataFlow bullet references Leerink Partners, a different firm",
         "No email address",
         "No phone number",
         "No contact details provided",
-        "Garbled section labels in professional experience"
+        "Duplicate/misplaced 'Key achievements' labels",
+        "MBBS medical degree unusual for equity research career"
       ],
       "missing_fields": [
         "location",

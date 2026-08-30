@@ -293,6 +293,11 @@ st.markdown(
                     margin-bottom: 2px; }}
       .attrvalue {{ font-size: 16px; font-weight: 600; color: {INK};
                     line-height: 1.25; }}
+      /* Figures summary cards: a stated figure can be a whole phrase, so
+         the headline sits a size below .attrvalue or it wraps into a
+         block that shouts over the label. */
+      .figval {{ font-size: 13px; font-weight: 600; color: {INK};
+                 line-height: 1.35; }}
       .attrnote {{ font-size: 11.5px; font-weight: 400; color: {MUTED};
                    margin-left: 8px; }}
       .attrwhy {{ display: flex; flex-wrap: wrap; align-items: center;
@@ -892,11 +897,12 @@ MODE_NOTES = {
 # trip. But the first version left the picker permanently expanded, so six
 # hundred pixels of chooser sat above the first candidate. Same screen,
 # folded away until wanted.
-tab_search, tab_insights, tab_quality, tab_method = st.tabs([
+tab_search, tab_insights, tab_quality, tab_method, tab_ask = st.tabs([
     ":material/group: Candidates",
     ":material/monitoring: Insights",
     ":material/fact_check: Data quality",
     ":material/menu_book: Method",
+    ":material/forum: Ask · preview",
 ])
 
 # The role picker renders inside the Candidates tab: Insights, Data quality
@@ -1092,6 +1098,7 @@ FACETS = [
     ("approach_family", "Approach", False),
     ("sectors", "Sector", True),
     ("market_side", "Market side", False),
+    ("asset_classes", "Asset class", True),
     ("software_tools", "Software and tools", True),
     ("credentials_summary", "Credentials", True),
 ]
@@ -1118,7 +1125,8 @@ def matches_facets(c: dict, skip: str | None = None) -> bool:
 # Market side joins the visible three: once a role fixes market, approach
 # and sector, those controls disappear entirely, and a sidebar showing only
 # a keyword box reads as broken.
-PRIMARY = {"region", "approach_family", "sectors", "market_side"}
+PRIMARY = {"region", "approach_family", "sectors", "market_side",
+           "asset_classes"}
 
 
 # Which sidebar facet answers to which hard requirement of the active role.
@@ -1229,10 +1237,13 @@ with st.sidebar.expander(
         0.0, NO_LIMIT, (0.0, NO_LIMIT), step=0.5, help=FILTER_HELP["years"],
         key="adv_years",
     )
-    include_unknown = st.checkbox(
-        "Include candidates whose tenure could not be computed",
-        value=True, help=FILTER_HELP["unknown"], key="adv_unknown",
-    )
+    # The "include uncomputable tenure" checkbox is gone from the UI: no
+    # candidate in this pool triggers it, so it was a control that never
+    # did anything -- pure reading cost. The handling it governed remains
+    # in passes_filters (uncomputable tenure is always shown, never
+    # silently dropped), and the control returns if the pool ever gains
+    # such a record.
+    include_unknown = True
     only_alum = st.checkbox(
         "Multi-manager platform alumni only", help=FILTER_HELP["alum"],
         key="adv_alum",
@@ -1244,6 +1255,20 @@ with st.sidebar.expander(
     prefer_quality = st.checkbox(
         "Rank well-parsed records first", help=FILTER_HELP["prefer_quality"],
         key="adv_prefer",
+    )
+
+
+with st.sidebar.expander("Coming soon", icon=":material/schedule:"):
+    # Roadmap made visible where it will live. The referred flag is ATS
+    # metadata, not resume content -- shown disabled rather than invented,
+    # because faking a data source would break the system's one rule.
+    st.toggle("Referred candidates only", value=False, disabled=True,
+              help="Referral status lives in the ATS, not the resume. "
+                   "This filter activates with the ATS integration.")
+    st.caption(
+        "Also on the roadmap: neural RAG over the internal sourcing corpus "
+        "(preview in the Ask tab) and a queryable knowledge graph "
+        "(preview in Insights)."
     )
 
 
@@ -1497,14 +1522,53 @@ with tab_search:
                 "Yrs career": c.get("years_experience"),
                 "Region": c.get("region") or "—",
                 "Approach": label_of(c.get("approach_family")),
+                "Title": next(
+                    (x["title"] for x in c["extraction"]["positions"]
+                     if x.get("is_current")),
+                    (c["extraction"]["positions"][0]["title"]
+                     if c["extraction"]["positions"] else "—")),
+                "Market side": label_of(c.get("market_side")),
                 "Sector": ", ".join(label_of(x) for x in c.get("sectors", [])),
                 "Firm": c.get("current_firm") or "—",
+                "Firm type": (label_of(c.get("current_firm_type"))
+                              if c.get("current_firm_type") else "—"),
+                "Platform alum": ", ".join(c.get("platform_alum_of", []))
+                                 or "—",
+                "Asset classes": ", ".join(
+                    label_of(a["value"])
+                    for a in c["extraction"].get("asset_classes", [])) or "—",
+                "Coverage": c["extraction"]["coverage"].get("stocks_covered"),
+                "Stated numbers": len([
+                    x for x in c["extraction"].get("stated_metrics", [])
+                    if x["kind"] in ("aum", "performance", "risk")]),
+                "Leadership": (c["extraction"].get("team_leadership") or
+                               {}).get("value") or "—",
+                "Software": ", ".join(c.get("software_tools", [])) or "—",
+                "Credentials": ", ".join(
+                    facet_label("credentials_summary", x)
+                    for x in c.get("credentials_summary", [])) or "—",
+                "Languages": ", ".join(c.get("languages", [])) or "—",
                 "Data": c["quality"]["band"],
+                "Issues": sum(f.get("severity", "warning") == "warning"
+                              for f in c["flags"]),
             })
         frame = pd.DataFrame(rows)
-        st.markdown(candidate_table(ordered, matches),
-                    unsafe_allow_html=True)
-        st.caption("Record = parse confidence of the resume.")
+        st.dataframe(
+            frame.style.set_properties(
+                subset=["Candidate"], **{"font-weight": "600"}
+            ),
+            hide_index=True, use_container_width=True,
+            column_config={
+                name: (st.column_config.NumberColumn(
+                           help=COLUMN_HELP.get(name, ""), format="%.1f")
+                       if name in ("Yrs investing", "Yrs career")
+                       else st.column_config.Column(
+                           help=COLUMN_HELP.get(name, "")))
+                for name in frame.columns
+            },
+        )
+        st.caption("Hover a column header for what it means; click a header "
+                   "to sort. The CSV below carries the same columns.")
         st.download_button(
             "Download shortlist (CSV)",
             frame.to_csv(index=False).encode(),
@@ -1805,8 +1869,10 @@ with tab_search:
             # exactly the pair a reader will conflate if both look like page nav.
             # So this is a pill row, visibly not a tab strip, and every label is
             # scoped to the person.
-            _views = ["Fit", "Profile", f"Issues ({_warn_n})", "Outreach",
-                      "Full record"]
+            _fig_n = len([x for x in e.get("stated_metrics", [])
+                          if x["kind"] in ("aum", "performance", "risk")])
+            _views = ["Fit", "Profile", f"Figures ({_fig_n})",
+                      f"Issues ({_warn_n})", "Outreach", "Full record"]
             _vkey = f"view_{chosen_id}"
             st.session_state.setdefault(_vkey, 0)
             # Columns weighted by label length, plus a spacer that absorbs the
@@ -1981,6 +2047,13 @@ with tab_search:
                         ", ".join(label_of(x["value"]) for x in _secs),
                         _secs,
                     )
+                if e.get("asset_classes"):
+                    attribute(
+                        "Asset classes",
+                        ", ".join(label_of(x["value"])
+                                  for x in e["asset_classes"]),
+                        e["asset_classes"],
+                    )
                 # Same theme as every other attribute -- the one factline
                 # here read as a different design system. The provenance
                 # rides as a tag, like any other "why".
@@ -2003,6 +2076,10 @@ with tab_search:
                         f"{label_of(_sb)} by career, {label_of(_isb)} by investing",
                         note="the gap is the point",
                     )
+
+                _lead = e.get("team_leadership") or {}
+                if _lead.get("value"):
+                    attribute("Team leadership", _lead["value"], [_lead])
 
                 section("Skills and credentials", "As stated in the document.")
 
@@ -2034,6 +2111,89 @@ with tab_search:
 
 
             if _view == 2:
+                # Stated figures get their own view: summary first, then the
+                # breakdown, in the same attr blocks as every classified
+                # attribute -- inside the profile they were a fourth design
+                # dialect and made a long pane longer. Structured by the
+                # model (a pattern cannot tell a $4.2bn book from a $500
+                # conference budget), displayed with verbatim quotes, and
+                # never scored: self-reported numbers are unverifiable by
+                # design.
+                section("Stated figures",
+                        "Performance, AUM and risk figures the resume "
+                        "itself states. Self-reported and unverified — "
+                        "shown with their quotes, never scored.")
+                _KIND = {"aum": "AUM / book", "performance": "Performance",
+                         "risk": "Risk"}
+                _mx = [x for x in e.get("stated_metrics", [])
+                       if x["kind"] in _KIND]
+                # Coverage joins the summary row because it IS a stated
+                # figure -- but it is the one stated figure that is SCORED
+                # (coverage_depth, 8% weight), and the card says so. The
+                # dividing line is comparability, not importance: "names
+                # under coverage" has one standardised meaning on every
+                # research resume, while AUM and returns arrive gross-or-
+                # net, book-or-firm, cherry-picked -- this very pool has a
+                # "$4.5 trillion" that is Fidelity's AUM, not the
+                # candidate's. Score what is comparable; display what is
+                # not, with its quote.
+                _cov = covered
+                if not _mx and not _cov:
+                    st.caption("This resume states no coverage, performance, "
+                               "AUM or risk figures.")
+                else:
+                    _sum_cols = st.columns(4)
+                    with _sum_cols[0]:
+                        st.markdown(
+                            "<div class='attrlabel'>Names covered</div>"
+                            + (f"<div class='figval'>{_cov}</div>"
+                               "<div class='attrwhy'><span class='kw'>"
+                               "scored · 8% weight</span></div>"
+                               if _cov else
+                               "<span class='pill pill-empty'>"
+                               "none stated</span>"),
+                            unsafe_allow_html=True,
+                        )
+                    for _col, _kind in zip(_sum_cols[1:],
+                                           ("aum", "performance", "risk")):
+                        _hits = [x for x in _mx if x["kind"] == _kind]
+                        # A stated figure can be a whole clause ("35%
+                        # increase in brokerage commission revenue"); the
+                        # summary card shows the head of it, the breakdown
+                        # below keeps the full text and quote.
+                        _fig = _hits[0]["figure"] if _hits else ""
+                        if len(_fig) > 26:
+                            _fig = _fig[:24].rstrip() + "…"
+                        with _col:
+                            st.markdown(
+                                f"<div class='attrlabel'>{_KIND[_kind]}</div>"
+                                + (f"<div class='figval'>{_fig}</div>"
+                                   f"<div class='attrwhy'><span class='kw'>"
+                                   f"{len(_hits)} stated</span></div>"
+                                   if _hits else
+                                   "<span class='pill pill-empty'>"
+                                   "none stated</span>"),
+                                unsafe_allow_html=True,
+                            )
+                    st.markdown("")
+                    # Breakdown: every figure with its verbatim quote, in
+                    # the standard attr block per kind.
+                    for _kind in ("aum", "performance", "risk"):
+                        _hits = [x for x in _mx if x["kind"] == _kind]
+                        if not _hits:
+                            continue
+                        _quotes = "".join(
+                            f"<div class='attrquote'><b>{_x['figure']}</b> — "
+                            f"“{_x['quote'][:200]}”</div>"
+                            for _x in _hits)
+                        st.markdown(
+                            f"<div class='attr'>"
+                            f"<div class='attrlabel'>{_KIND[_kind]} · "
+                            f"breakdown</div>{_quotes}</div>",
+                            unsafe_allow_html=True,
+                        )
+
+            if _view == 3:
                 section("Issues in this resume", METRIC_HELP["issues"])
                 # Issues sit AFTER the profile: a reviewer wants to know who this
                 # person is before being told what is uncertain about the record. The
@@ -2103,7 +2263,7 @@ with tab_search:
                                 )
 
 
-            if _view == 3:
+            if _view == 4:
                 # -- Outreach draft ------------------------------------------------
                 # The step after "this candidate fits" is always "someone writes to
                 # them". The draft is assembled from the same evidence the profile
@@ -2213,7 +2373,7 @@ with tab_search:
                         )
 
 
-            if _view == 4:
+            if _view == 5:
                 # Reference material, collapsed.
                 with st.expander("Experience, as parsed"):
                     head = ("<tr><th>Employer</th><th>Resolved to</th><th>Title</th>"
@@ -2434,6 +2594,79 @@ with tab_insights:
                 fig.update_xaxes(showgrid=True, gridcolor=GRID, dtick=1)
                 st.plotly_chart(styled_chart(fig, 360), use_container_width=True)
                 st.caption("Dark = credentials · light = software.")
+
+
+    # -- Talent network (preview) ------------------------------------------
+    # The knowledge base is already a small graph (candidate -> firm ->
+    # parent platform); drawing it makes the pod-lineage story visible: the
+    # reader can SEE that Ryan reaches Millennium through North53. At this
+    # scale a static three-layer layout is honest; the roadmap's knowledge
+    # graph makes it queryable ("everyone two hops from a Millennium pod").
+    section("Talent network", "Candidates, their resolved firms, and "
+            "platform lineage from the knowledge base.")
+    st.markdown("<span class='pill pill-note'>preview</span>",
+                unsafe_allow_html=True)
+
+    _firms, _platforms, _edges = {}, {}, []
+    for _c in candidates:
+        for _l in _c.get("firms", []):
+            if _l.get("canonical") and _l.get("resolution") in {
+                    "exact", "alias", "fuzzy"}:
+                _firms.setdefault(_l["canonical"], _l)
+                _edges.append((_c["display_name"], _l["canonical"], "worked"))
+    for _name, _l in _firms.items():
+        if _l.get("parent"):
+            _platforms.setdefault(_l["parent"], True)
+            _edges.append((_name, _l["parent"], "pod"))
+        elif _l.get("firm_type") == "multi_strategy_platform":
+            _platforms.setdefault(_name, True)
+
+    def _row(names, y):
+        n = max(len(names), 1)
+        return {name: ((i + 0.5) / n, y) for i, name in enumerate(names)}
+
+    _pos = {}
+    _pos.update(_row(sorted(_platforms), 1.0))
+    _pos.update(_row(sorted(f for f in _firms if f not in _pos), 0.55))
+    _pos.update(_row(sorted(c["display_name"] for c in candidates), 0.0))
+
+    _fig = go.Figure()
+    for _a, _b, _kind in _edges:
+        if _a in _pos and _b in _pos:
+            _fig.add_trace(go.Scatter(
+                x=[_pos[_a][0], _pos[_b][0]], y=[_pos[_a][1], _pos[_b][1]],
+                mode="lines",
+                line=dict(color=SERIES_2 if _kind == "pod" else GRID,
+                          width=2 if _kind == "pod" else 1),
+                hoverinfo="skip", showlegend=False))
+    # Thirty firm labels on one row are unreadable ink; firms show on
+    # hover, and only the two rows a reader navigates BY -- platforms and
+    # candidates -- carry printed names.
+    for _names, _y, _colour, _label, _mode in (
+            (sorted(_platforms), 1.0, NAVY, "platform", "markers+text"),
+            (sorted(f for f in _firms
+                    if f not in _platforms), 0.55, SERIES_1, "firm",
+             "markers"),
+            (sorted(c["display_name"] for c in candidates), 0.0,
+             "#8badd0", "candidate", "markers+text")):
+        _fig.add_trace(go.Scatter(
+            x=[_pos[n][0] for n in _names], y=[_y] * len(_names),
+            mode=_mode, text=_names, name=_label,
+            textposition="top center" if _y > 0.5 else "bottom center",
+            textfont=dict(size=10),
+            marker=dict(size=11, color=_colour), hoverinfo="text",
+            hovertext=_names))
+    _fig.update_layout(
+        xaxis=dict(visible=False, range=[-0.05, 1.05]),
+        yaxis=dict(visible=False, range=[-0.25, 1.2]),
+        showlegend=True,
+        legend=dict(orientation="h", y=-0.05, font=dict(size=11)),
+    )
+    st.plotly_chart(styled_chart(_fig, 430), use_container_width=True)
+    st.caption(
+        "Bronze edges are pod-to-platform lineage the resumes never state. "
+        "Grey edges are employment, resolved through the firm knowledge base."
+    )
 
 
 # ===========================================================================
@@ -2761,3 +2994,58 @@ diverges from practitioner judgment, and it found precisely one.
         "Built for the Millennium Business Development data science case "
         "study · github.com/yc4379-commits/m-case-study"
     )
+
+
+# ===========================================================================
+# Ask -- retrieval preview
+# ===========================================================================
+
+with tab_ask:
+    section(
+        "Ask the pool",
+        "Free-text retrieval over every parsed resume sentence.",
+    )
+    st.markdown(
+        "<span class='pill pill-note'>preview</span> "
+        "<span style='font-size:12.5px;color:" + MUTED + "'>"
+        "Today this runs the same auditable keyword + concept scorer the "
+        "matcher uses, over resume sentences only. The production version "
+        "is the roadmap's RAG step: neural retrieval over resumes plus the "
+        "internal sourcing corpus (meeting notes, call summaries), with the "
+        "same rule — every answer quotes its source.</span>",
+        unsafe_allow_html=True,
+    )
+    _q = st.text_input(
+        "Ask", placeholder="e.g. who has run money in healthcare?",
+        label_visibility="collapsed", key="ask_query",
+    )
+    if _q and len(_q.strip()) >= 3:
+        from match import ConceptTfidfBackend, candidate_sentences
+        _backend = ConceptTfidfBackend(store.concept_map)
+        _hits = []
+        for _c in candidates:
+            _score, _sent = _backend.score(_q, candidate_sentences(_c))
+            if _score > 0.05 and _sent:
+                _hits.append((_score, _c, _sent))
+        _hits.sort(key=lambda x: -x[0])
+        if not _hits:
+            st.caption(
+                "Nothing in the parsed resumes matches that phrasing. The "
+                "concept map covers this domain's vocabulary — an unmatched "
+                "query usually means the pool genuinely lacks it."
+            )
+        for _score, _c, _sent in _hits[:5]:
+            st.markdown(
+                f"<div class='odraft' style='margin-bottom:8px'>"
+                f"<div class='odraft-name'>{_c['display_name']}"
+                f"<span> — {_c.get('current_firm') or '—'} · "
+                f"match {_score:.0%}</span></div>"
+                f"<div class='attrquote' style='margin-top:6px'>“{_sent}”"
+                f"</div></div>",
+                unsafe_allow_html=True,
+            )
+        if _hits:
+            st.caption(
+                "Scores are sentence-level retrieval strength, not Fit — "
+                "open the candidate in Candidates for the scored view."
+            )

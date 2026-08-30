@@ -42,6 +42,29 @@ COLUMN_HELP: dict[str, str] = {
     "Data": "Parse confidence: how completely the pipeline could read this "
     "document. A property of the file, not of the candidate.",
     "Firm": "Current employer, resolved against the firm knowledge base.",
+    "Firm type": "Operating model of the current employer — pod shop, "
+    "multi-strategy platform, long-only, sell-side research, and so on.",
+    "Market side": "Buy side (deploys capital), sell side (publishes "
+    "research), investment banking, consulting or corporate.",
+    "Platform alum": "Multi-manager platforms this candidate has worked at "
+    "or under, resolved through pod-to-platform lineage.",
+    "Coverage": "Largest stated number of names under research coverage; "
+    "blank when the resume never says.",
+    "Software": "Named tools, normalised — 'Bloomberg Terminal' and "
+    "'Bloomberg' count as one.",
+    "Credentials": "Professional qualifications and business-school "
+    "degrees, normalised (MBA / PGDM are one bucket).",
+    "Languages": "Languages the resume states.",
+    "Title": "Current (or most recent) job title, as written in the resume.",
+    "Asset classes": "Asset classes the candidate has worked in — equities, "
+    "credit, rates/FX, commodities — each backed by a resume quote.",
+    "Stated numbers": "How many performance, AUM or risk figures the resume "
+    "states, classified by the model with verbatim quotes. Self-reported "
+    "and unverified — shown on the profile, never scored.",
+    "Leadership": "Largest people-leadership responsibility the resume "
+    "states, with its quote. Never inferred from a title alone.",
+    "Issues": "Count of open warnings on this record — contradictions, "
+    "gaps, malformed details. Notes triaged as benign are not counted.",
 }
 
 # ---------------------------------------------------------------------------
@@ -58,6 +81,9 @@ FILTER_HELP: dict[str, str] = {
     "selecting several matches any of them.",
     "market_side": "Buy side (deploys capital), sell side (publishes research "
     "to institutional clients), investment banking, consulting, corporate.",
+    "asset_classes": "Asset classes worked in — equities, credit, rates, "
+    "derivatives — each judged from what the candidate did, with a resume "
+    "quote behind it.",
     "software_tools": "Named tools from the resume, normalised — 'Bloomberg "
     "Terminal' and 'Bloomberg' count as one.",
     "credentials_summary": "Professional qualifications, with licence codes "

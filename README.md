@@ -6,6 +6,7 @@ by an LLM, enriched against a curated domain knowledge base, and searched
 against job requisitions in a Streamlit app.
 
 **Live app:** https://m-case-study-jasmine.streamlit.app/
+**Walk-through notebook:** [`case_study.ipynb`](case_study.ipynb)
 
 ---
 
@@ -136,16 +137,16 @@ reported ambiguous rather than resolved.
 
 ## Requisition matching
 
-Three requisitions ship with the app — *India Fundamental Equity Analyst*
-(REQ-21865), *Quantitative Analyst, Quantitative Strategies* (REQ-29449) and
-*Quantitative Researcher, Cross-Asset QIS* (REQ-30350) — all transcribed from
-real Millennium postings rather than written to fit the data. That matters: a
-requisition invented alongside the scoring logic can only confirm itself.
+Four requisitions ship with the app — three Millennium postings (REQ-27950,
+REQ-25042, REQ-29449) and one Point72 posting — all transcribed from real
+postings rather than written to fit the data. That matters: a requisition
+invented alongside the scoring logic can only confirm itself.
 
-Against the real posting's 3–5 year requirement, **no candidate in this pool
-qualifies** — the three APAC fundamental analysts are all far too senior. The
-app reports that plainly, lists the near misses, and names the single
-constraint each one failed.
+Against the Mumbai posting's 4–5 year requirement, **no candidate in this
+pool qualifies** — the three APAC fundamental analysts are all far too
+senior. The app reports that plainly, lists the near misses, names the single
+constraint each one failed, and computes what widening each requirement
+would admit.
 
 Similarity between a requirement and a candidate's experience uses a pluggable
 backend (`src/match.py`). The default combines lexical overlap with a curated

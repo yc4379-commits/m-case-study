@@ -305,6 +305,35 @@ class CoverageDetail(BaseModel):
 # What the model returns
 # --------------------------------------------------------------------------
 
+class StatedMetric(BaseModel):
+    """A performance, AUM or risk figure the resume itself states.
+
+    These are transcribed, never interpreted: self-reported numbers are
+    unverifiable and non-comparable (gross vs net, cherry-picked periods,
+    book vs firm AUM), so downstream they are DISPLAYED with their quotes
+    and never scored. Structure still beats regex: the model can tell
+    "$4.2bn gross portfolio" from "$500 conference budget", which a pattern
+    cannot.
+    """
+
+    kind: Literal["aum", "performance", "risk", "other"] = Field(
+        description=(
+            "aum = money managed or book size; performance = returns, "
+            "alpha, P&L, outperformance; risk = drawdown, Sharpe, "
+            "volatility or similar; other = a substantive stated figure "
+            "that fits none of these."
+        )
+    )
+    figure: str = Field(
+        description="The number as written, e.g. '$4.2bn', '+12% vs "
+                    "benchmark', 'Sharpe 1.8'. Verbatim, no conversion."
+    )
+    quote: str = Field(
+        description="The complete resume sentence or bullet containing the "
+                    "figure, VERBATIM."
+    )
+
+
 class ResumeExtraction(BaseModel):
     """The exact structure the LLM is constrained to produce.
 
@@ -399,6 +428,27 @@ class ResumeExtraction(BaseModel):
         ),
     )
     coverage: CoverageDetail = Field(default_factory=CoverageDetail)
+
+    team_leadership: Inferred = Field(
+        default_factory=Inferred,
+        description=(
+            "Largest people-leadership responsibility the resume states: "
+            "value is a SHORT phrase such as 'led 5 analysts' or 'managed "
+            "investment team', with the verbatim sentence as evidence. "
+            "Mentoring one intern is not leadership; leave the value empty "
+            "when the resume states none. Never infer leadership from a "
+            "title alone."
+        ),
+    )
+    stated_metrics: list[StatedMetric] = Field(
+        default_factory=list,
+        description=(
+            "Every performance, AUM or risk FIGURE the resume states about "
+            "the candidate's own work (not firm marketing copy). Transcribe "
+            "verbatim; do not compute, convert or deduplicate beyond exact "
+            "repeats."
+        ),
+    )
 
     # --- self-reported quality signals -------------------------------------
     flags: list[ResumeFlag] = Field(

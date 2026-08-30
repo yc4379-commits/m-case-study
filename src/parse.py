@@ -191,6 +191,9 @@ def verify_quotes(extraction: ResumeExtraction, source: str) -> list[str]:
         check(f"sector[{item.value}]", item.evidence)
     for item in extraction.asset_classes:
         check(f"asset_class[{item.value}]", item.evidence)
+    check("team_leadership", extraction.team_leadership.evidence)
+    for metric in extraction.stated_metrics:
+        check(f"stated_metric[{metric.kind}]", metric.quote)
     return unverified
 
 
