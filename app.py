@@ -325,6 +325,17 @@ st.markdown(
                        vertical-align: top; }}
       .recordtbl td:first-child {{ color: {MUTED}; width: 42%; }}
       /* The shortlist table: typeset, not gridded. */
+      .pill-empty {{ background: transparent; border: 1px dashed #cbd5e1;
+                     color: #94a3b8; }}
+      .odraft {{ border: 1px solid {GRID}; border-radius: 12px;
+                 background: {SURFACE}; padding: 16px 18px; margin: 4px 0 10px; }}
+      .odraft-name {{ font-size: 15px; font-weight: 650; color: {INK}; }}
+      .odraft-name span {{ font-weight: 400; font-size: 12.5px; color: {MUTED}; }}
+      .odraft-contact {{ font-size: 12px; color: {MUTED}; margin-top: 2px; }}
+      .odraft-role {{ font-size: 13.5px; font-weight: 600; color: {INK}; }}
+      .odraft-verdict {{ display: block; font-size: 12px; font-weight: 400;
+                         color: {MUTED}; margin-top: 1px; }}
+      .odraft-why {{ font-size: 12.5px; color: {INK}; margin-top: 8px; }}
       .ctblwrap {{ overflow-x: auto; max-width: 100%; padding-bottom: 4px; }}
       .ctbl {{ border-collapse: separate; border-spacing: 0; width: 100%;
                font-size: 12.5px; table-layout: auto; border: none !important; }}
@@ -864,13 +875,14 @@ def searchable_text(c: dict) -> str:
 # ===========================================================================
 
 MODE_NOTES = {
-    "Use a saved requisition":
-        "A real posting, with its requirement text — the richest ranking.",
-    "Define a role":
-        "The four dimensions the brief names. Add requirement lines for a "
-        "deeper score.",
-    "Browse without a role":
-        "Filter the pool, rank nobody.",
+    "Use the job library":
+        "Pick a saved job posting. Candidates are matched against its "
+        "requirements and ranked by fit.",
+    "Define your own criteria":
+        "Set market, approach, sector and experience yourself, and "
+        "optionally add requirement lines for a richer ranking.",
+    "Browse all candidates":
+        "See the whole pool with filters only — no matching, no ranking.",
 }
 
 # The role picker lives in a collapsed panel whose label states the current
@@ -898,7 +910,7 @@ with tab_search:
     # that produces it. The bar is still a placeholder container, filled in
     # once the chosen requisition exists.
     _role_panel = st.expander(
-        "Choose a seat",
+        "How do you want to filter candidates?",
         expanded=False, icon=":material/work:",
     )
     _role_bar = st.container()
@@ -919,7 +931,7 @@ with tab_search:
     requisition: dict | None = None
 
     with _role_panel:
-        if mode == "Use a saved requisition":
+        if mode == "Use the job library":
             titles = store.titles
             # Every stored requisition is transcribed from a real posting,
             # so the per-row provenance tag became noise repeated four
@@ -939,7 +951,7 @@ with tab_search:
                        "Millennium, one Point72.")
             requisition = store.get(chosen)
 
-        elif mode == "Define a role":
+        elif mode == "Define your own criteria":
             st.caption("Each is a HARD requirement: outside it means "
                        "excluded, not down-ranked.")
             d1, d2, d3, d4 = st.columns([1, 1, 1.2, 1.3])
@@ -1969,11 +1981,16 @@ with tab_search:
                         ", ".join(label_of(x["value"]) for x in _secs),
                         _secs,
                     )
-                factline(
+                # Same theme as every other attribute -- the one factline
+                # here read as a different design system. The provenance
+                # rides as a tag, like any other "why".
+                attribute(
                     "Markets covered",
                     ", ".join(c.get("coverage_markets", [])) or "—",
-                    note="inferred from location"
-                    if c.get("coverage_markets_source") == "inferred" else "stated",
+                    [{"keywords": [
+                        "inferred from location"
+                        if c.get("coverage_markets_source") == "inferred"
+                        else "stated in resume"], "confidence": None}],
                 )
                 # Seniority is only worth a row when the two bands DISAGREE --
                 # a senior career with a junior investing record is a finding.
@@ -1988,29 +2005,27 @@ with tab_search:
                     )
 
                 section("Skills and credentials", "As stated in the document.")
-                for cred in c.get("credentials_summary", []) or []:
-                    st.markdown(f"<div style='font-size:13px'>· {cred}</div>",
-                                unsafe_allow_html=True)
-                if not c.get("credentials_summary"):
-                    st.caption("No professional credentials stated.")
 
                 def chips(label: str, values: list[str], klass: str = "") -> None:
                     # Colour is back on the tags, but drawn from the palette
-                    # rather than invented per row: three tints of the same two
-                    # hues the charts use, at pill weight. The violet is what had
-                    # to go, not the idea of colour -- it belonged to no other
-                    # element on the screen.
+                    # rather than invented per row. Every row -- credentials
+                    # included -- uses this one shape, and an empty row is a
+                    # dashed "none listed" TAG rather than a grey sentence:
+                    # at a glance the absence reads in the same visual
+                    # register as the presence, but cannot be mistaken for a
+                    # held skill.
                     st.markdown(
                         f"<div style='margin-top:9px;font-size:12px;"
                         f"color:{MUTED}'>{label}</div>" + (
                             "".join(f"<span class='pill {klass}'>{v}</span>"
                                     for v in values) if values else
-                            f"<span style='color:{MUTED};font-size:12.5px'>"
-                            "not stated</span>"
+                            "<span class='pill pill-empty'>none listed</span>"
                         ),
                         unsafe_allow_html=True,
                     )
 
+                chips("Professional credentials",
+                      c.get("credentials_summary", []), "pill-bronze")
                 chips("Software and platforms", c.get("software_tools", []),
                       "pill-slate")
                 chips("Analytical methods", c.get("methods", []), "pill-bronze")
@@ -2019,6 +2034,7 @@ with tab_search:
 
 
             if _view == 2:
+                section("Issues in this resume", METRIC_HELP["issues"])
                 # Issues sit AFTER the profile: a reviewer wants to know who this
                 # person is before being told what is uncertain about the record. The
                 # data-quality badge at the top links down here, so the caveats are
@@ -2035,7 +2051,9 @@ with tab_search:
                 if not _warns and not _notes:
                     st.caption("Nothing flagged — the document parsed cleanly.")
                 else:
-                    st.caption(METRIC_HELP["issues"])
+                    # Explanation rides the section title's hover tip --
+                    # inline it rendered larger than the issues themselves.
+
 
                     def _group_of(f) -> str:
                         text = f["summary"].lower()
@@ -2106,6 +2124,8 @@ with tab_search:
                     if _contact:
                         _lines.append(_contact)
                     _lines.append("")
+                    _strong = []
+                    verdict_txt = ""
                     if m and requisition:
                         verdict_txt = ("meets every hard requirement"
                                        if m.is_exact else
@@ -2131,16 +2151,66 @@ with tab_search:
                             "pod; lineage resolved via knowledge base)")
                     if covered:
                         _lines.append(f"- {covered} names under research coverage")
-                    st.caption("Parsed facts and verbatim quotes. Check the gap "
-                               "line before sending.")
+                    # Rendered as a briefing card in the app's own design
+                    # language -- a raw <pre> block of the draft read as a
+                    # terminal dump inside a typeset interface. The plain-text
+                    # version survives underneath for copy and download; the
+                    # card is for reading, the code block is for taking.
+                    _h = [f"<div class='odraft'>"]
+                    _h.append(f"<div class='odraft-name'>{c['display_name']}"
+                              + (f"<span> — {_cur['title']} at {_cur['firm']}"
+                                 + (f" · {c['location']}" if c.get('location')
+                                    else "") + "</span>" if _cur else "")
+                              + "</div>")
+                    if _contact:
+                        _h.append(f"<div class='odraft-contact'>{_contact}</div>")
+                    if m and requisition:
+                        _fitcolour = STATUS_GOOD if m.is_exact else SERIES_2
+                        _h.append(
+                            "<div class='attrlabel' style='margin-top:12px'>"
+                            "Role</div>"
+                            f"<div class='odraft-role'>{requisition['title']}"
+                            f"<span style='color:{_fitcolour};font-weight:700'>"
+                            f" · Fit {m.soft_score:.0%}</span>"
+                            f"<span class='odraft-verdict'>{verdict_txt}</span>"
+                            "</div>")
+                        if _strong:
+                            _h.append("<div class='attrlabel' "
+                                      "style='margin-top:12px'>"
+                                      "Why this candidate</div>")
+                        for x in _strong:
+                            _h.append(
+                                f"<div class='odraft-why'><b>"
+                                f"{CRITERION_LABEL.get(x.key, x.key)}</b> — "
+                                f"{x.found}"
+                                f"<div class='attrquote'>“{x.evidence[:180]}”"
+                                f"</div></div>")
+                    _extras = []
+                    if c.get("platform_alum_of"):
+                        _extras.append(
+                            f"<span class='pill pill-slate'>previously at "
+                            f"{', '.join(c['platform_alum_of'])}</span>")
+                    if covered:
+                        _extras.append(f"<span class='pill'>{covered} names "
+                                       "under coverage</span>")
+                    if _extras:
+                        _h.append("<div style='margin-top:10px'>"
+                                  + "".join(_extras) + "</div>")
+                    _h.append("</div>")
+                    st.markdown("".join(_h), unsafe_allow_html=True)
+                    st.caption("Parsed facts and verbatim quotes only — check "
+                               "the gap line before sending.")
+
                     _draft = "\n".join(_lines)
-                    st.code(_draft, language=None)
-                    st.download_button(
-                        "Download draft (.txt)", _draft.encode(),
-                        file_name=f"outreach_{c['candidate_id']}.txt",
-                        mime="text/plain", use_container_width=True,
-                        key=f"outreach_{c['candidate_id']}",
-                    )
+                    with st.expander("Copy as plain text",
+                                     icon=":material/content_copy:"):
+                        st.code(_draft, language=None)
+                        st.download_button(
+                            "Download draft (.txt)", _draft.encode(),
+                            file_name=f"outreach_{c['candidate_id']}.txt",
+                            mime="text/plain", use_container_width=True,
+                            key=f"outreach_{c['candidate_id']}",
+                        )
 
 
             if _view == 4:
