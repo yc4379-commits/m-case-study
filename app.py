@@ -1875,29 +1875,29 @@ with tab_search:
                       f"Issues ({_warn_n})", "Outreach", "Full record"]
             _vkey = f"view_{chosen_id}"
             st.session_state.setdefault(_vkey, 0)
-            # Columns weighted by label length, plus a spacer that absorbs the
-            # slack. Equal columns made every pill the width of the longest label
-            # and wrapped that one onto a second line, so one pill stood a row
-            # taller than its neighbours -- a switcher whose items are different
-            # sizes reads as a group of unrelated buttons.
-            _vcols = st.columns([max(len(v), 7) for v in _views] + [9])
 
             def _setview(k: str, i: int) -> None:
                 st.session_state[k] = i
 
-            for _i, (_col, _name) in enumerate(zip(_vcols, _views)):
-                # on_click, not a return value plus st.rerun(). Reading the
-                # button's return meant the pills above it had already drawn with
-                # the previous selection, so the switch needed a second run to
-                # look right -- two full script executions per click, which is
-                # exactly the lag. A callback fires before the single rerun, so
-                # state and paint agree the first time.
-                _col.button(
-                    _name, key=f"{_vkey}_{_i}", use_container_width=True,
-                    on_click=_setview, args=(_vkey, _i),
-                    type=("primary" if st.session_state[_vkey] == _i
-                          else "secondary"),
-                )
+            # A horizontal flex container, not st.columns. Weighted columns
+            # sized each pill to a share of the panel, and any share narrower
+            # than its label clipped the text ("Outreac|"). Here every pill
+            # takes its natural width and the row wraps if the panel is
+            # narrow -- nothing can be cut off.
+            with st.container(horizontal=True, gap="small"):
+                for _i, _name in enumerate(_views):
+                    # on_click, not a return value plus st.rerun(). Reading the
+                    # button's return meant the pills above it had already drawn
+                    # with the previous selection, so the switch needed a second
+                    # run to look right -- two full script executions per click,
+                    # which is exactly the lag. A callback fires before the
+                    # single rerun, so state and paint agree the first time.
+                    st.button(
+                        _name, key=f"{_vkey}_{_i}",
+                        on_click=_setview, args=(_vkey, _i),
+                        type=("primary" if st.session_state[_vkey] == _i
+                              else "secondary"),
+                    )
             _view = st.session_state[_vkey]
 
             if _view == 0:
