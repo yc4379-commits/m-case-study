@@ -88,9 +88,9 @@ md("""
 First, an orientation view — eight columns chosen for scanning, not the
 full record. Each parsed candidate carries **30+ top-level fields** plus the
 complete nested extraction (every position with dates and bullets, education,
-credentials, coverage, per-claim evidence quotes, flags); the full inventory
-and one complete record follow in §3, and the whole dataset is itself a
-deliverable: `data/candidates.json` / `data/candidates.csv`.
+credentials, coverage, per-claim evidence quotes, flags); the field
+inventory and one record in full follow in §3, and the whole dataset is
+itself a deliverable: `data/candidates.json` / `data/candidates.csv`.
 """)
 
 code("""
@@ -151,28 +151,31 @@ log
 md("""
 ## 3 · Structured extraction by the model
 
-`src/parse.py` calls the Anthropic API with the Pydantic schema in
-`src/schema.py` passed as a **tool definition**, so the model must return an
-object of exactly that shape — no free-text JSON to repair. Three guards sit
-on top:
+The mechanics, end to end:
 
-- **Corrective retry**: a validation failure is sent back once *with the
-  specific errors attached*, not blindly re-rolled.
-- **Verbatim-quote verification**: every evidence quote is checked to appear
-  in the source text (whitespace/punctuation forgiven — our own extraction
-  reflows lines — words never). Unverified quotes reduce the record's
-  confidence score.
-- **Content-hash cache** keyed on (text, model, schema, system prompt):
-  re-running the pipeline after a knowledge-base change costs $0.00. The
-  key *includes the prompt* because an early version silently replayed
-  pre-fix results after a prompt fix.
+1. **The schema is the interface.** The Pydantic model in `src/schema.py`
+   is serialised to JSON Schema and passed to the Anthropic API as a
+   **tool definition**, with tool choice forced — the model can only
+   answer as an object of exactly that shape. No free-text JSON to repair,
+   and every field's description doubles as that field's prompt, versioned
+   in code review like any other code.
+2. **Corrective retry.** A validation failure is sent back once *with the
+   specific errors attached*, not blindly re-rolled.
+3. **Verbatim-quote verification.** Every evidence quote is checked to
+   appear in the source text (whitespace and punctuation forgiven — our
+   own extraction reflows lines — words never). Unverified quotes reduce
+   the record's confidence score.
+4. **Content-hash cache** keyed on (text, model, schema, system prompt):
+   re-running after a knowledge-base change costs $0.00. The key includes
+   the prompt because an early version silently replayed pre-fix results
+   after a prompt fix; it includes the schema because a schema change
+   *must* re-parse.
 
-One prompt lesson worth recording: the filename was originally included in
-the prompt, and the model used it for the candidate's name on some runs and
-refused on others. **Ambiguous instructions produce non-deterministic
-output — the bug was in the prompt, not the model.** The filename is now
-withheld; a deterministic `name_from_filename()` fallback applies only when
-the document itself states no name, and flags the record.
+One prompt lesson: the filename was originally in the prompt, and the model
+used it for the candidate's name on some runs and refused on others —
+ambiguous instructions produce non-deterministic output. The filename is
+now withheld; a deterministic fallback applies only when the document
+itself states no name, and flags the record.
 
 Parsing all 10 resumes cost **≈ $0.80** (claude-sonnet-5); the public app
 calls no model and needs no key.
@@ -183,18 +186,43 @@ from parse import SYSTEM_PROMPT
 print(SYSTEM_PROMPT)
 """)
 
+md("""
+What one parsed record looks like — **Ryan Patel**, as tables rather than a
+JSON wall. First every judgement the model made, each with its confidence
+and the verbatim quote that earned it; then the position history the tenure
+arithmetic runs on. The full nested record (bullets, education, flags) is
+`data/candidates.json` — nothing appears in the app that is not in it.
+""")
+
 code("""
-# A parsed record, abbreviated: the approach/sector judgements carry their
-# evidence, and the quotes are verified verbatim against the source text.
 ryan = next(c for c in candidates if c["display_name"] == "Ryan Patel")
 e = ryan["extraction"]
-{
-    "investment_approach": e["investment_approach"],
-    "primary_sectors": e["primary_sectors"][:2],
-    "positions[0]": {k: e["positions"][0][k] for k in
-                     ("firm", "title", "start_date", "end_date",
-                      "employment_type", "is_investment_role")},
-}
+pd.set_option("display.max_colwidth", 100)
+
+def j(field, item):
+    return {"field": field, "value": str(item["value"]),
+            "conf": item["confidence"], "evidence (verbatim)": item["evidence"]}
+
+pd.DataFrame(
+    [j("investment_approach", e["investment_approach"]),
+     j("market_side", e["market_side"])]
+    + [j("sector", s) for s in e["primary_sectors"]]
+    + [j("asset_class", a) for a in e["asset_classes"]]
+    + ([j("team_leadership", e["team_leadership"])]
+       if e["team_leadership"]["value"] else [])
+    + [{"field": f"stated_metric · {m['kind']}", "value": m["figure"],
+        "conf": "", "evidence (verbatim)": m["quote"]}
+       for m in e["stated_metrics"]]
+)
+""")
+
+code("""
+pd.DataFrame([{
+    "firm": pos["firm"], "title": pos["title"],
+    "dates": f'{pos["start_date"]} → {pos["end_date"] or "present"}',
+    "type": pos["employment_type"],
+    "investment role": pos["is_investment_role"],
+} for pos in e["positions"]])
 """)
 
 code("""
@@ -208,16 +236,6 @@ print("ENRICHMENT (computed: knowledge base + arithmetic + checks)")
 print("  " + ", ".join(sorted(k for k in ryan.keys() if k != "extraction")))
 """)
 
-md("""
-And one **complete record**, unabridged — every position with its bullets,
-every judgement with its quote, every flag with its provenance. This is what
-"parse the resume" actually means here; the other nine records have the same
-shape in `data/candidates.json`.
-""")
-
-code("""
-print(json.dumps(ryan, indent=2, ensure_ascii=False))
-""")
 
 # ------------------------------------------------------ 4 · knowledge base
 md("""
@@ -419,28 +437,117 @@ app to leak or spend.
 
 ![Candidates view](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_candidates.png)
 
-The interface went through ~15 review rounds with two reviewers (a BD-user
-perspective and a UI designer). The decisions that survived:
+Almost every commitment in this document is visible in that one frame:
 
-- **One screen, three zones**: role (eligibility) → advanced filters
-  (refinement) → results with profile. When a role fixes a dimension, the
-  sidebar filter for it *disappears* — a second control over the same axis,
-  even disabled, read as a second authority.
-- **Qualify vs One-gap-away** as separate collapsible groups; rows are one
-  line each (name, Fit, two facts, quality tag) because the *why* lives one
-  glance right, in the Fit panel.
-- **Colour grammar**: navy is chrome, green means "clears every hard
-  requirement", bronze means gap/caveat, and every informational tag is one
-  neutral pill. Verdict facts may be *tags with tinted backgrounds*;
-  coloured *text* was reviewed out.
-- **Evidence on demand**: profile shows keywords and per-dimension
-  contributions ("What counted"); verbatim quotes live one expander deeper.
-- **Outreach draft**: the step after "this candidate fits" is always
-  "someone writes to them" — one click assembles a summary whose every
-  claim quotes the resume, because a sourcing mail earns replies by proving
-  someone actually read it.
+- The **FILLING bar** pins the active requisition and its four hard
+  requirements as chips; everything below is conditioned on it. The
+  sidebar meanwhile shows only Market side, Asset class and Keyword —
+  the role has fixed region, approach, sector and experience, so those
+  filters are *gone*, not greyed out.
+- **"Qualified · 2" and "One gap away · 6"** are separate groups, never
+  one ranked list. Each near miss names the single constraint it failed
+  ("Gap — Region APAC — needs US") — a recruiter reads it as "what would
+  I have to relax", which is a decision, not a score.
+- Ryan Patel's **"Millennium alum"** pill: his resume names only Meridian
+  Capital Partners. The platform surfaced through pod-lineage entity
+  resolution in `firms.yaml` — one pill carrying the whole knowledge-base
+  argument.
+- The **61% is green only because he clears all four hard requirements** —
+  green marks eligibility, not magnitude. Under it, "from 7 of 8 signals ·
+  93% of the full weighting" concedes what the number could not see (no
+  stated coverage), instead of quietly renormalising.
+- The header strip says **"Resume read cleanly · high 0.88 · 4 issues"** —
+  parse confidence rides on every record, next to the name, not buried in
+  an admin tab.
+- The radar ("Fit, as a shape") decomposes the 61% into its eight signals,
+  and the **six pill views** (Fit / Profile / Figures / Issues / Outreach /
+  Full record) replace one long scroll; they sit inside a Streamlit
+  fragment, so switching redraws only the panel.
+
+**The filters.** Five primary facets — region, approach, sector, market
+side, asset class — each with live counts that update as the others
+narrow, plus free-text keyword search over employers, titles, bullets and
+tools. "Advanced filters" holds the rest: software, credentials, an
+experience slider whose top stop means *no upper limit*, platform-alum,
+and a parse-confidence floor with an optional prefer-well-parsed sort. Two
+rules govern all of them: a filter refines the eligible pool but **never
+overrides the role**, and every control carries a hover definition —
+the first reviewer could not tell what "coverage" meant, and a number a
+user cannot interpret is worse than no number.
+
+### The profile, three of its six views
+
+**Profile** — every classified attribute as a three-tier block: the value,
+the keyword tags that earned it, the verbatim quote, with the model's
+confidence alongside. Absence is stated ("none listed" in a dashed pill),
+never left blank:
+
+![Profile view](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_profile.png)
+
+**Figures** — the resume's own numbers, structured. Stated AUM,
+performance and risk figures are extracted with verbatim quotes and
+**displayed, never scored**; the one comparable figure — names under
+coverage — is scored at 8% weight and its card says so. The dividing line
+is comparability, not importance: this very pool contains a
+"$4.5 trillion" that is Fidelity's AUM, not the candidate's book:
+
+![Figures view](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_figures.png)
+
+**Outreach** — the step after "this candidate fits" is always "someone
+writes to them": a one-click briefing whose every claim quotes the resume,
+because a sourcing mail earns replies by proving someone actually read it:
+
+![Outreach view](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_outreach.png)
+
+### Same score, different candidate
+
+Marcus and Ryan both score 61% on the Point72 seat. The compare view
+overlays their radars and prints the weighted components: Marcus earns it
+on requirements and skills, Ryan on firm type and platform lineage. One
+blended number would have hidden exactly the trade-off a recruiter is
+paid to make:
+
+![Compare view](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_compare.png)
+
+### The empty state is a feature
+
+Against the Mumbai posting's 4–5 year band, nobody qualifies — and the
+app says so instead of ranking unqualified people confidently. It names
+each near miss's single gap and computes what each widening would admit:
+
+![Zero results](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_zero_results.png)
+
+### Table view and export
+
+The full parsed breadth as a sortable table — 21 columns, every header
+with a hover definition — and the same columns as a CSV download:
 
 ![Shortlist table](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_table.png)
+
+The interface went through ~15 review rounds with two reviewers (a
+BD-user perspective and a UI designer). The grammar that survived: navy
+is chrome, **green means "clears every hard requirement"** and nothing
+else, bronze means gap or caveat, and informational facts are neutral
+pills — tags may carry a tinted background; coloured *text* was reviewed
+out. Qualified and one-gap-away are separate collapsible groups, one-line
+rows, because the *why* lives one glance right in the panel.
+
+The Insights tab reads the pool as a whole, on the axes the requisitions
+filter on. The heatmap's empty cells are the point — the seats this pool
+cannot fill; the dumbbell chart plots career length against investing
+tenure because the *gap* between them is the story for anyone who arrived
+from banking or engineering:
+
+![Insights view](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_insights.png)
+
+Below the distributions sits the talent-network graph — platforms, firms
+and candidates as three layers, drawn live from `firms.yaml`. Bronze edges
+are pod-to-platform lineage **the resumes never state**: this is the
+knowledge-graph roadmap item (§10) at its smallest honest size, and it is
+how "previously at Millennium" surfaces for a resume that only names the
+pod:
+
+![Talent network](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_network.png)
 """)
 
 # --------------------------------------------------------- 9 · scalability
@@ -467,9 +574,15 @@ ships.
 md("""
 ## 10 · If I had more time (and the features I chose not to fake)
 
+Three of these already exist in the app as deliberately small **previews**
+— real code over real data, never a mock with invented output — so the
+roadmap below is a widening, not a wish list.
+
 - **Referral & CRM metadata.** "Referred by" is not in any resume — it is
   ATS-side data. The record schema gets a `referral` field (default
-  unknown) and a sidebar facet; kept out now rather than invented.
+  unknown) and a sidebar facet. *In the app today:* a disabled "Referred
+  candidates only" toggle that names exactly the data it is waiting for,
+  kept out rather than invented.
 - **Verified performance.** Self-reported AUM and returns are shown today
   as quoted, clearly-labelled statements only — they are unverifiable and
   most resumes omit them, so as a *ranking* signal they would reward
@@ -478,7 +591,10 @@ md("""
 - **Internal sourcing corpus + RAG.** Meeting notes and call summaries
   would let free-text questions ("who impressed us on biotech last year?")
   join the structured search — with governance caveats: retrieval scope,
-  permissions, and the same evidence-quote discipline.
+  permissions, and the same evidence-quote discipline. *In the app today:*
+  the "Ask · preview" tab is this feature's smallest real slice —
+  concept-map retrieval over actual candidate sentences, quotes returned,
+  no generation.
 - **In-app labelling.** The ground-truth workflow (§7) moves into the app:
   pick a role, label candidates, accuracy recomputes — evaluation as a
   habit, not an event.
@@ -488,7 +604,9 @@ md("""
   public page. An internal deployment removes that constraint.
 - **Knowledge graph.** `firms.yaml` is already a small graph (firm → parent
   → platform); at scale it becomes queryable lineage ("everyone two hops
-  from a Millennium pod").
+  from a Millennium pod"). *In the app today:* the Insights talent network
+  draws that graph live — the bronze edges are relationships no resume
+  states.
 """)
 
 md("""
