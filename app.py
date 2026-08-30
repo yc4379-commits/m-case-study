@@ -260,6 +260,13 @@ st.markdown(
       .hardgrid {{ display: grid; grid-template-columns: 1fr 1fr;
                    gap: 6px 22px; }}
       .hardrow {{ font-size: 12.5px; color: {INK}; }}
+      /* The evidence sentence, at two lines with the rest on hover. The
+         quote is not optional -- its LENGTH was the layout problem. */
+      .quote {{ font-size: 12px; line-height: 1.5; color: {MUTED};
+                border-left: 2px solid {GRID}; padding-left: 9px;
+                margin: 5px 0 2px; cursor: help; display: -webkit-box;
+                -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+                overflow: hidden; }}
       .statusline {{ font-size: 14px; margin: 4px 0 8px; }}
       .statusline b {{ font-size: 17px; }}
       .recordtbl {{ border-collapse: collapse; width: 100%; font-size: 12.5px; }}
@@ -357,24 +364,25 @@ st.markdown(
          14px, which is a screen with no entry point. */
       .candname {{ font-size: 26px; font-weight: 600; letter-spacing: -.015em;
                    color: {INK}; line-height: 1.15; margin: 0 0 2px; }}
-      /* The profile's sub-tabs must NOT inherit the masthead tab rules
-         above -- those are fixed-position and white-on-navy. */
-      [data-testid="stVerticalBlockBorderWrapper"] div[role="tablist"] {{
-        position: static; left: auto; transform: none; height: auto;
-        z-index: auto; gap: 22px; margin-bottom: 2px;
-        border-bottom: 1px solid {GRID} !important;
+      /* The profile's section switcher: a pill row, deliberately shaped
+         unlike the masthead's tab strip. st.download_button is a different
+         testid, so the exports below keep their own styling. */
+      div[data-testid="stButton"] > button {{
+        border-radius: 999px; border: 1px solid {GRID}; background: {SURFACE};
+        color: {MUTED}; font-weight: 500; padding: 4px 6px; min-height: 0;
       }}
-      [data-testid="stVerticalBlockBorderWrapper"] div[role="tablist"]
-        [data-testid="stTab"] {{ color: {MUTED}; padding: 6px 2px; }}
-      [data-testid="stVerticalBlockBorderWrapper"] div[role="tablist"]
-        [data-testid="stTab"] p {{ font-size: 13.5px !important;
-                                   color: inherit !important; }}
-      [data-testid="stVerticalBlockBorderWrapper"] div[role="tablist"]
-        [data-testid="stTab"]:hover {{ color: {INK}; }}
-      [data-testid="stVerticalBlockBorderWrapper"] div[role="tablist"]
-        [data-testid="stTab"][aria-selected="true"] {{
-          color: {INK} !important; border-bottom: 2px solid {NAVY};
-        }}
+      div[data-testid="stButton"] > button p {{ font-size: 12.5px !important; }}
+      div[data-testid="stButton"] > button:hover {{
+        border-color: #d9e1ea; background: #f7f9fc; color: {INK};
+      }}
+      div[data-testid="stButton"] > button[kind="primary"],
+      div[data-testid="stButton"] > button[data-testid$="primary"] {{
+        background: {NAVY_WASH}; border-color: {NAVY}; color: {NAVY};
+      }}
+      div[data-testid="stButton"] > button[kind="primary"] p,
+      div[data-testid="stButton"] > button[data-testid$="primary"] p {{
+        font-weight: 600; color: {NAVY} !important;
+      }}
       /* The Fit bar in a result row is a monospace run of block characters,
          so it aligns down the whole column at any zoom -- ranking becomes
          visible instead of merely stated. */
@@ -511,15 +519,25 @@ def record_note(c: dict) -> str:
     q = c["quality"]
     missing = q.get("missing_fields") or []
     warns = sum(f.get("severity", "warning") == "warning" for f in c["flags"])
-    if q["band"] == "high" and not missing:
-        return ""
+    # Every record reports, including the clean ones: visible data quality is
+    # one of this system's three standing claims, and a badge that appears
+    # only on bad records turns a property of the pipeline into an exception.
+    # The band, the score and the issue count all stay -- only the WORDING
+    # changes, because "Data quality: high 0.94" never said whether it was
+    # judging the document or the person.
     if missing:
-        body = "Record incomplete — no " + ", ".join(
-            m.replace("_", " ") for m in missing[:3])
+        body = ("Resume partly unreadable — no "
+                + ", ".join(m.replace("_", " ") for m in missing[:3]))
+    elif q["band"] == "high":
+        body = "Resume read cleanly"
     else:
-        body = f"Record has {warns} unresolved issue" + ("s" if warns != 1 else "")
-    return (f"<span class='pill pill-note' title='{METRIC_HELP["quality"]}'>"
-            f"{body}</span>")
+        body = "Resume read with difficulty"
+    tail = f" · {q['band']} {q['score']}"
+    if warns:
+        tail += f" · {warns} issue" + ("s" if warns != 1 else "")
+    klass = "pill" if q["band"] == "high" and not missing else "pill pill-note"
+    return (f"<span class='{klass}' title='{METRIC_HELP["quality"]}'>"
+            f"{body}{tail}</span>")
 
 
 # ---------------------------------------------------------------------------
@@ -1121,49 +1139,6 @@ def fit_radar(results: list, height: int = 380) -> go.Figure | None:
     return fig
 
 
-def fit_bars(results: list) -> go.Figure | None:
-    """Score components as horizontal bars, heaviest weight last.
-
-    This replaces the radar. A radar cannot be read for value -- which is
-    exactly why the same numbers were printed in a table beneath it, and one
-    chart that needs a second chart is one chart too many. A bar carries
-    shape and value at once: length is the score, the axis label carries the
-    weight, and two candidates sit side by side without two translucent
-    polygons overlapping. It also costs about a third of the height.
-    """
-    weighted = [c for c in results[0].soft_criteria if c.weight > 0]
-    if not weighted:
-        return None
-    weighted = sorted(weighted, key=lambda c: c.weight)
-    labels = [
-        f"{CRITERION_LABEL.get(c.key, label_of(c.key))}  ·  {c.weight:.0%}"
-        for c in weighted
-    ]
-    fig = go.Figure()
-    for index, result in enumerate(results[:2]):
-        lookup = {c.key: c.score for c in result.soft_criteria}
-        values = [lookup.get(c.key, 0.0) for c in weighted]
-        colour = [SERIES_1, SERIES_2][index]
-        fig.add_trace(go.Bar(
-            x=values, y=labels, orientation="h", name=result.display_name,
-            marker_color=colour, marker_line=dict(color=SURFACE, width=2),
-            text=[f"{v:.0%}" for v in values], textposition="outside",
-            textfont=dict(size=11, color=INK),
-            hovertemplate="%{y}<br>%{x:.0%}<extra>%{fullData.name}</extra>",
-        ))
-    fig.update_layout(
-        barmode="group", bargap=0.34,
-        showlegend=len(results) > 1,
-        legend=dict(orientation="h", y=1.14, x=0, font=dict(size=11)),
-    )
-    fig.update_xaxes(range=[0, 1.16], tickformat=".0%", showgrid=True,
-                     gridcolor=GRID)
-    fig.update_yaxes(showgrid=False)
-    return styled_chart(
-        fig, 40 + 30 * len(weighted) * min(len(results), 2)
-    )
-
-
 _HONORIFICS = {"dr.", "dr", "mr.", "mr", "ms.", "ms", "mrs.", "prof.", "prof"}
 
 
@@ -1286,7 +1261,8 @@ with tab_search:
                 f"background:{SURFACE};border:1px solid {GRID};"
                 f"border-left:3px solid {SERIES_2};border-radius:10px;"
                 f"padding:12px 16px;margin:2px 0 6px;font-size:13px'>"
-                f"<b>Nobody clears every requirement for this role.</b> "
+                f"<b>0 of {len(filtered)} clear every requirement for this "
+                f"role.</b> "
                 f"Each candidate below misses exactly one requirement, "
                 f"named on their row — the decision is whether to widen "
                 f"that requirement, not to accept a high Fit score that "
@@ -1364,7 +1340,7 @@ with tab_search:
                     picked = [matches[p] for p in pair if p in matches]
                     if len(picked) == 2:
                         st.plotly_chart(
-                            fit_bars(picked), use_container_width=True
+                            fit_radar(picked, 330), use_container_width=True
                         )
                         st.markdown(
                             component_table(picked), unsafe_allow_html=True
@@ -1621,11 +1597,38 @@ with tab_search:
         # jump link from the badge above.
         _warn_n = sum(f.get("severity", "warning") == "warning"
                       for f in c["flags"])
-        t_fit, t_profile, t_issues, t_outreach, t_record = st.tabs([
-            "Fit", "Profile", f"Issues ({_warn_n})", "Outreach", "Record",
-        ])
+        # NOT st.tabs. Two reasons, one of them a bug.
+        #
+        # The bug: the masthead rule that lifts the page tabs into the navy
+        # bar targets div[role="tablist"], and a second st.tabs anywhere on
+        # the page is also a tablist -- so the profile's own tabs were being
+        # fixed-positioned into the masthead and landing on top of Insights
+        # and Data quality. Scoping the rule by ancestor is guesswork against
+        # Streamlit's DOM; having exactly one tablist in the app is not.
+        #
+        # The design reason outlives the bug: page tabs and section switches
+        # are different acts, and rendering both as the same tab strip claims
+        # they are siblings. "Data quality" (the whole pool) and this
+        # candidate's own issues are one subject at two scopes, which is
+        # exactly the pair a reader will conflate if both look like page nav.
+        # So this is a pill row, visibly not a tab strip, and every label is
+        # scoped to the person.
+        _views = ["Fit", "Profile", f"Resume issues ({_warn_n})", "Outreach",
+                  "Full record"]
+        _vkey = f"view_{chosen_id}"
+        st.session_state.setdefault(_vkey, 0)
+        _vcols = st.columns(len(_views))
+        for _i, (_col, _name) in enumerate(zip(_vcols, _views)):
+            if _col.button(
+                _name, key=f"{_vkey}_{_i}", use_container_width=True,
+                type=("primary" if st.session_state[_vkey] == _i
+                      else "secondary"),
+            ):
+                st.session_state[_vkey] = _i
+                st.rerun()
+        _view = st.session_state[_vkey]
 
-        with t_fit:
+        if _view == 0:
             if m is None:
                 st.caption(
                     "Choose a seat above to score this candidate against a "
@@ -1654,6 +1657,15 @@ with tab_search:
                     unsafe_allow_html=True,
                 )
                 section(
+                    "Fit, as a shape",
+                    "Read the shape, not the area: a radar's area grows with "
+                    "the square of the radius and exaggerates differences, "
+                    "so every component value is also printed below.",
+                )
+                radar = fit_radar([m], 350)
+                if radar:
+                    st.plotly_chart(radar, use_container_width=True)
+                section(
                     "What earned the Fit score",
                     "Fit ranks only candidates who already clear every hard "
                     "requirement. Each dimension is scored 0-1 and weighted; "
@@ -1674,7 +1686,7 @@ with tab_search:
                         )
 
 
-        with t_profile:
+        if _view == 1:
             section(
                 "Classified attributes",
                 "Each attribute as the pipeline classified it, with the "
@@ -1702,22 +1714,33 @@ with tab_search:
                             ),
                             unsafe_allow_html=True,
                         )
-                    # No inline quote. Ten stacked attributes each trailing a
-                    # 40-word sentence is the long string this pane had
-                    # become; the quotes live one fold away under Fit, which
-                    # is where anyone auditing a score is already looking.
+                    # The quote is back where the claim is: "nothing is
+                    # asserted without its evidence" is a standing claim of
+                    # this system, and moving the sentence one fold away
+                    # quietly retired it. What changes is only the rendering
+                    # -- two lines, clamped, with the full sentence on hover
+                    # -- so ten attributes no longer stack into a wall of
+                    # 40-word paragraphs.
+                    if block.get("evidence"):
+                        _ev = block["evidence"].replace("'", "’")
+                        st.markdown(
+                            f"<div class='quote' title='{_ev}'>“{_ev}”</div>",
+                            unsafe_allow_html=True,
+                        )
 
             attribute("Investment approach", label_of(e["investment_approach"]["value"]),
                       e["investment_approach"], note=label_of(c.get("approach_family")))
             attribute("Market side", label_of(e["market_side"]["value"]), e["market_side"])
+            # One row per sector: each carries its own keywords and its own
+            # resume sentence, and merging them threw two of the three away.
+            # The repeated label was the actual complaint, so the label is
+            # numbered instead -- "Sector 1 of 3" reads as one field observed
+            # three times, which is what it is.
             _secs = e["primary_sectors"]
-            if _secs:
-                # One row, not one row per sector. Three stacked "Sector"
-                # labels read as three different fields.
+            for _i, sector in enumerate(_secs, 1):
                 attribute(
-                    "Sectors",
-                    ", ".join(label_of(x["value"]) for x in _secs),
-                    _secs[0] if len(_secs) == 1 else None,
+                    "Sector" if len(_secs) == 1 else f"Sector {_i} of {len(_secs)}",
+                    label_of(sector["value"]), sector,
                 )
             attribute(
                 "Markets covered", ", ".join(c.get("coverage_markets", [])) or "—", None,
@@ -1764,7 +1787,7 @@ with tab_search:
 
 
 
-        with t_issues:
+        if _view == 2:
             # Issues sit AFTER the profile: a reviewer wants to know who this
             # person is before being told what is uncertain about the record. The
             # data-quality badge at the top links down here, so the caveats are
@@ -1831,7 +1854,7 @@ with tab_search:
                             )
 
 
-        with t_outreach:
+        if _view == 3:
             # -- Outreach draft ------------------------------------------------
             # The step after "this candidate fits" is always "someone writes to
             # them". The draft is assembled from the same evidence the profile
@@ -1892,7 +1915,7 @@ with tab_search:
                 )
 
 
-        with t_record:
+        if _view == 4:
             # Reference material, collapsed.
             with st.expander("Experience, as parsed"):
                 head = ("<tr><th>Employer</th><th>Resolved to</th><th>Title</th>"
