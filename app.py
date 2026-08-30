@@ -483,14 +483,23 @@ with tab_search:
     with _role_panel:
         if mode == "Use a saved requisition":
             titles = store.titles
+            # Every stored requisition is transcribed from a real posting,
+            # so the per-row provenance tag became noise repeated four
+            # times; each row shows its office and REQ number instead, and
+            # provenance is stated once below.
             chosen = st.selectbox(
                 "Requisition",
                 options=list(titles),
                 format_func=lambda k: (
                     f"{titles[k]}"
-                    + ("   ·  from a real posting" if store.get(k).get("source") else "")
+                    + (f"   ·  {store.get(k).get('team')}"
+                       if store.get(k).get("team") else "")
                 ),
                 label_visibility="collapsed",
+            )
+            st.caption(
+                "All requisitions are transcribed from real postings — "
+                "three Millennium (REQ numbers shown), one Point72."
             )
             requisition = store.get(chosen)
 
