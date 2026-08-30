@@ -75,14 +75,30 @@ DATA = ROOT / "data" / "candidates.json"
 # and 3:1 contrast all pass. Comparison is capped at two candidates partly for
 # legibility and partly because this pair is what has been validated.
 # ---------------------------------------------------------------------------
+# One navy, one bronze, one deep green -- and the green only ever means
+# "clears every hard requirement".
+#
+# The palette had drifted into a traffic light bolted onto a navy chrome: a
+# 2010s-bright #0ca30c (3.4:1 on white -- below the 4.5:1 needed for the
+# 12px text it was set in), a saturated amber that read as a browser warning
+# bar, a fire-engine red, and a stray violet on the language chips. Five
+# hues, four of them shouting, none of them related to the navy or the
+# bronze that carry the rest of the interface.
+#
+# Now: NAVY_DEEP is the masthead, NAVY the chrome accent, SERIES_1 the data
+# slate, SERIES_2 the single warm accent -- and every status colour is
+# pulled into that same low-chroma, dark-lightness register so it can sit at
+# 11.5px and still pass contrast. Nothing in the interface is brighter than
+# the content.
+NAVY_DEEP = "#0a1b38"
 NAVY = "#0b2f5e"
 NAVY_WASH = "#f4f7fb"
 SERIES_1 = "#2f5f98"
-SERIES_2 = "#b5793a"
+SERIES_2 = "#96622e"
 SEQ = ["#eef3f9", "#d5e1ef", "#b4c9e1", "#8badd0", "#5d8bba", "#2f5f98", "#123a6f"]
-STATUS_GOOD = "#0ca30c"
-STATUS_WARN = "#fab219"
-STATUS_BAD = "#d03b3b"
+STATUS_GOOD = "#146c43"   # 5.4:1 on white, was 3.4:1
+STATUS_WARN = "#96622e"   # the bronze accent, not a browser amber
+STATUS_BAD = "#8f2c2c"
 QUALITY_COLOUR = {"high": STATUS_GOOD, "medium": STATUS_WARN, "low": STATUS_BAD}
 INK = "#0b1b2b"
 MUTED = "#64748b"
@@ -139,7 +155,7 @@ st.markdown(
       .brandbar {{
         position: fixed; top: 0; left: 0; right: 0; height: 50px;
         z-index: 1000002; display: flex; align-items: center; gap: 14px;
-        background: #0a1b38; padding: 0 24px;
+        background: {NAVY_DEEP}; padding: 0 24px;
       }}
       .brandbar b {{ font-family: 'Playfair Display', Georgia, serif;
                      font-size: 19px; font-weight: 500; color: #fff;
@@ -155,9 +171,9 @@ st.markdown(
          strip is lifted out of the page flow into the bar; the tab PANELS
          stay exactly where they were. */
       div[role="tablist"] {{
-        position: fixed; top: 0; left: 50%; transform: translateX(-50%);
-        height: 50px; z-index: 1000003; background: transparent;
-        border-bottom: none !important; gap: 26px; align-items: center;
+        position: fixed; top: 0; left: 235px; height: 50px;
+        z-index: 1000003; background: transparent;
+        border-bottom: none !important; gap: 24px; align-items: center;
         display: flex;
       }}
       div[role="tablist"] [data-testid="stTab"] {{
@@ -206,9 +222,44 @@ st.markdown(
       .grouphead {{ font-size: 11px; font-weight: 600;
                     text-transform: uppercase; letter-spacing: .08em;
                     margin: 12px 0 8px; }}
-      .pill {{ display: inline-block; background: #e9edf3;
-               border-radius: 999px; padding: 3px 12px; font-size: 11.5px;
-               color: {INK}; margin: 0 6px 6px 0; }}
+      /* The one informational pill. Every tag in the interface uses it. */
+      .pill {{ display: inline-block; background: #eef1f5;
+               border: 1px solid #e2e8f0; border-radius: 999px;
+               padding: 3px 12px; font-size: 11.5px;
+               color: #46586b; margin: 0 6px 6px 0; }}
+      /* The single exception: a record we could not fully read. Bronze,
+         because it is a caveat about the data, not a verdict on the person. */
+      .pill-note {{ background: #faf5ef; border-color: #e8ded1;
+                    color: #7a512a; font-weight: 600; }}
+      .sechead {{ font-size: 11.5px; font-weight: 700;
+                  text-transform: uppercase; letter-spacing: .08em;
+                  color: {INK}; margin: 16px 0 8px; display: flex;
+                  align-items: center; gap: 7px; }}
+      .sechead i {{ font-style: normal; font-size: 9.5px; font-weight: 700;
+                    width: 14px; height: 14px; border-radius: 8px;
+                    background: #eef1f5; color: {MUTED}; cursor: help;
+                    display: inline-flex; align-items: center;
+                    justify-content: center; letter-spacing: 0; }}
+      /* The contribution ledger: what each scoring dimension actually found,
+         at the weight it was worth. */
+      .ledger {{ display: flex; flex-direction: column; gap: 12px; }}
+      .ldrow {{ display: flex; flex-direction: column; gap: 5px; }}
+      .ldtop {{ display: flex; align-items: baseline; gap: 9px; }}
+      .ldlbl {{ font-size: 13px; font-weight: 600; color: {INK};
+                cursor: help; }}
+      .ldw {{ font-size: 11.5px; color: {MUTED}; }}
+      .ldval {{ margin-left: auto; font-size: 13px; font-weight: 700;
+                color: {INK}; font-variant-numeric: tabular-nums; }}
+      .ldbar {{ height: 6px; background: #eff2f6; border-radius: 3px;
+                overflow: hidden; }}
+      .ldbar i {{ display: block; height: 100%; background: {SERIES_1}; }}
+      .lddid {{ font-size: 12.5px; line-height: 1.5; color: #46586b; }}
+      .ldrow-idle .ldlbl, .ldrow-idle .ldval {{ color: {MUTED};
+                                                font-weight: 500; }}
+      .ldrow-idle .lddid {{ color: #94a3b8; font-style: italic; }}
+      .hardgrid {{ display: grid; grid-template-columns: 1fr 1fr;
+                   gap: 6px 22px; }}
+      .hardrow {{ font-size: 12.5px; color: {INK}; }}
       .statusline {{ font-size: 14px; margin: 4px 0 8px; }}
       .statusline b {{ font-size: 17px; }}
       .recordtbl {{ border-collapse: collapse; width: 100%; font-size: 12.5px; }}
@@ -242,6 +293,12 @@ st.markdown(
       div[role="radiogroup"] label > div:first-child {{ margin-top: 3px; }}
       div[role="radiogroup"] label p {{ font-size: 13px !important;
                                         line-height: 1.5; }}
+      /* The name gets its own step. At a single 13px, ten cards blur into
+         one block; 15px semibold against a 13px description line is enough
+         separation to scan the column without reading it. */
+      div[role="radiogroup"] label p:first-of-type {{
+        font-size: 15px !important; font-weight: 600; line-height: 1.35;
+      }}
       div[role="radiogroup"] label p + p {{ margin-top: 2px !important; }}
       [data-testid="stExpander"] details {{
         border: 1px solid {GRID}; border-radius: 12px; background: {SURFACE};
@@ -274,11 +331,60 @@ st.markdown(
         white-space: normal !important; overflow: visible !important;
         text-overflow: clip !important; max-width: none !important;
       }}
-      .rolecard {{
-        border: 1px solid {GRID}; border-left: 3px solid {NAVY};
-        border-radius: 12px; background: {SURFACE};
-        padding: 9px 14px; font-size: 12.5px; margin: 2px 0 14px;
-        line-height: 1.7;
+      /* The role is this app's central claim, so it gets a permanent band
+         rather than a collapsed step. Folded shut behind "Step 1", a
+         first-time visitor saw a filter sidebar and a list -- exactly the
+         tool this design argues against. */
+      .rolebar {{
+        display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px;
+        background: #faf7f3; border: 1px solid #e8ded1;
+        border-radius: 12px; padding: 12px 16px; margin: 0 0 12px;
+      }}
+      .rolebar-empty {{ background: #f7f9fc; border-color: {GRID}; }}
+      .rolekick {{ font-size: 10px; font-weight: 700; letter-spacing: .1em;
+                   color: {SERIES_2}; }}
+      .rolebar-empty .rolekick {{ color: {MUTED}; }}
+      .roletitle {{ font-size: 15px; font-weight: 600; color: {INK}; }}
+      .roleteam {{ font-size: 12.5px; color: {MUTED}; }}
+      .hardchips {{ display: flex; flex-wrap: wrap; gap: 6px; }}
+      .hardchip {{ background: #fff; border: 1px solid #e4d8c8;
+                   border-radius: 999px; padding: 3px 11px;
+                   font-size: 11.5px; color: #7a512a; }}
+      .hardchip b {{ color: {INK}; }}
+      .rolecount {{ margin-left: auto; font-size: 11.5px; color: {MUTED};
+                    max-width: 320px; text-align: right; }}
+      /* One large string per screen. Every other label sat between 11 and
+         14px, which is a screen with no entry point. */
+      .candname {{ font-size: 26px; font-weight: 600; letter-spacing: -.015em;
+                   color: {INK}; line-height: 1.15; margin: 0 0 2px; }}
+      /* The profile's sub-tabs must NOT inherit the masthead tab rules
+         above -- those are fixed-position and white-on-navy. */
+      [data-testid="stVerticalBlockBorderWrapper"] div[role="tablist"] {{
+        position: static; left: auto; transform: none; height: auto;
+        z-index: auto; gap: 22px; margin-bottom: 2px;
+        border-bottom: 1px solid {GRID} !important;
+      }}
+      [data-testid="stVerticalBlockBorderWrapper"] div[role="tablist"]
+        [data-testid="stTab"] {{ color: {MUTED}; padding: 6px 2px; }}
+      [data-testid="stVerticalBlockBorderWrapper"] div[role="tablist"]
+        [data-testid="stTab"] p {{ font-size: 13.5px !important;
+                                   color: inherit !important; }}
+      [data-testid="stVerticalBlockBorderWrapper"] div[role="tablist"]
+        [data-testid="stTab"]:hover {{ color: {INK}; }}
+      [data-testid="stVerticalBlockBorderWrapper"] div[role="tablist"]
+        [data-testid="stTab"][aria-selected="true"] {{
+          color: {INK} !important; border-bottom: 2px solid {NAVY};
+        }}
+      /* The Fit bar in a result row is a monospace run of block characters,
+         so it aligns down the whole column at any zoom -- ranking becomes
+         visible instead of merely stated. */
+      div[role="radiogroup"] label code {{
+        font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+        font-size: 11.5px; letter-spacing: -.5px; background: transparent;
+        color: {SERIES_1}; padding: 0;
+      }}
+      div[role="radiogroup"] label:has(input:checked) code {{
+        color: {NAVY};
       }}
     </style>
     """,
@@ -309,8 +415,14 @@ def load_candidates() -> list[dict]:
         parts = (c.get("display_name") or "").split()
         while parts and parts[0].lower().rstrip(".") in _NAME_HONORIFICS:
             parts.pop(0)
-        if parts:
-            c["display_name"] = " ".join(parts)
+        name = " ".join(parts) if parts else (c.get("display_name") or "")
+        # "MARINA SILVA COSTA" is a resume-header typographic convention, not
+        # a name. One all-caps row in a list of ten reads as emphasis -- as if
+        # the tool ranked her first -- so case is normalised here, once, and
+        # every view downstream inherits it.
+        if name and name == name.upper():
+            name = name.title()
+        c["display_name"] = name
     return rows
 
 
@@ -337,7 +449,6 @@ NO_LIMIT = float(math.ceil(max(
 
 st.markdown(
     '<div class="brandbar"><b>talent intelligence</b>'
-    "<span>Business Development</span>"
     f"<span class='ctx'>{len(candidates)} candidates · "
     f"{len(store.items)} roles</span></div>",
     unsafe_allow_html=True,
@@ -349,6 +460,30 @@ by_id = {c["candidate_id"]: c for c in candidates}
 # Helpers
 # ---------------------------------------------------------------------------
 
+# Deep coverage is the pool's upper quartile, not a round number: "20 names"
+# is remarkable in one pool and unremarkable in another.
+_COVERAGES = sorted(
+    x for x in (
+        (c.get("extraction", {}).get("coverage") or {}).get("stocks_covered")
+        for c in candidates
+    ) if x
+)
+_COVERAGE_DEEP = (_COVERAGES[int(len(_COVERAGES) * 0.75)]
+                  if _COVERAGES else 10 ** 9)
+_APPROACH_COUNTS: dict[str, int] = {}
+for _c in candidates:
+    _f = _c.get("approach_family")
+    if _f:
+        _APPROACH_COUNTS[_f] = _APPROACH_COUNTS.get(_f, 0) + 1
+_RARE_APPROACHES = {
+    f for f, n in _APPROACH_COUNTS.items() if n / len(candidates) < 0.4
+}
+_BOTH_SIDES_RARE = sum(
+    1 for c in candidates
+    if c.get("has_buy_side_experience") and c.get("has_sell_side_experience")
+) / max(len(candidates), 1) < 0.4
+
+
 def _fmt_pct(x) -> str:
     """n/a-aware percent for the evaluation table."""
     return "n/a" if x is None else f"{x:.0%}"
@@ -358,26 +493,79 @@ def label_of(value: str | None) -> str:
     return value.replace("_", " ").title() if value else "—"
 
 
-def quality_chip(band: str, score: float, issues: int) -> str:
-    """The parse-confidence badge, spelled out and linked to its evidence.
+def record_note(c: dict) -> str:
+    """What is wrong with this RECORD, in words, or nothing at all.
 
-    An earlier version read "DATA MEDIUM 0.62" and explained nothing: a
-    reviewer could not tell whether it judged the document or the candidate,
-    and there was no way to find out what drove it. It now names itself,
-    carries the definition on hover, and links straight to the issue list
-    that produced the number -- a score with no route to its reasons is just
-    an assertion.
+    This replaces a badge reading "Data quality: high 0.94". Two faults. It
+    was ambiguous in exactly the way the pipeline must never be -- a reader
+    could not tell whether "high" praised the document or the candidate, and
+    "0.94" is a number no recruiter has a use for. And it was rendered on
+    every row, including the majority with nothing wrong, so the one record
+    that genuinely cannot be trusted looked like all the others.
+
+    A clean record now says nothing: silence is the correct report for "we
+    read this document without difficulty". Only a thin or unreadable record
+    speaks, and it speaks about the document -- naming the fields that are
+    missing rather than scoring them.
     """
-    colour = QUALITY_COLOUR.get(band, MUTED)
-    tail = f" · {issues} issue{'s' if issues != 1 else ''}" if issues else ""
-    tooltip = METRIC_HELP["quality"]
-    return (
-        f"<a href='#issues' title='{tooltip}' "
-        f"style='text-decoration:none'>"
-        f"<span style='background:{colour}1f;color:{colour};padding:2px 10px;"
-        f"border-radius:9px;font-size:11.5px;font-weight:700;'>"
-        f"Data quality: {band} {score}{tail} ↓</span></a>"
-    )
+    q = c["quality"]
+    missing = q.get("missing_fields") or []
+    warns = sum(f.get("severity", "warning") == "warning" for f in c["flags"])
+    if q["band"] == "high" and not missing:
+        return ""
+    if missing:
+        body = "Record incomplete — no " + ", ".join(
+            m.replace("_", " ") for m in missing[:3])
+    else:
+        body = f"Record has {warns} unresolved issue" + ("s" if warns != 1 else "")
+    return (f"<span class='pill pill-note' title='{METRIC_HELP["quality"]}'>"
+            f"{body}</span>")
+
+
+# ---------------------------------------------------------------------------
+# Distinctions
+#
+# What is worth printing next to a name is a property of the POOL, not of the
+# person. The rows used to read "US · Fundamental · 6.3y investing · data
+# high" -- four facts, three of them fixed by the role that produced the list
+# and therefore identical on every row, and one of them a score about the
+# document. Nothing there told two candidates apart, which is the only job a
+# tag has.
+#
+# A tag is shown only when fewer than 40% of the pool carries it: in ten
+# fundamental analysts "fundamental" distinguishes nobody, and in a pool of
+# one quant "systematic" distinguishes everything. The threshold is the whole
+# idea, so it is named once here rather than tuned per tag.
+# ---------------------------------------------------------------------------
+
+RARE_SHARE = 0.4
+
+
+def _share(predicate) -> float:
+    return sum(1 for x in candidates if predicate(x)) / max(len(candidates), 1)
+
+
+def distinctions(c: dict) -> list[str]:
+    """Up to three things that set this candidate apart from this pool."""
+    out: list[str] = []
+    if c.get("platform_alum_of"):
+        out.append(f"{c['platform_alum_of'][0].split()[0]} alum")
+    for cred in c.get("credentials_summary") or []:
+        if cred.startswith("CFA"):
+            out.append("CFA" if "Charterholder" in cred else "CFA candidate")
+            break
+    covered = (c.get("extraction", {}).get("coverage") or {}).get(
+        "stocks_covered")
+    if covered and covered >= _COVERAGE_DEEP:
+        out.append(f"{covered} names covered")
+    if c.get("approach_family") in _RARE_APPROACHES:
+        out.append(label_of(c.get("approach_family")))
+    if len(c.get("languages") or []) >= 3:
+        out.append(f"{len(c['languages'])} languages")
+    if (_BOTH_SIDES_RARE and c.get("has_buy_side_experience")
+            and c.get("has_sell_side_experience")):
+        out.append("Both sides")
+    return out[:3]
 
 
 def styled_chart(fig: go.Figure, height: int = 320) -> go.Figure:
@@ -406,6 +594,61 @@ def styled_chart(fig: go.Figure, height: int = 320) -> go.Figure:
     fig.update_yaxes(showgrid=True, gridcolor=GRID, zeroline=False,
                      linecolor=GRID, tickfont=dict(color=MUTED))
     return fig
+
+
+def section(title: str, tip: str = "", container=None) -> None:
+    """A section title, and its definition on hover rather than under it.
+
+    Every zone gets one of these, and only one line: the titles were 11px
+    uppercase grey while the explanatory caption beneath them was 12.5px --
+    the explanation was literally larger than the thing it explained, which
+    is how a screen ends up with no readable structure. The prose moves into
+    the title's tooltip, where the reader can ask for it.
+    """
+    mark = "<i title='{}'>?</i>".format(tip.replace("'", "’")) if tip else ""
+    (container or st).markdown(
+        f"<div class='sechead'>{title}{mark}</div>", unsafe_allow_html=True
+    )
+
+
+def contribution_ledger(result) -> str:
+    """One row per scoring dimension: weight, score, and what earned it.
+
+    This is the answer to "why 84%". The previous answer was a radar, plus a
+    table of the same numbers, plus a collapsed list of quotes -- three
+    renderings of one fact, none of which said what the candidate actually
+    DID on that dimension. Each row now carries the pipeline's own finding
+    for the dimension, which IS the contribution; the verbatim quote stays
+    one fold below for anyone auditing it.
+
+    Dimensions the role never specified are listed too, greyed and at zero.
+    Omitting them is how a thin score passes for a complete one.
+    """
+    rows = []
+    active = [x for x in result.soft_criteria if x.weight > 0]
+    idle = [x for x in result.soft_criteria if x.weight <= 0]
+    for crit in sorted(active, key=lambda x: -x.weight):
+        did = crit.found or "no signal found in this resume"
+        rows.append(
+            f"<div class='ldrow'><div class='ldtop'>"
+            f"<span class='ldlbl' title='{CRITERION_HELP.get(crit.key, '')}'>"
+            f"{CRITERION_LABEL.get(crit.key, label_of(crit.key))}</span>"
+            f"<span class='ldw'>{crit.weight:.0%} of Fit</span>"
+            f"<span class='ldval'>{crit.score:.0%}</span></div>"
+            f"<div class='ldbar'><i style='width:{crit.score:.0%}'></i></div>"
+            f"<div class='lddid'>{did}</div></div>"
+        )
+    for crit in idle:
+        rows.append(
+            f"<div class='ldrow ldrow-idle'><div class='ldtop'>"
+            f"<span class='ldlbl'>"
+            f"{CRITERION_LABEL.get(crit.key, label_of(crit.key))}</span>"
+            f"<span class='ldw'>not measured</span>"
+            f"<span class='ldval'>—</span></div>"
+            f"<div class='lddid'>this role specifies nothing to score "
+            f"against</div></div>"
+        )
+    return "<div class='ledger'>" + "".join(rows) + "</div>"
 
 
 def searchable_text(c: dict) -> str:
@@ -460,9 +703,12 @@ tab_search, tab_insights, tab_quality, tab_method = st.tabs([
 # The tabs are created first so the panel can render into the working view
 # while the chosen requisition still exists before the sidebar builds.
 with tab_search:
+    # The bar is declared first so it renders ABOVE the picker; it is filled
+    # in further down, once the chosen requisition exists.
+    _role_bar = st.container()
     _role_panel = st.expander(
-        "**Step 1 · Which seat are you filling?**", expanded=False,
-        icon=":material/work:",
+        "Change role — saved requisition, define one, or browse unranked",
+        expanded=False, icon=":material/work:",
     )
 
     with _role_panel:
@@ -571,26 +817,45 @@ with tab_search:
                 },
             }
 
+    # The active seat and its hard requirements, stated permanently. Each
+    # requirement is a chip rather than a run of bolded words in a sentence:
+    # four chips can be counted at a glance, and the sidebar no longer needs
+    # to repeat any of them as a disabled control.
     if requisition:
         hard = requisition.get("hard", {})
         bits = []
         if r := hard.get("regions"):
-            bits.append(f"<b>Market</b> {' / '.join(r)}")
+            bits.append(("Market", " / ".join(r)))
         if a := hard.get("approach_families"):
-            bits.append(f"<b>Approach</b> {' / '.join(label_of(x) for x in a)}")
+            bits.append(("Approach", " / ".join(label_of(x) for x in a)))
         if s := hard.get("sectors_any"):
-            bits.append(f"<b>Sector</b> {' / '.join(label_of(x) for x in s)}")
+            bits.append(("Sector", " / ".join(label_of(x) for x in s)))
         if y := hard.get("investment_years"):
             _span = (f"{y.get('min', 0)}+" if "max" not in y
                      else f"{y.get('min', 0)}–{y['max']}")
-            bits.append(f"<b>Experience</b> {_span} yrs investing")
-        st.markdown(
-            f"<div class='rolecard'><b>{requisition['title']}</b>"
-            + (f" <span style='color:{MUTED}'>· {requisition.get('team','')}</span>"
+            bits.append(("Investing", f"{_span} yrs"))
+        _role_bar.markdown(
+            "<div class='rolebar'><span class='rolekick'>FILLING</span>"
+            f"<span class='roletitle'>{requisition['title']}</span>"
+            + (f"<span class='roleteam'>{requisition.get('team','')}</span>"
                if requisition.get("team") else "")
-            + f"<span style='color:{MUTED}'> &nbsp;—&nbsp; must satisfy </span>"
-            + " <span style='color:#cbd5e1'>·</span> ".join(bits)
-            + "</div>",
+            + "<span class='hardchips'>"
+            + "".join(f"<span class='hardchip'>{k} <b>{v}</b></span>"
+                      for k, v in bits)
+            + "</span>"
+            + f"<span class='rolecount'>{len(bits)} hard requirement"
+            + ("s" if len(bits) != 1 else "")
+            + " — miss exactly one and you appear under “One gap away”"
+            + "</span></div>",
+            unsafe_allow_html=True,
+        )
+    else:
+        _role_bar.markdown(
+            "<div class='rolebar rolebar-empty'>"
+            "<span class='rolekick'>NO ROLE</span>"
+            "<span class='roletitle'>Browsing the whole pool, unranked</span>"
+            "<span class='rolecount'>Choose a seat above to rank candidates "
+            "and see who is disqualified.</span></div>",
             unsafe_allow_html=True,
         )
 
@@ -657,7 +922,10 @@ def matches_facets(c: dict, skip: str | None = None) -> bool:
 # made the sidebar taller than the results beside it, which reads as a wall
 # of settings rather than a tool -- and the three below are the ones a
 # recruiter reaches for first.
-PRIMARY = {"region", "approach_family", "sectors"}
+# Market side joins the visible three: once a role fixes market, approach
+# and sector, those controls disappear entirely, and a sidebar showing only
+# a keyword box reads as broken.
+PRIMARY = {"region", "approach_family", "sectors", "market_side"}
 
 
 # Which sidebar facet answers to which hard requirement of the active role.
@@ -713,20 +981,11 @@ def facet_control(key: str, label: str, container) -> list[str]:
     fixed = (requisition.get("hard") or {}).get(hard_key) \
         if requisition and hard_key else None
     if fixed:
-        fixed_labels = ", ".join(facet_label(key, v) for v in fixed)
-        container.multiselect(
-            label,
-            options=options,
-            default=[],
-            disabled=True,
-            help=FILTER_HELP.get(key, ""),
-            placeholder=f"Set by the role — {fixed_labels}",
-            key=f"locked_{key}",
-        )
-        container.caption(
-            f":material/lock: Fixed by the role. Candidates who miss it "
-            "still appear under *One gap away*."
-        )
+        # Nothing is rendered. The role bar at the top of the screen already
+        # states this dimension and its value, and a disabled copy of the
+        # same fact costs a full sidebar row, reads as a broken control, and
+        # invites a click that does nothing. Eligibility has one owner; the
+        # sidebar simply stops speaking about it.
         return []
     return container.multiselect(
         label,
@@ -747,8 +1006,12 @@ query = st.sidebar.text_input(
     help=FILTER_HELP["keyword"],
 )
 
-with st.sidebar.expander("Experience, skills and credentials",
-                         icon=":material/tune:"):
+# One fold, not two. Two collapsed groups meant a selection could hide in
+# either of them while silently shrinking the list.
+with st.sidebar.expander("More filters", icon=":material/tune:"):
+    for key, label, _ in FACETS:
+        if key not in PRIMARY:
+            selections[key] = facet_control(key, label, st)
     years_span = st.slider(
         "Years of investment experience",
         0.0, NO_LIMIT, (0.0, NO_LIMIT), step=0.5, help=FILTER_HELP["years"],
@@ -757,13 +1020,6 @@ with st.sidebar.expander("Experience, skills and credentials",
         "Include candidates whose tenure could not be computed",
         value=True, help=FILTER_HELP["unknown"],
     )
-    for key, label, _ in FACETS:
-        if key not in PRIMARY and key != "market_side":
-            selections[key] = facet_control(key, label, st)
-
-with st.sidebar.expander("Background and data quality",
-                         icon=":material/database:"):
-    selections["market_side"] = facet_control("market_side", "Market side", st)
     only_alum = st.checkbox(
         "Multi-manager platform alumni only", help=FILTER_HELP["alum"]
     )
@@ -863,6 +1119,49 @@ def fit_radar(results: list, height: int = 380) -> go.Figure | None:
         font=dict(family='system-ui, -apple-system, sans-serif', color=INK),
     )
     return fig
+
+
+def fit_bars(results: list) -> go.Figure | None:
+    """Score components as horizontal bars, heaviest weight last.
+
+    This replaces the radar. A radar cannot be read for value -- which is
+    exactly why the same numbers were printed in a table beneath it, and one
+    chart that needs a second chart is one chart too many. A bar carries
+    shape and value at once: length is the score, the axis label carries the
+    weight, and two candidates sit side by side without two translucent
+    polygons overlapping. It also costs about a third of the height.
+    """
+    weighted = [c for c in results[0].soft_criteria if c.weight > 0]
+    if not weighted:
+        return None
+    weighted = sorted(weighted, key=lambda c: c.weight)
+    labels = [
+        f"{CRITERION_LABEL.get(c.key, label_of(c.key))}  ·  {c.weight:.0%}"
+        for c in weighted
+    ]
+    fig = go.Figure()
+    for index, result in enumerate(results[:2]):
+        lookup = {c.key: c.score for c in result.soft_criteria}
+        values = [lookup.get(c.key, 0.0) for c in weighted]
+        colour = [SERIES_1, SERIES_2][index]
+        fig.add_trace(go.Bar(
+            x=values, y=labels, orientation="h", name=result.display_name,
+            marker_color=colour, marker_line=dict(color=SURFACE, width=2),
+            text=[f"{v:.0%}" for v in values], textposition="outside",
+            textfont=dict(size=11, color=INK),
+            hovertemplate="%{y}<br>%{x:.0%}<extra>%{fullData.name}</extra>",
+        ))
+    fig.update_layout(
+        barmode="group", bargap=0.34,
+        showlegend=len(results) > 1,
+        legend=dict(orientation="h", y=1.14, x=0, font=dict(size=11)),
+    )
+    fig.update_xaxes(range=[0, 1.16], tickformat=".0%", showgrid=True,
+                     gridcolor=GRID)
+    fig.update_yaxes(showgrid=False)
+    return styled_chart(
+        fig, 40 + 30 * len(weighted) * min(len(results), 2)
+    )
 
 
 _HONORIFICS = {"dr.", "dr", "mr.", "mr", "ms.", "ms", "mrs.", "prof.", "prof"}
@@ -966,7 +1265,7 @@ with tab_search:
         if exact:
             st.markdown(
                 f"<div class='statusline'><b style='color:{STATUS_GOOD}'>"
-                f"{len(exact)} qualify</b> · ranked by Fit; "
+                f"{len(exact)} shortlisted</b> · ranked by Fit; "
                 f"{len(near)} more are one gap away, listed after."
                 "</div>",
                 unsafe_allow_html=True,
@@ -987,7 +1286,7 @@ with tab_search:
                 f"background:{SURFACE};border:1px solid {GRID};"
                 f"border-left:3px solid {SERIES_2};border-radius:10px;"
                 f"padding:12px 16px;margin:2px 0 6px;font-size:13px'>"
-                f"<b>0 of {len(filtered)} qualify for this role.</b> "
+                f"<b>Nobody clears every requirement for this role.</b> "
                 f"Each candidate below misses exactly one requirement, "
                 f"named on their row — the decision is whether to widen "
                 f"that requirement, not to accept a high Fit score that "
@@ -997,10 +1296,10 @@ with tab_search:
     else:
         results, matches = None, {}
         ordered = filtered
-        st.markdown("##### Candidate pool")
-        st.caption(
+        section(
+            "Candidate pool",
             f"{len(filtered)} of {len(candidates)} candidates after the "
-            "sidebar refinements. Choose a role above to rank them."
+            "sidebar refinements. Choose a role above to rank them.",
         )
 
     if prefer_quality:
@@ -1016,7 +1315,11 @@ with tab_search:
 
     # -- Result list: the NAME is the click target -------------------------
     with list_col:
-        st.markdown("##### Results")
+        section(
+            "Results",
+            "Ranked by Fit within each group. Eligibility is decided by the "
+            "role, never by the sidebar.",
+        )
 
         # Active refinements, restated where the results are. Two of the
         # sidebar's filter groups collapse, so a selection made inside one
@@ -1046,7 +1349,28 @@ with tab_search:
                 "".join(f"<span class='pill'>{t}</span>" for t in pills),
                 unsafe_allow_html=True,
             )
-        st.caption("Click a name to open the profile.")
+
+        if requisition and len(ordered) > 1:
+            with st.expander("Compare two candidates",
+                             icon=":material/compare_arrows:"):
+                pair = st.multiselect(
+                    "Pick two",
+                    options=[c["candidate_id"] for c in ordered],
+                    format_func=lambda cid: by_id[cid]["display_name"],
+                    max_selections=2,
+                    label_visibility="collapsed",
+                )
+                if len(pair) == 2:
+                    picked = [matches[p] for p in pair if p in matches]
+                    if len(picked) == 2:
+                        st.plotly_chart(
+                            fit_bars(picked), use_container_width=True
+                        )
+                        st.markdown(
+                            component_table(picked), unsafe_allow_html=True
+                        )
+                elif pair:
+                    st.caption("Select one more to compare.")
 
         def row_label(cid: str) -> str:
             """Two lines: a status chip with the name and score, then one
@@ -1068,36 +1392,56 @@ with tab_search:
             m = matches.get(cid)
             inv = c.get("years_investment_experience")
 
-            meta = " · ".join([
-                f"{'—' if inv is None else f'{inv:g}y'} investing",
-                c.get("region") or "—",
-                label_of(c.get("approach_family")) or "—",
-            ])
+            # Line two is identity: where they sit and how long they have
+            # been investing. Region and approach are gone -- the role bar
+            # fixed both, so printing them on every row was three columns of
+            # the same word.
+            meta = " · ".join(x for x in (
+                c.get("current_firm"),
+                label_of(c["current_firm_type"])
+                if c.get("current_firm_type") else None,
+                None if inv is None else f"{inv:g}y investing",
+            ) if x)
 
             if m is None:
                 return f"**{c['display_name']}**\n\n:gray[{meta}]"
 
-            head = (f"**{c['display_name']}**&nbsp;&nbsp;"
-                    f"Fit **{m.soft_score:.0%}**")
+            # Every row now has the same three zones in the same order --
+            # name and bar, metadata, verdict -- so two rows can be compared
+            # without reading either in full. Previously a row was a
+            # paragraph: bold name, an inline "Fit 84%", a coloured sentence
+            # and grey metadata, all at one size and one alignment.
+            cells = round(m.soft_score * 10)
+            bar = "█" * cells + "░" * (10 - cells)
+            head = (f"**{c['display_name']}** &nbsp; "
+                    f"`{bar}` **{m.soft_score:.0%}**")
 
             if m.is_exact:
                 strong = sorted(
                     (x for x in m.soft_criteria if x.weight and x.score >= .5),
                     key=lambda x: x.score * x.weight, reverse=True,
                 )[:2]
-                why = (" · ".join(
+                # Line three is what sets them apart. Score components were
+                # here before, restating the bar two inches to the left; a
+                # pool-relative distinction is the thing the bar cannot say.
+                why = " · ".join(distinctions(c)) or (" · ".join(
                     f"{CRITERION_LABEL.get(x.key, x.key)} {x.score:.0%}"
                     for x in strong
-                ) or "meets every hard requirement")
-                return (f"{head}\n\n"
-                        f":green[{why}] :gray[· {meta}]")
+                ) or "clears every hard requirement")
+                # Streamlit's :green[] and :orange[] are its own stock
+                # accents -- brighter than anything else on the screen and
+                # not overridable from our stylesheet. The section header
+                # above already says which side of the line this row sits
+                # on, so the reason line is set in body ink and the gap line
+                # is labelled in words. Two saturated colours leave the
+                # densest part of the interface.
+                return f"{head}\n\n:gray[{meta}]\n\n{why}"
 
             fail = m.failed_hard[0]
             gap = (f"{fail.label} {fail.found}".replace("Investment ", "")
                    + f" — needs {fail.required}")
             gap = gap[0].upper() + gap[1:]
-            return (f"{head}\n\n"
-                    f":orange[{gap}] :gray[· {meta}]")
+            return f"{head}\n\n:gray[{meta}]\n\n**Gap** — {gap}"
 
         # With a role set, the list is two labelled sections -- people who
         # qualify, people one gap away -- rather than one run of rows told
@@ -1122,7 +1466,7 @@ with tab_search:
             if exact_ids:
                 st.markdown(
                     f"<div class='grouphead' style='color:{STATUS_GOOD}'>"
-                    f"Qualify · {len(exact_ids)}</div>",
+                    f"Shortlist · {len(exact_ids)}</div>",
                     unsafe_allow_html=True,
                 )
                 picked_a = st.radio(
@@ -1188,27 +1532,6 @@ with tab_search:
                 use_container_width=True,
             )
 
-        if requisition and len(ordered) > 1:
-            with st.expander("Compare two candidates",
-                             icon=":material/compare_arrows:"):
-                pair = st.multiselect(
-                    "Pick two",
-                    options=[c["candidate_id"] for c in ordered],
-                    format_func=lambda cid: by_id[cid]["display_name"],
-                    max_selections=2,
-                    label_visibility="collapsed",
-                )
-                if len(pair) == 2:
-                    picked = [matches[p] for p in pair if p in matches]
-                    if len(picked) == 2:
-                        st.plotly_chart(
-                            fit_radar(picked, 330), use_container_width=True
-                        )
-                        st.markdown(
-                            component_table(picked), unsafe_allow_html=True
-                        )
-                elif pair:
-                    st.caption("Select one more to compare.")
 
     # -- Detail -----------------------------------------------------------
     with detail_col.container(border=True):
@@ -1218,7 +1541,8 @@ with tab_search:
         inv = c["years_investment_experience"]
         covered = e["coverage"].get("stocks_covered")
 
-        st.markdown(f"### {c['display_name']}")
+        st.markdown(f"<div class='candname'>{c['display_name']}</div>",
+                    unsafe_allow_html=True)
         if c["name_source"] == "filename":
             st.caption(
                 "⚠ This name comes from the filename — the document never "
@@ -1231,10 +1555,10 @@ with tab_search:
             ) if p
         )
         st.markdown(
-            f"<div style='color:{MUTED};font-size:13px;margin:-6px 0 8px'>{meta}"
-            "</div>" + quality_chip(c["quality"]["band"], c["quality"]["score"],
-                                    sum(f.get("severity", "warning") == "warning"
-                                        for f in c["flags"])),
+            f"<div style='color:{MUTED};font-size:13px;margin:-6px 0 8px'>"
+            f"{meta}</div>"
+            + "".join(f"<span class='pill'>{t}</span>" for t in distinctions(c))
+            + record_note(c),
             unsafe_allow_html=True,
         )
 
@@ -1242,7 +1566,7 @@ with tab_search:
             # Compact banner, not st.success -- the stock alert renders at
             # body size and shouts; this is a fact line, not an alarm.
             st.markdown(
-                f"<div style='background:#f0f7f1;border:1px solid #cde5d2;"
+                f"<div style='background:#f2f6f3;border:1px solid #d3e2d8;"
                 f"border-radius:10px;padding:8px 12px;font-size:12.5px;"
                 f"margin:2px 0 10px'>"
                 f"<b style='color:{STATUS_GOOD}'>Platform alum</b> — "
@@ -1262,7 +1586,8 @@ with tab_search:
             # bronze when one is not. The other headline numbers stay navy --
             # they describe the candidate, this one describes the decision.
             verdict_colour = STATUS_GOOD if m.is_exact else SERIES_2
-            verdict = "qualifies" if m.is_exact else "1 gap"
+            verdict = (f"clears all {len(m.hard_criteria)} requirements"
+                       if m.is_exact else "1 requirement missed")
             share, active_n, total_n = score_basis(m)
             cols[0].markdown(
                 f"<div title='{METRIC_HELP['fit']}'>"
@@ -1289,330 +1614,376 @@ with tab_search:
             "Stocks covered", covered or "—", help=METRIC_HELP["coverage"],
         )
 
-        # Fit, as a shape.
-        if m:
-            st.markdown("##### Fit against this role")
-            for crit in m.hard_criteria:
-                # Amber, not red, on the miss -- same reasoning as the result
-                # list: a near miss is a state in the pipeline, not an error.
-                icon, colour = ("✓", STATUS_GOOD) if crit.passed else ("✗", SERIES_2)
-                st.markdown(
-                    f"<div style='font-size:13px'><span style='color:{colour};"
-                    f"font-weight:700'>{icon}</span> <b>{crit.label}</b> — "
-                    f"needs {crit.required}; has {crit.found}</div>",
-                    unsafe_allow_html=True,
-                )
-            radar = fit_radar([m], 350)
-            if radar:
-                st.plotly_chart(radar, use_container_width=True)
+        # The profile was one 3,000px scroll: metrics, hard checks, a chart,
+        # a table, evidence, profile, chips, issues, outreach and four more
+        # expanders, in that order. Same content, one question at a time --
+        # and the issue count moves into a tab label instead of needing a
+        # jump link from the badge above.
+        _warn_n = sum(f.get("severity", "warning") == "warning"
+                      for f in c["flags"])
+        t_fit, t_profile, t_issues, t_outreach, t_record = st.tabs([
+            "Fit", "Profile", f"Issues ({_warn_n})", "Outreach", "Record",
+        ])
+
+        with t_fit:
+            if m is None:
                 st.caption(
-                    "Shape, not area — a radar exaggerates differences, so the "
-                    "component values are given as numbers below."
+                    "Choose a seat above to score this candidate against a "
+                    "role."
                 )
-                st.markdown(component_table([m]), unsafe_allow_html=True)
-            with st.expander("Evidence for each component"):
-                for crit in m.soft_criteria:
-                    if crit.weight <= 0 or not crit.evidence:
-                        continue
-                    st.markdown(
-                        f"<div style='font-size:12.5px;margin:0 0 9px'>"
-                        f"<b>{crit.label}</b> — {crit.found}<br>"
-                        f"<span style='color:{MUTED}'>"
-                        f"“{crit.evidence[:260]}”</span></div>",
-                        unsafe_allow_html=True,
+            if m:
+                section(
+                    "Hard requirements",
+                    "Constraints that disqualify. A candidate outside any of "
+                    "them is not ranked lower, they are not a match.",
+                )
+                _hard = []
+                for crit in m.hard_criteria:
+                    # Bronze, not red, on the miss -- a near miss is a state
+                    # in the pipeline, not an error.
+                    icon, colour = (("✓", STATUS_GOOD) if crit.passed
+                                    else ("✗", SERIES_2))
+                    _hard.append(
+                        f"<div class='hardrow'><span style='color:{colour};"
+                        f"font-weight:700'>{icon}</span> <b>{crit.label}</b> "
+                        f"<span style='color:{MUTED}'>{crit.found} · needs "
+                        f"{crit.required}</span></div>"
                     )
-
-        # Profile: every attribute with the text that produced it.
-        st.markdown("##### Profile")
-        st.caption(
-            "Each attribute with the keywords that drove it and the resume "
-            "sentence it came from. Nothing here is asserted without a quote."
-        )
-
-        def attribute(label: str, value: str, block: dict | None = None,
-                      note: str = "") -> None:
-            conf = f" · {block['confidence']} confidence" if block else ""
-            st.markdown(
-                f"<div style='margin-top:9px;font-size:13px'>"
-                f"<span style='color:{MUTED}'>{label}</span><br>"
-                f"<b style='font-size:14px'>{value}</b>"
-                f"<span style='color:{MUTED};font-size:12px'>{conf}"
-                f"{' · ' + note if note else ''}</span></div>",
-                unsafe_allow_html=True,
-            )
-            if block:
-                if block.get("keywords"):
-                    st.markdown(
-                        " ".join(
-                            f"<span style='background:#f0ece4;color:#7a4d1d;"
-                            f"font-size:11px;padding:1px 8px;border-radius:9px;"
-                            f"margin-right:4px'>{k}</span>"
-                            for k in block["keywords"]
-                        ),
-                        unsafe_allow_html=True,
-                    )
-                if block.get("evidence"):
-                    st.caption(f"“{block['evidence']}”")
-
-        attribute("Investment approach", label_of(e["investment_approach"]["value"]),
-                  e["investment_approach"], note=label_of(c.get("approach_family")))
-        attribute("Market side", label_of(e["market_side"]["value"]), e["market_side"])
-        for sector in e["primary_sectors"]:
-            attribute("Sector", label_of(sector["value"]), sector)
-        attribute(
-            "Markets covered", ", ".join(c.get("coverage_markets", [])) or "—", None,
-            note="inferred from location"
-            if c.get("coverage_markets_source") == "inferred" else "stated",
-        )
-        attribute(
-            "Seniority",
-            f"{label_of(c.get('seniority_band'))} by career · "
-            f"{label_of(c.get('investment_seniority_band'))} by investing",
-        )
-
-        st.markdown("##### Skills and credentials")
-        for cred in c.get("credentials_summary", []) or []:
-            st.markdown(f"<div style='font-size:13px'>· {cred}</div>",
-                        unsafe_allow_html=True)
-        if not c.get("credentials_summary"):
-            st.caption("No professional credentials stated.")
-
-        def chips(label: str, values: list[str], colour: str) -> None:
-            st.markdown(
-                f"<div style='margin-top:9px;font-size:12px;color:{MUTED}'>{label}"
-                "</div>" + (
-                    " ".join(
-                        f"<span style='background:{colour}1a;color:{colour};"
-                        f"font-size:11.5px;padding:2px 9px;border-radius:9px;"
-                        f"margin:0 4px 4px 0;display:inline-block'>{v}</span>"
-                        for v in values
-                    ) if values else
-                    f"<span style='color:{MUTED};font-size:12.5px'>not stated</span>"
-                ),
-                unsafe_allow_html=True,
-            )
-
-        chips("Software and platforms", c.get("software_tools", []), SERIES_1)
-        chips("Analytical methods", c.get("methods", []), SERIES_2)
-        chips("Languages", c.get("languages", []), "#4a3aa7")
-
-
-        # Issues sit AFTER the profile: a reviewer wants to know who this
-        # person is before being told what is uncertain about the record. The
-        # data-quality badge at the top links down here, so the caveats are
-        # one click away rather than in the reader's path.
-        st.markdown("<div id='issues'></div>", unsafe_allow_html=True)
-        # Issues, grouped the way a recruiter reads them (the grouping came
-        # from one): possible misrepresentation first -- the only category
-        # that can kill a candidacy -- then timeline, contact, and the
-        # detail errors that signal carelessness rather than dishonesty.
-        # Triaged-benign flags render last as grey notes: visible, priced
-        # at zero.
-        _warns = [f for f in c["flags"]
-                  if f.get("severity", "warning") == "warning"]
-        _notes = [f for f in c["flags"] if f.get("severity") == "info"]
-        st.markdown(f"##### Issues found in this resume ({len(_warns)})")
-        if not _warns and not _notes:
-            st.caption("Nothing flagged — the document parsed cleanly.")
-        else:
-            st.caption(METRIC_HELP["issues"])
-
-            def _group_of(f) -> str:
-                text = f["summary"].lower()
-                if "email" in text or "phone" in text:
-                    return "Contact details"
-                if f["category"] in {"internal_contradiction",
-                                     "attribution_ambiguity"}:
-                    return "Possible misrepresentation"
-                if f["category"] == "date_anomaly":
-                    return "Timeline"
-                return "Detail errors"
-
-            _order = ["Possible misrepresentation", "Timeline",
-                      "Contact details", "Detail errors"]
-            for group in _order:
-                members = [f for f in _warns if _group_of(f) == group]
-                if not members:
-                    continue
                 st.markdown(
-                    f"<div style='font-size:10.5px;font-weight:700;"
-                    f"text-transform:uppercase;letter-spacing:.07em;"
-                    f"color:{MUTED};margin:8px 0 5px'>{group}</div>",
+                    "<div class='hardgrid'>" + "".join(_hard) + "</div>",
                     unsafe_allow_html=True,
                 )
-                for f in members:
-                    colour = SERIES_1 if f["source"] == "computed" else SERIES_2
-                    origin = ("computed from the data"
-                              if f["source"] == "computed"
-                              else "read from the text")
-                    st.markdown(
-                        f"<div style='font-size:12.5px;margin-bottom:7px;"
-                        f"border-left:3px solid {colour};padding-left:9px'>"
-                        f"<b>{f['summary']}</b> <span style='color:{MUTED};"
-                        f"font-size:11px'>· {origin}</span><br>"
-                        f"<span style='color:{MUTED}'>{f['detail']}</span></div>",
-                        unsafe_allow_html=True,
-                    )
-            if _notes:
-                with st.expander(f"Notes — reviewed, no action ({len(_notes)})"):
-                    for f in _notes:
+                section(
+                    "What earned the Fit score",
+                    "Fit ranks only candidates who already clear every hard "
+                    "requirement. Each dimension is scored 0-1 and weighted; "
+                    "the line under each bar is what the pipeline found for "
+                    "it.",
+                )
+                st.markdown(contribution_ledger(m), unsafe_allow_html=True)
+                with st.expander("The resume sentence behind each score"):
+                    for crit in m.soft_criteria:
+                        if crit.weight <= 0 or not crit.evidence:
+                            continue
                         st.markdown(
-                            f"<div style='font-size:12px;margin-bottom:6px;"
-                            f"color:{MUTED};border-left:3px solid {GRID};"
-                            f"padding-left:9px'><b>{f['summary']}</b><br>"
-                            f"{f['detail']}</div>",
+                            f"<div style='font-size:12.5px;margin:0 0 9px'>"
+                            f"<b>{crit.label}</b> — {crit.found}<br>"
+                            f"<span style='color:{MUTED}'>"
+                            f"“{crit.evidence[:260]}”</span></div>",
                             unsafe_allow_html=True,
                         )
 
-        # -- Outreach draft ------------------------------------------------
-        # The step after "this candidate fits" is always "someone writes to
-        # them". The draft is assembled from the same evidence the profile
-        # shows -- specific and checkable, never generated flattery: a
-        # sourcing mail earns a reply by proving someone actually read the
-        # resume, and every claim here carries its quote.
-        with st.expander("Outreach draft", icon=":material/mail:"):
-            _cur = next((x for x in e["positions"]
-                         if x.get("is_current")), e["positions"][0]
-                        if e["positions"] else None)
-            _lines = [f"{c['display_name']}"]
-            if _cur:
-                _lines.append(f"{_cur['title']} at {_cur['firm']}"
-                              + (f" · {c['location']}" if c.get("location")
-                                 else ""))
-            _contact = " · ".join(x for x in (e.get("email"), e.get("phone"))
-                                  if x)
-            if _contact:
-                _lines.append(_contact)
-            _lines.append("")
-            if m and requisition:
-                verdict_txt = ("meets every hard requirement"
-                               if m.is_exact else
-                               f"one gap: {m.failed_hard[0].label.lower()} "
-                               f"({m.failed_hard[0].found}; role needs "
-                               f"{m.failed_hard[0].required})")
-                _lines.append(f"Role: {requisition['title']} — "
-                              f"Fit {m.soft_score:.0%}, {verdict_txt}")
-                _lines.append("")
-                _lines.append("Why this candidate:")
-                _strong = sorted(
-                    (x for x in m.soft_criteria
-                     if x.weight and x.score >= .5 and x.evidence),
-                    key=lambda x: x.score * x.weight, reverse=True)[:3]
-                for x in _strong:
-                    _lines.append(
-                        f"- {CRITERION_LABEL.get(x.key, x.key)}: {x.found}")
-                    _lines.append(f'    resume: "{x.evidence[:180]}"')
-            if c.get("platform_alum_of"):
-                _lines.append(
-                    f"- Platform alum: previously at "
-                    f"{', '.join(c['platform_alum_of'])} (resume names the "
-                    "pod; lineage resolved via knowledge base)")
-            if covered:
-                _lines.append(f"- {covered} names under research coverage")
-            st.caption(
-                "Assembled from parsed facts and verbatim resume quotes — "
-                "check the gap line before sending. Copy from the block, or "
-                "download."
-            )
-            _draft = "\n".join(_lines)
-            st.code(_draft, language=None)
-            st.download_button(
-                "Download draft (.txt)", _draft.encode(),
-                file_name=f"outreach_{c['candidate_id']}.txt",
-                mime="text/plain", use_container_width=True,
-                key=f"outreach_{c['candidate_id']}",
+
+        with t_profile:
+            section(
+                "Classified attributes",
+                "Each attribute as the pipeline classified it, with the "
+                "keywords that drove the classification. The verbatim resume "
+                "sentence behind every one sits under Fit.",
             )
 
-        # Reference material, collapsed.
-        with st.expander("Experience, as parsed"):
-            head = ("<tr><th>Employer</th><th>Resolved to</th><th>Title</th>"
-                    "<th>Dates</th><th>Type</th><th>Inv.</th></tr>")
-            firm_by_raw = {f["raw"]: f for f in c.get("firms", [])}
-            body = []
-            for pos in e["positions"]:
-                link = firm_by_raw.get(pos["firm"], {})
-                resolution = link.get("resolution", "unresolved")
-                bad = resolution in {"unresolved", "ambiguous"} and pos[
-                    "employment_type"] in {"professional", "internship"}
-                dates = (
-                    f"{pos.get('start_date') or '?'} – "
-                    f"{'present' if pos.get('is_current') else (pos.get('end_date') or '?')}"
-                )
-                if not pos.get("start_date") and pos.get("duration_months"):
-                    dates = f"{pos['duration_months']} mo (duration only)"
-                body.append(
-                    f"<tr><td>{pos['firm']}</td>"
-                    f"<td style='color:{STATUS_BAD if bad else INK}'>"
-                    f"{link.get('canonical') or '—'}"
-                    f"<span class='res'>{resolution}</span></td>"
-                    f"<td>{pos['title']}</td><td>{dates}</td>"
-                    f"<td style='color:{MUTED}'>"
-                    f"{pos['employment_type'].replace('_', ' ')}</td>"
-                    f"<td>{'✓' if pos.get('is_investment_role') else '·'}</td></tr>"
-                )
-            st.markdown(f"<table class='postbl'>{head}{''.join(body)}</table>",
-                        unsafe_allow_html=True)
-            if c.get("non_professional_affiliations"):
-                st.caption("Excluded from tenure: "
-                           + "; ".join(c["non_professional_affiliations"]))
-
-        with st.expander("Education"):
-            if not e.get("education"):
-                st.caption("No education section could be parsed.")
-            for degree in e.get("education", []):
+            def attribute(label: str, value: str, block: dict | None = None,
+                          note: str = "") -> None:
+                conf = f" · {block['confidence']} confidence" if block else ""
                 st.markdown(
-                    f"<div style='font-size:13px;margin-bottom:5px'>"
-                    f"<b>{degree.get('degree') or 'Degree'}"
-                    f"{', ' + degree['field_of_study'] if degree.get('field_of_study') else ''}"
-                    f"</b> · {degree['institution']}<span style='color:{MUTED}'>"
-                    f" — {degree.get('start_year') or '?'}–"
-                    f"{degree.get('graduation_year') or '?'}</span></div>",
+                    f"<div style='margin-top:9px;font-size:13px'>"
+                    f"<span style='color:{MUTED}'>{label}</span><br>"
+                    f"<b style='font-size:14px'>{value}</b>"
+                    f"<span style='color:{MUTED};font-size:12px'>{conf}"
+                    f"{' · ' + note if note else ''}</span></div>",
+                    unsafe_allow_html=True,
+                )
+                if block:
+                    if block.get("keywords"):
+                        st.markdown(
+                            " ".join(
+                                f"<span class='pill'>{k}</span>"
+                                for k in block["keywords"]
+                            ),
+                            unsafe_allow_html=True,
+                        )
+                    # No inline quote. Ten stacked attributes each trailing a
+                    # 40-word sentence is the long string this pane had
+                    # become; the quotes live one fold away under Fit, which
+                    # is where anyone auditing a score is already looking.
+
+            attribute("Investment approach", label_of(e["investment_approach"]["value"]),
+                      e["investment_approach"], note=label_of(c.get("approach_family")))
+            attribute("Market side", label_of(e["market_side"]["value"]), e["market_side"])
+            _secs = e["primary_sectors"]
+            if _secs:
+                # One row, not one row per sector. Three stacked "Sector"
+                # labels read as three different fields.
+                attribute(
+                    "Sectors",
+                    ", ".join(label_of(x["value"]) for x in _secs),
+                    _secs[0] if len(_secs) == 1 else None,
+                )
+            attribute(
+                "Markets covered", ", ".join(c.get("coverage_markets", [])) or "—", None,
+                note="inferred from location"
+                if c.get("coverage_markets_source") == "inferred" else "stated",
+            )
+            attribute(
+                "Seniority",
+                f"{label_of(c.get('seniority_band'))} by career · "
+                f"{label_of(c.get('investment_seniority_band'))} by investing",
+            )
+
+            section("Skills and credentials")
+            for cred in c.get("credentials_summary", []) or []:
+                st.markdown(f"<div style='font-size:13px'>· {cred}</div>",
+                            unsafe_allow_html=True)
+            if not c.get("credentials_summary"):
+                st.caption("No professional credentials stated.")
+
+            def chips(label: str, values: list[str], colour: str = "") -> None:
+                # One neutral pill for every informational tag. Software was
+                # slate, methods bronze, languages violet: four small colour
+                # systems, none of them carrying meaning, because the label
+                # above each row already says what the row is. Colour is now
+                # reserved for judgement -- green clears, bronze is a gap,
+                # navy is chrome. The colour argument is kept so call sites
+                # read unchanged; it is deliberately ignored.
+                st.markdown(
+                    f"<div style='margin-top:9px;font-size:12px;"
+                    f"color:{MUTED}'>{label}</div>" + (
+                        "".join(f"<span class='pill'>{v}</span>"
+                                for v in values) if values else
+                        f"<span style='color:{MUTED};font-size:12.5px'>"
+                        "not stated</span>"
+                    ),
                     unsafe_allow_html=True,
                 )
 
-        with st.expander("Summary — every parsed field"):
-            fields = [
-                ("Name / source", f"{c['display_name']} ({c['name_source']})"),
-                ("Email", e.get("email") or "—"),
-                ("Phone", e.get("phone") or "—"),
-                ("Location / region", f"{c.get('location') or '—'} · {c.get('region') or '—'}"),
-                ("Career tenure", f"{c['years_experience'] or '—'} yrs"),
-                ("Investment tenure", "—" if inv is None else f"{inv} yrs"),
-                ("Seniority (career / investing)",
-                 f"{label_of(c.get('seniority_band'))} / "
-                 f"{label_of(c.get('investment_seniority_band'))}"),
-                ("Approach", f"{c.get('approach')} → {c.get('approach_family')}"),
-                ("Market side", c.get("market_side") or "—"),
-                ("Sectors", ", ".join(c.get("sectors", [])) or "—"),
-                ("Asset classes", ", ".join(c.get("asset_classes", [])) or "—"),
-                ("Coverage markets",
-                 f"{', '.join(c.get('coverage_markets', [])) or '—'} "
-                 f"({c.get('coverage_markets_source')})"),
-                ("Stocks covered", str(covered or "—")),
-                ("Current firm / type",
-                 f"{c.get('current_firm') or '—'} · {c.get('current_firm_type') or '—'}"),
-                ("Employers", "; ".join(c.get("employers", [])) or "—"),
-                ("Non-professional", "; ".join(c.get("non_professional_affiliations", [])) or "—"),
-                ("Buy / sell side experience",
-                 f"{c.get('has_buy_side_experience')} / {c.get('has_sell_side_experience')}"),
-                ("Platform alumni", ", ".join(c.get("platform_alum_of", [])) or "—"),
-                ("Credentials", "; ".join(c.get("credentials_summary", [])) or "—"),
-                ("Languages", ", ".join(c.get("languages", [])) or "—"),
-                ("Software", ", ".join(c.get("software_tools", [])) or "—"),
-                ("Methods", ", ".join(c.get("methods", [])) or "—"),
-                ("Positions parsed", str(len(e["positions"]))),
-                ("Parse confidence",
-                 f"{c['quality']['band']} {c['quality']['score']} · "
-                 f"{len(c['flags'])} issue(s)"),
-                ("Missing fields", ", ".join(c["quality"]["missing_fields"]) or "none"),
-                ("Source file", c["source_file"]),
-            ]
-            st.markdown(
-                "<table class='recordtbl'>"
-                + "".join(f"<tr><td>{k}</td><td>{v}</td></tr>" for k, v in fields)
-                + "</table>",
-                unsafe_allow_html=True,
-            )
+            chips("Software and platforms", c.get("software_tools", []), SERIES_1)
+            chips("Analytical methods", c.get("methods", []), SERIES_2)
+            # Slate, not violet. A third hue on the third chip row was decoration
+        # -- the label already says which row is which.
+        chips("Languages", c.get("languages", []), MUTED)
+
+
+
+        with t_issues:
+            # Issues sit AFTER the profile: a reviewer wants to know who this
+            # person is before being told what is uncertain about the record. The
+            # data-quality badge at the top links down here, so the caveats are
+            # one click away rather than in the reader's path.
+            # Issues, grouped the way a recruiter reads them (the grouping came
+            # from one): possible misrepresentation first -- the only category
+            # that can kill a candidacy -- then timeline, contact, and the
+            # detail errors that signal carelessness rather than dishonesty.
+            # Triaged-benign flags render last as grey notes: visible, priced
+            # at zero.
+            _warns = [f for f in c["flags"]
+                      if f.get("severity", "warning") == "warning"]
+            _notes = [f for f in c["flags"] if f.get("severity") == "info"]
+            if not _warns and not _notes:
+                st.caption("Nothing flagged — the document parsed cleanly.")
+            else:
+                st.caption(METRIC_HELP["issues"])
+
+                def _group_of(f) -> str:
+                    text = f["summary"].lower()
+                    if "email" in text or "phone" in text:
+                        return "Contact details"
+                    if f["category"] in {"internal_contradiction",
+                                         "attribution_ambiguity"}:
+                        return "Possible misrepresentation"
+                    if f["category"] == "date_anomaly":
+                        return "Timeline"
+                    return "Detail errors"
+
+                _order = ["Possible misrepresentation", "Timeline",
+                          "Contact details", "Detail errors"]
+                for group in _order:
+                    members = [f for f in _warns if _group_of(f) == group]
+                    if not members:
+                        continue
+                    st.markdown(
+                        f"<div style='font-size:10.5px;font-weight:700;"
+                        f"text-transform:uppercase;letter-spacing:.07em;"
+                        f"color:{MUTED};margin:8px 0 5px'>{group}</div>",
+                        unsafe_allow_html=True,
+                    )
+                    for f in members:
+                        colour = SERIES_1 if f["source"] == "computed" else SERIES_2
+                        origin = ("computed from the data"
+                                  if f["source"] == "computed"
+                                  else "read from the text")
+                        st.markdown(
+                            f"<div style='font-size:12.5px;margin-bottom:7px;"
+                            f"border-left:3px solid {colour};padding-left:9px'>"
+                            f"<b>{f['summary']}</b> <span style='color:{MUTED};"
+                            f"font-size:11px'>· {origin}</span><br>"
+                            f"<span style='color:{MUTED}'>{f['detail']}</span></div>",
+                            unsafe_allow_html=True,
+                        )
+                if _notes:
+                    with st.expander(f"Notes — reviewed, no action ({len(_notes)})"):
+                        for f in _notes:
+                            st.markdown(
+                                f"<div style='font-size:12px;margin-bottom:6px;"
+                                f"color:{MUTED};border-left:3px solid {GRID};"
+                                f"padding-left:9px'><b>{f['summary']}</b><br>"
+                                f"{f['detail']}</div>",
+                                unsafe_allow_html=True,
+                            )
+
+
+        with t_outreach:
+            # -- Outreach draft ------------------------------------------------
+            # The step after "this candidate fits" is always "someone writes to
+            # them". The draft is assembled from the same evidence the profile
+            # shows -- specific and checkable, never generated flattery: a
+            # sourcing mail earns a reply by proving someone actually read the
+            # resume, and every claim here carries its quote.
+            with st.container():
+                _cur = next((x for x in e["positions"]
+                             if x.get("is_current")), e["positions"][0]
+                            if e["positions"] else None)
+                _lines = [f"{c['display_name']}"]
+                if _cur:
+                    _lines.append(f"{_cur['title']} at {_cur['firm']}"
+                                  + (f" · {c['location']}" if c.get("location")
+                                     else ""))
+                _contact = " · ".join(x for x in (e.get("email"), e.get("phone"))
+                                      if x)
+                if _contact:
+                    _lines.append(_contact)
+                _lines.append("")
+                if m and requisition:
+                    verdict_txt = ("meets every hard requirement"
+                                   if m.is_exact else
+                                   f"one gap: {m.failed_hard[0].label.lower()} "
+                                   f"({m.failed_hard[0].found}; role needs "
+                                   f"{m.failed_hard[0].required})")
+                    _lines.append(f"Role: {requisition['title']} — "
+                                  f"Fit {m.soft_score:.0%}, {verdict_txt}")
+                    _lines.append("")
+                    _lines.append("Why this candidate:")
+                    _strong = sorted(
+                        (x for x in m.soft_criteria
+                         if x.weight and x.score >= .5 and x.evidence),
+                        key=lambda x: x.score * x.weight, reverse=True)[:3]
+                    for x in _strong:
+                        _lines.append(
+                            f"- {CRITERION_LABEL.get(x.key, x.key)}: {x.found}")
+                        _lines.append(f'    resume: "{x.evidence[:180]}"')
+                if c.get("platform_alum_of"):
+                    _lines.append(
+                        f"- Platform alum: previously at "
+                        f"{', '.join(c['platform_alum_of'])} (resume names the "
+                        "pod; lineage resolved via knowledge base)")
+                if covered:
+                    _lines.append(f"- {covered} names under research coverage")
+                st.caption(
+                    "Assembled from parsed facts and verbatim resume quotes — "
+                    "check the gap line before sending. Copy from the block, or "
+                    "download."
+                )
+                _draft = "\n".join(_lines)
+                st.code(_draft, language=None)
+                st.download_button(
+                    "Download draft (.txt)", _draft.encode(),
+                    file_name=f"outreach_{c['candidate_id']}.txt",
+                    mime="text/plain", use_container_width=True,
+                    key=f"outreach_{c['candidate_id']}",
+                )
+
+
+        with t_record:
+            # Reference material, collapsed.
+            with st.expander("Experience, as parsed"):
+                head = ("<tr><th>Employer</th><th>Resolved to</th><th>Title</th>"
+                        "<th>Dates</th><th>Type</th><th>Inv.</th></tr>")
+                firm_by_raw = {f["raw"]: f for f in c.get("firms", [])}
+                body = []
+                for pos in e["positions"]:
+                    link = firm_by_raw.get(pos["firm"], {})
+                    resolution = link.get("resolution", "unresolved")
+                    bad = resolution in {"unresolved", "ambiguous"} and pos[
+                        "employment_type"] in {"professional", "internship"}
+                    dates = (
+                        f"{pos.get('start_date') or '?'} – "
+                        f"{'present' if pos.get('is_current') else (pos.get('end_date') or '?')}"
+                    )
+                    if not pos.get("start_date") and pos.get("duration_months"):
+                        dates = f"{pos['duration_months']} mo (duration only)"
+                    body.append(
+                        f"<tr><td>{pos['firm']}</td>"
+                        f"<td style='color:{STATUS_BAD if bad else INK}'>"
+                        f"{link.get('canonical') or '—'}"
+                        f"<span class='res'>{resolution}</span></td>"
+                        f"<td>{pos['title']}</td><td>{dates}</td>"
+                        f"<td style='color:{MUTED}'>"
+                        f"{pos['employment_type'].replace('_', ' ')}</td>"
+                        f"<td>{'✓' if pos.get('is_investment_role') else '·'}</td></tr>"
+                    )
+                st.markdown(f"<table class='postbl'>{head}{''.join(body)}</table>",
+                            unsafe_allow_html=True)
+                if c.get("non_professional_affiliations"):
+                    st.caption("Excluded from tenure: "
+                               + "; ".join(c["non_professional_affiliations"]))
+
+            with st.expander("Education"):
+                if not e.get("education"):
+                    st.caption("No education section could be parsed.")
+                for degree in e.get("education", []):
+                    st.markdown(
+                        f"<div style='font-size:13px;margin-bottom:5px'>"
+                        f"<b>{degree.get('degree') or 'Degree'}"
+                        f"{', ' + degree['field_of_study'] if degree.get('field_of_study') else ''}"
+                        f"</b> · {degree['institution']}<span style='color:{MUTED}'>"
+                        f" — {degree.get('start_year') or '?'}–"
+                        f"{degree.get('graduation_year') or '?'}</span></div>",
+                        unsafe_allow_html=True,
+                    )
+
+            with st.expander("Summary — every parsed field"):
+                fields = [
+                    ("Name / source", f"{c['display_name']} ({c['name_source']})"),
+                    ("Email", e.get("email") or "—"),
+                    ("Phone", e.get("phone") or "—"),
+                    ("Location / region", f"{c.get('location') or '—'} · {c.get('region') or '—'}"),
+                    ("Career tenure", f"{c['years_experience'] or '—'} yrs"),
+                    ("Investment tenure", "—" if inv is None else f"{inv} yrs"),
+                    ("Seniority (career / investing)",
+                     f"{label_of(c.get('seniority_band'))} / "
+                     f"{label_of(c.get('investment_seniority_band'))}"),
+                    ("Approach", f"{c.get('approach')} → {c.get('approach_family')}"),
+                    ("Market side", c.get("market_side") or "—"),
+                    ("Sectors", ", ".join(c.get("sectors", [])) or "—"),
+                    ("Asset classes", ", ".join(c.get("asset_classes", [])) or "—"),
+                    ("Coverage markets",
+                     f"{', '.join(c.get('coverage_markets', [])) or '—'} "
+                     f"({c.get('coverage_markets_source')})"),
+                    ("Stocks covered", str(covered or "—")),
+                    ("Current firm / type",
+                     f"{c.get('current_firm') or '—'} · {c.get('current_firm_type') or '—'}"),
+                    ("Employers", "; ".join(c.get("employers", [])) or "—"),
+                    ("Non-professional", "; ".join(c.get("non_professional_affiliations", [])) or "—"),
+                    ("Buy / sell side experience",
+                     f"{c.get('has_buy_side_experience')} / {c.get('has_sell_side_experience')}"),
+                    ("Platform alumni", ", ".join(c.get("platform_alum_of", [])) or "—"),
+                    ("Credentials", "; ".join(c.get("credentials_summary", [])) or "—"),
+                    ("Languages", ", ".join(c.get("languages", [])) or "—"),
+                    ("Software", ", ".join(c.get("software_tools", [])) or "—"),
+                    ("Methods", ", ".join(c.get("methods", [])) or "—"),
+                    ("Positions parsed", str(len(e["positions"]))),
+                    ("Parse confidence",
+                     f"{c['quality']['band']} {c['quality']['score']} · "
+                     f"{len(c['flags'])} issue(s)"),
+                    ("Missing fields", ", ".join(c["quality"]["missing_fields"]) or "none"),
+                    ("Source file", c["source_file"]),
+                ]
+                st.markdown(
+                    "<table class='recordtbl'>"
+                    + "".join(f"<tr><td>{k}</td><td>{v}</td></tr>" for k, v in fields)
+                    + "</table>",
+                    unsafe_allow_html=True,
+                )
+
 
 
 # ===========================================================================
