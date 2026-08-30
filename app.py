@@ -1781,9 +1781,9 @@ with tab_search:
 
             chips("Software and platforms", c.get("software_tools", []), SERIES_1)
             chips("Analytical methods", c.get("methods", []), SERIES_2)
-            # Slate, not violet. A third hue on the third chip row was decoration
-        # -- the label already says which row is which.
-        chips("Languages", c.get("languages", []), MUTED)
+            # Slate, not violet. A third hue on the third chip row was
+            # decoration -- the label already says which row is which.
+            chips("Languages", c.get("languages", []), MUTED)
 
 
 
