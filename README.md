@@ -5,7 +5,7 @@ Development team. Resumes in PDF and Word are parsed into structured records
 by an LLM, enriched against a curated domain knowledge base, and searched
 against job requisitions in a Streamlit app.
 
-**Live app:** _(link added after deployment)_
+**Live app:** https://m-case-study-jasmine.streamlit.app/
 
 ---
 
