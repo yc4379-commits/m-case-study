@@ -274,9 +274,10 @@ st.markdown(
       .ldw {{ font-size: 11.5px; color: {MUTED}; }}
       .ldval {{ margin-left: auto; font-size: 13px; font-weight: 700;
                 color: {INK}; font-variant-numeric: tabular-nums; }}
-      .ldbar {{ height: 6px; background: #eff2f6; border-radius: 3px;
+      .ldbar {{ height: 5px; background: #eff2f6; border-radius: 999px;
                 overflow: hidden; }}
-      .ldbar i {{ display: block; height: 100%; background: #123a6f; }}
+      .ldbar i {{ display: block; height: 100%; background: #123a6f;
+                  border-radius: 999px; }}
       .lddid {{ font-size: 12.5px; line-height: 1.5; color: #46586b; }}
       .ldrow-idle .ldlbl, .ldrow-idle .ldval {{ color: {MUTED};
                                                 font-weight: 500; }}
@@ -284,6 +285,34 @@ st.markdown(
       .hardgrid {{ display: grid; grid-template-columns: 1fr 1fr;
                    gap: 6px 22px; }}
       .hardrow {{ font-size: 12.5px; color: {INK}; }}
+      /* One attribute, three ranked tiers, inside one hairline rule. */
+      .attr {{ margin: 0 0 15px; padding-left: 12px;
+               border-left: 2px solid #e6ecf4; }}
+      .attrlabel {{ font-size: 9.5px; font-weight: 700; letter-spacing: .1em;
+                    text-transform: uppercase; color: {MUTED};
+                    margin-bottom: 2px; }}
+      .attrvalue {{ font-size: 16px; font-weight: 600; color: {INK};
+                    line-height: 1.25; }}
+      .attrnote {{ font-size: 11.5px; font-weight: 400; color: {MUTED};
+                   margin-left: 8px; }}
+      .attrwhy {{ display: flex; flex-wrap: wrap; align-items: center;
+                  gap: 4px 5px; margin-top: 6px; }}
+      .kw {{ font-size: 10.5px; background: #f4efe8; color: #7a512a;
+             padding: 1px 8px; border-radius: 999px; white-space: nowrap; }}
+      .conf {{ font-size: 10.5px; color: #a3aeba; margin-left: 2px; }}
+      .attrquote {{ font-size: 11.5px; line-height: 1.5; color: #7b8794;
+                    margin-top: 5px; cursor: help; display: -webkit-box;
+                    -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+                    overflow: hidden; }}
+      .attrquote b {{ color: #5a6b7d; font-weight: 600; }}
+      /* Computed facts: a quiet key-value row, deliberately not an attr. */
+      .fact {{ display: flex; align-items: baseline; gap: 12px;
+               font-size: 12.5px; padding: 6px 0;
+               border-bottom: 1px solid #f0f3f7; }}
+      .fact span {{ color: {MUTED}; min-width: 118px; flex: none; }}
+      .fact b {{ color: {INK}; font-weight: 600; }}
+      .fact i {{ color: #a3aeba; font-style: normal; font-size: 11.5px;
+                 margin-left: auto; }}
       /* The evidence sentence, at two lines with the rest on hover. The
          quote is not optional -- its LENGTH was the layout problem. */
       .quote {{ font-size: 12px; line-height: 1.5; color: {MUTED};
@@ -291,15 +320,14 @@ st.markdown(
                 margin: 5px 0 2px; cursor: help; display: -webkit-box;
                 -webkit-line-clamp: 2; -webkit-box-orient: vertical;
                 overflow: hidden; }}
-      .statusline {{ font-size: 14px; margin: 4px 0 8px; }}
-      .statusline b {{ font-size: 17px; }}
       .recordtbl {{ border-collapse: collapse; width: 100%; font-size: 12.5px; }}
       .recordtbl td {{ padding: 5px 8px; border-bottom: 1px solid {GRID};
                        vertical-align: top; }}
       .recordtbl td:first-child {{ color: {MUTED}; width: 42%; }}
       /* The shortlist table: typeset, not gridded. */
+      .ctblwrap {{ overflow-x: auto; max-width: 100%; padding-bottom: 4px; }}
       .ctbl {{ border-collapse: separate; border-spacing: 0; width: 100%;
-               font-size: 12.5px; }}
+               min-width: 560px; font-size: 12.5px; }}
       .ctbl th {{ text-align: left; font-size: 9.5px; font-weight: 700;
                   text-transform: uppercase; letter-spacing: .09em;
                   color: {MUTED}; padding: 0 12px 7px 0;
@@ -310,17 +338,17 @@ st.markdown(
                   vertical-align: middle; }}
       .ctbl tr:last-child td {{ border-bottom: none; }}
       .ctbl td.who {{ font-size: 13px; font-weight: 600; color: {INK};
-                      white-space: nowrap; }}
+                      line-height: 1.3; }}
       .ctbl td.sub {{ color: {MUTED}; }}
       .ctbl td.gap {{ color: #7a512a; }}
       .ctbl .fitcell {{ display: flex; flex-direction: column;
                         align-items: flex-end; gap: 4px; }}
       .ctbl .fitcell b {{ font-size: 13px; color: {INK}; }}
       .ctbl .fitcell i {{ display: block; height: 3px; width: 48px;
-                          background: #eef1f5; border-radius: 2px;
+                          background: #eef1f5; border-radius: 999px;
                           overflow: hidden; }}
       .ctbl .fitcell i u {{ display: block; height: 100%;
-                            background: #123a6f; }}
+                            background: #123a6f; border-radius: 999px; }}
       .ctbl .dot {{ display: inline-block; width: 7px; height: 7px;
                     border-radius: 4px; cursor: help; }}
       .postbl {{ border-collapse: collapse; width: 100%; font-size: 12px; }}
@@ -615,6 +643,19 @@ def _share(predicate) -> float:
     return sum(1 for x in candidates if predicate(x)) / max(len(candidates), 1)
 
 
+def _dtint(tag: str) -> str:
+    """Platform lineage is the strongest differentiator in this pool."""
+    return "pill-navy" if tag.endswith(" alum") else "pill-slate"
+
+
+def _dtip(tag: str, c: dict) -> str:
+    if tag.endswith(" alum") and c.get("platform_alum_of"):
+        return ("Resolved from the firm knowledge base — the resume names "
+                "only the pod. Platform: "
+                + ", ".join(c["platform_alum_of"]))
+    return "Shown because fewer than 40% of this pool carry it."
+
+
 def distinctions(c: dict) -> list[str]:
     """Up to three things that set this candidate apart from this pool."""
     out: list[str] = []
@@ -658,10 +699,13 @@ def styled_chart(fig: go.Figure, height: int = 320) -> go.Figure:
         ),
         hoverlabel=dict(bgcolor="white", font_size=12),
     )
-    fig.update_xaxes(showgrid=False, zeroline=False, linecolor=GRID,
-                     tickfont=dict(color=MUTED))
-    fig.update_yaxes(showgrid=True, gridcolor=GRID, zeroline=False,
-                     linecolor=GRID, tickfont=dict(color=MUTED))
+    # Hairline grid, no axis lines: the bars are the drawing, the grid is a
+    # reference the eye should have to look for.
+    fig.update_xaxes(showgrid=False, zeroline=False, linecolor="rgba(0,0,0,0)",
+                     ticks="", tickfont=dict(color=MUTED, size=11))
+    fig.update_yaxes(showgrid=True, gridcolor="#f0f3f7", zeroline=False,
+                     linecolor="rgba(0,0,0,0)", ticks="",
+                     tickfont=dict(color=MUTED, size=11))
     return fig
 
 
@@ -746,7 +790,11 @@ def candidate_table(rows: list[dict], matches: dict) -> str:
             f"title='Parse confidence {band} {c["quality"]["score"]}'>"
             f"</span></td></tr>"
         )
-    return f"<table class='ctbl'>{head}{''.join(body)}</table>"
+    # The table lives in the results column, which is narrower than seven
+    # columns of text: it scrolls horizontally inside its own box rather than
+    # running out past the panel border.
+    return (f"<div class='ctblwrap'><table class='ctbl'>{head}"
+            f"{''.join(body)}</table></div>")
 
 
 def contribution_ledger(result) -> str:
@@ -828,16 +876,12 @@ def searchable_text(c: dict) -> str:
 
 MODE_NOTES = {
     "Use a saved requisition":
-        "Loads a stored role with its hard requirements and its written "
-        "responsibilities. The richest ranking, because the requirement text "
-        "gives the scorer something to match against.",
+        "A real posting, with its requirement text — the richest ranking.",
     "Define a role":
-        "Builds the same object from the four dimensions the case brief "
-        "names. Add requirement lines to make the ranking richer — without "
-        "them the score rests on firm type and coverage alone.",
+        "The four dimensions the brief names. Add requirement lines for a "
+        "deeper score.",
     "Browse without a role":
-        "No matching at all: the pool is listed and filtered, but nobody is "
-        "ranked, because ranking without a role to rank against is meaningless.",
+        "Filter the pool, rank nobody.",
 }
 
 # The role picker lives in a collapsed panel whose label states the current
@@ -864,7 +908,7 @@ with tab_search:
     # in further down, once the chosen requisition exists.
     _role_bar = st.container()
     _role_panel = st.expander(
-        "Change role — saved requisition, define one, or browse unranked",
+        "Change role",
         expanded=False, icon=":material/work:",
     )
 
@@ -900,18 +944,13 @@ with tab_search:
                 ),
                 label_visibility="collapsed",
             )
-            st.caption(
-                "All requisitions are transcribed from real postings — "
-                "three Millennium (REQ numbers shown), one Point72."
-            )
+            st.caption("All transcribed from real postings — three "
+                       "Millennium, one Point72.")
             requisition = store.get(chosen)
 
         elif mode == "Define a role":
-            st.caption(
-                "These four dimensions are the ones the case brief names, and each is "
-                "a HARD requirement: a candidate outside them is excluded, not "
-                "down-ranked."
-            )
+            st.caption("Each is a HARD requirement: outside it means "
+                       "excluded, not down-ranked.")
             d1, d2, d3, d4 = st.columns([1, 1, 1.2, 1.3])
             regions = d1.multiselect(
                 "Market", sorted({c["region"] for c in candidates if c.get("region")}),
@@ -1001,18 +1040,15 @@ with tab_search:
                       for k, v in bits)
             + "</span>"
             + f"<span class='rolecount'>{len(bits)} hard requirement"
-            + ("s" if len(bits) != 1 else "")
-            + " — miss exactly one and you appear under “One gap away”"
-            + "</span></div>",
+            + ("s" if len(bits) != 1 else "") + "</span></div>",
             unsafe_allow_html=True,
         )
     else:
         _role_bar.markdown(
             "<div class='rolebar rolebar-empty'>"
             "<span class='rolekick'>NO ROLE</span>"
-            "<span class='roletitle'>Browsing the whole pool, unranked</span>"
-            "<span class='rolecount'>Choose a seat above to rank candidates "
-            "and see who is disqualified.</span></div>",
+            "<span class='roletitle'>Whole pool, unranked</span>"
+            "<span class='rolecount'>Choose a seat to rank</span></div>",
             unsafe_allow_html=True,
         )
 
@@ -1022,10 +1058,7 @@ with tab_search:
 # ===========================================================================
 
 st.sidebar.markdown("### Refine the pool")
-st.sidebar.caption(
-    "Narrows an already-eligible list. Never overrides a hard requirement "
-    "from the role."
-)
+st.sidebar.caption("Narrows the eligible pool. Never overrides the role.")
 
 
 def facet_counts(key: str, base: list[dict]) -> dict[str, int]:
@@ -1184,9 +1217,7 @@ with st.sidebar.expander(
     "Advanced filters" + (f"  ·  {_adv_n} active" if _adv_n else ""),
     icon=":material/tune:", expanded=bool(_adv_n),
 ):
-    st.caption(
-        "Dimensions the role does not decide. Eligibility is never set here."
-    )
+    st.caption("Dimensions the role does not decide.")
     for key, label, _ in FACETS:
         if key not in PRIMARY:
             selections[key] = facet_control(key, label, st)
@@ -1235,8 +1266,7 @@ def passes_filters(c: dict) -> bool:
 
 filtered = [c for c in candidates if passes_filters(c)]
 st.sidebar.caption(
-    f"**{len(filtered)} of {len(candidates)}** candidates pass these "
-    "refinements. Eligibility is decided by the role, not here."
+    f"**{len(filtered)} of {len(candidates)}** pass these refinements."
 )
 
 
@@ -1384,13 +1414,10 @@ with tab_search:
             share, active_n, total_n = score_basis(results[0])
             if share < 0.6:
                 st.info(
-                    f"**This role specifies little to score against**, so Fit "
-                    f"is built from {active_n} of {total_n} signals — "
-                    f"{share:.0%} of the intended weighting, renormalised to "
-                    "100%. The ranking is valid but thin: a candidate can top "
-                    "it without ever being measured on sector or requirement "
-                    "fit. Adding sectors or requirement lines to the role "
-                    "deepens it.",
+                    f"**Thin score.** This role gives {active_n} of "
+                    f"{total_n} signals something to measure — {share:.0%} "
+                    "of the weighting, renormalised to 100%. Add sectors or "
+                    "requirement lines to deepen it.",
                     icon="ℹ",
                 )
 
@@ -1400,15 +1427,14 @@ with tab_search:
         # result is normal output, not an alarm, and the useful reaction to
         # it is specific: name the requirement most candidates miss and what
         # widening it would admit.
-        if exact:
-            st.markdown(
-                f"<div class='statusline'><b style='color:{STATUS_GOOD}'>"
-                f"{len(exact)} qualified</b> · ranked by Fit; "
-                f"{len(near)} more are one gap away, listed after."
-                "</div>",
-                unsafe_allow_html=True,
-            )
-        else:
+        # When anyone qualifies, nothing is printed here: the two group
+        # headers below are "Qualified · 2" and "One gap away · 6", so a
+        # status line saying "2 qualified · 6 one gap away" was the same two
+        # numbers twice, a few dozen pixels apart -- and the headers are also
+        # the controls that fold each group, so they are the copy that has to
+        # stay. The empty case still speaks, because zero results with no
+        # explanation reads as a broken filter.
+        if not exact:
             from collections import Counter
             gap_counts = Counter(r.failed_hard[0].label for r in near)
             hint = ""
@@ -1424,12 +1450,9 @@ with tab_search:
                 f"background:{SURFACE};border:1px solid {GRID};"
                 f"border-left:3px solid {SERIES_2};border-radius:10px;"
                 f"padding:12px 16px;margin:2px 0 6px;font-size:13px'>"
-                f"<b>0 of {len(filtered)} clear every requirement for this "
-                f"role.</b> "
-                f"Each candidate below misses exactly one requirement, "
-                f"named on their row — the decision is whether to widen "
-                f"that requirement, not to accept a high Fit score that "
-                f"hides it.{hint}</div>",
+                f"<b>0 of {len(filtered)} clear every requirement.</b> "
+                f"Each candidate below misses exactly one, named on their "
+                f"row.{hint}</div>",
                 unsafe_allow_html=True,
             )
     else:
@@ -1454,11 +1477,7 @@ with tab_search:
 
     # -- Result list: the NAME is the click target -------------------------
     with list_col:
-        section(
-            "Results",
-            "Ranked by Fit within each group. Eligibility is decided by the "
-            "role, never by the sidebar.",
-        )
+        section("Results", "Ranked by Fit within each group.")
 
         # Active refinements, restated where the results are. Two of the
         # sidebar's filter groups collapse, so a selection made inside one
@@ -1512,11 +1531,7 @@ with tab_search:
             frame = pd.DataFrame(rows)
             st.markdown(candidate_table(ordered, matches),
                         unsafe_allow_html=True)
-            st.caption(
-                "Region and approach are not columns here: the role fixes "
-                "both, so every row carried the same two words. The dot is "
-                "parse confidence — hover it."
-            )
+            st.caption("Dot = parse confidence. Hover for the score.")
             st.download_button(
                 "Download shortlist (CSV)",
                 frame.to_csv(index=False).encode(),
@@ -1698,25 +1713,20 @@ with tab_search:
         st.markdown(
             f"<div style='color:{MUTED};font-size:13px;margin:-6px 0 8px'>"
             f"{meta}</div>"
-            + "".join(f"<span class='pill'>{t}</span>" for t in distinctions(c))
+            + "".join(
+                f"<span class='pill {_dtint(t)}' title='{_dtip(t, c)}'>{t}"
+                f"</span>" for t in distinctions(c)
+            )
             + record_note(c),
             unsafe_allow_html=True,
         )
-
-        if c.get("platform_alum_of"):
-            # Compact banner, not st.success -- the stock alert renders at
-            # body size and shouts; this is a fact line, not an alarm.
-            st.markdown(
-                f"<div style='background:#f2f6f3;border:1px solid #d3e2d8;"
-                f"border-radius:10px;padding:8px 12px;font-size:12.5px;"
-                f"margin:2px 0 10px'>"
-                f"<b style='color:{STATUS_GOOD}'>Platform alum</b> — "
-                f"previously at <b>{', '.join(c['platform_alum_of'])}</b>. "
-                f"<span style='color:{MUTED}'>The resume names only the pod; "
-                f"the platform link comes from the firm knowledge base."
-                f"</span></div>",
-                unsafe_allow_html=True,
-            )
+        # The platform-alum banner is gone. It said, in a bordered green box
+        # directly beneath the tag that already said it, "Platform alum --
+        # previously at Millennium Management": the same fact twice, the
+        # second time louder. Once a tag states something, an explanation
+        # under it is a restatement; the provenance that WAS worth keeping
+        # (the resume names only the pod, the lineage comes from the firm
+        # knowledge base) is now the tag's tooltip.
 
         # Headline numbers, Fit first when a role is set.
         cols = st.columns(4 if m else 3)
@@ -1788,14 +1798,23 @@ with tab_search:
         # taller than its neighbours -- a switcher whose items are different
         # sizes reads as a group of unrelated buttons.
         _vcols = st.columns([max(len(v), 7) for v in _views] + [9])
+
+        def _setview(k: str, i: int) -> None:
+            st.session_state[k] = i
+
         for _i, (_col, _name) in enumerate(zip(_vcols, _views)):
-            if _col.button(
+            # on_click, not a return value plus st.rerun(). Reading the
+            # button's return meant the pills above it had already drawn with
+            # the previous selection, so the switch needed a second run to
+            # look right -- two full script executions per click, which is
+            # exactly the lag. A callback fires before the single rerun, so
+            # state and paint agree the first time.
+            _col.button(
                 _name, key=f"{_vkey}_{_i}", use_container_width=True,
+                on_click=_setview, args=(_vkey, _i),
                 type=("primary" if st.session_state[_vkey] == _i
                       else "secondary"),
-            ):
-                st.session_state[_vkey] = _i
-                st.rerun()
+            )
         _view = st.session_state[_vkey]
 
         if _view == 0:
@@ -1807,8 +1826,8 @@ with tab_search:
             if m:
                 section(
                     "Hard requirements",
-                    "Constraints that disqualify. A candidate outside any of "
-                    "them is not ranked lower, they are not a match.",
+                    "These disqualify. Outside any one of them is not a "
+                    "lower rank, it is not a match.",
                 )
                 _hard = []
                 for crit in m.hard_criteria:
@@ -1828,22 +1847,19 @@ with tab_search:
                 )
                 section(
                     "Fit, as a shape",
-                    "Read the shape, not the area: a radar's area grows with "
-                    "the square of the radius and exaggerates differences, "
-                    "so every component value is also printed below.",
+                    "Read the shape, not the area — a radar exaggerates "
+                    "differences. Values are printed below.",
                 )
                 radar = fit_radar([m], 350)
                 if radar:
                     st.plotly_chart(radar, use_container_width=True)
                 section(
                     "What earned the Fit score",
-                    "Fit ranks only candidates who already clear every hard "
-                    "requirement. Each dimension is scored 0-1 and weighted; "
-                    "the line under each bar is what the pipeline found for "
-                    "it.",
+                    "Each dimension scored 0-1, then weighted. The line "
+                    "under each bar is what the pipeline found.",
                 )
                 st.markdown(contribution_ledger(m), unsafe_allow_html=True)
-                with st.expander("The resume sentence behind each score"):
+                with st.expander("Resume sentences, per dimension"):
                     for crit in m.soft_criteria:
                         if crit.weight <= 0 or not crit.evidence:
                             continue
@@ -1859,71 +1875,114 @@ with tab_search:
         if _view == 1:
             section(
                 "Classified attributes",
-                "Each attribute as the pipeline classified it, with the "
-                "keywords that drove the classification. The verbatim resume "
-                "sentence behind every one sits under Fit.",
+                "As classified, with the keywords that drove it and the "
+                "sentence it came from.",
             )
 
-            def attribute(label: str, value: str, block: dict | None = None,
+            def attribute(label: str, value: str, blocks=None,
                           note: str = "") -> None:
-                conf = f" · {block['confidence']} confidence" if block else ""
+                """One attribute as three ranked tiers, in ONE html block.
+
+                The tiers had no hierarchy for a structural reason, not a
+                typographic one: the value, the keyword pills and the quote
+                were three separate st.markdown calls, so Streamlit put its
+                own equal gap between them and they read as three siblings.
+                No amount of font sizing fixes that -- the grouping has to be
+                one element with its own spacing.
+
+                Ranked, loudest first: WHAT it decided (16px semibold, the
+                only large thing in the row), WHY it decided (keyword pills,
+                10.5px, plus the confidence), and the PROOF (the resume
+                sentence, 11.5px, clamped to two lines, full text on hover).
+                Everything sits inside a hairline left rule, so a reader sees
+                one object rather than three.
+                """
+                blocks = [b for b in (blocks or []) if b]
+                kws = list(dict.fromkeys(
+                    k for b in blocks for k in (b.get("keywords") or [])))
+                confs = list(dict.fromkeys(
+                    b["confidence"] for b in blocks if b.get("confidence")))
+                parts = [
+                    f"<div class='attrlabel'>{label}</div>",
+                    f"<div class='attrvalue'>{value}"
+                    + (f"<span class='attrnote'>{note}</span>" if note else "")
+                    + "</div>",
+                ]
+                if kws or confs:
+                    why = "".join(f"<span class='kw'>{k}</span>" for k in kws)
+                    if confs:
+                        why += (f"<span class='conf'>{'/'.join(confs)} "
+                                f"confidence</span>")
+                    parts.append(f"<div class='attrwhy'>{why}</div>")
+                for b in blocks:
+                    ev = (b.get("evidence") or "").replace("'", "’")
+                    if not ev:
+                        continue
+                    tag = (f"<b>{label_of(b.get('value'))}</b> — "
+                           if len(blocks) > 1 else "")
+                    parts.append(
+                        f"<div class='attrquote' title='{ev}'>{tag}“{ev}”"
+                        f"</div>"
+                    )
+                st.markdown(f"<div class='attr'>{''.join(parts)}</div>",
+                            unsafe_allow_html=True)
+
+            def factline(label: str, value: str, note: str = "") -> None:
+                """A secondary fact: no keywords, no quote, no large type.
+
+                Not everything in this pane is a classification. Markets
+                covered and the seniority bands are computed, not read, so
+                giving them the same three-tier block as the classified
+                attributes flattened the pane back out -- eight identical
+                units, none of them the point.
+                """
                 st.markdown(
-                    f"<div style='margin-top:9px;font-size:13px'>"
-                    f"<span style='color:{MUTED}'>{label}</span><br>"
-                    f"<b style='font-size:14px'>{value}</b>"
-                    f"<span style='color:{MUTED};font-size:12px'>{conf}"
-                    f"{' · ' + note if note else ''}</span></div>",
+                    f"<div class='fact'><span>{label}</span><b>{value}</b>"
+                    + (f"<i>{note}</i>" if note else "") + "</div>",
                     unsafe_allow_html=True,
                 )
-                if block:
-                    if block.get("keywords"):
-                        st.markdown(
-                            " ".join(
-                                f"<span class='pill'>{k}</span>"
-                                for k in block["keywords"]
-                            ),
-                            unsafe_allow_html=True,
-                        )
-                    # The quote is back where the claim is: "nothing is
-                    # asserted without its evidence" is a standing claim of
-                    # this system, and moving the sentence one fold away
-                    # quietly retired it. What changes is only the rendering
-                    # -- two lines, clamped, with the full sentence on hover
-                    # -- so ten attributes no longer stack into a wall of
-                    # 40-word paragraphs.
-                    if block.get("evidence"):
-                        _ev = block["evidence"].replace("'", "’")
-                        st.markdown(
-                            f"<div class='quote' title='{_ev}'>“{_ev}”</div>",
-                            unsafe_allow_html=True,
-                        )
 
-            attribute("Investment approach", label_of(e["investment_approach"]["value"]),
-                      e["investment_approach"], note=label_of(c.get("approach_family")))
-            attribute("Market side", label_of(e["market_side"]["value"]), e["market_side"])
-            # One row per sector: each carries its own keywords and its own
-            # resume sentence, and merging them threw two of the three away.
-            # The repeated label was the actual complaint, so the label is
-            # numbered instead -- "Sector 1 of 3" reads as one field observed
-            # three times, which is what it is.
+            # The note repeated the value whenever the classifier and its
+            # family agree, which is most of the time: "Fundamental ·
+            # Fundamental".
+            _fam = label_of(c.get("approach_family"))
+            _appr = label_of(e["investment_approach"]["value"])
+            attribute("Investment approach", _appr,
+                      [e["investment_approach"]],
+                      note="" if _fam == _appr else f"family: {_fam}")
+            attribute("Market side", label_of(e["market_side"]["value"]),
+                      [e["market_side"]])
+            # One "Sectors" row. Numbering it 1 of 3 was worse than
+            # repeating the label: it implied a rank the pipeline never
+            # assigned. The sectors are one value, their keywords merge into
+            # one pill row, and each sector's own sentence is kept below,
+            # named -- so nothing is lost and the label appears once.
             _secs = e["primary_sectors"]
-            for _i, sector in enumerate(_secs, 1):
+            if _secs:
                 attribute(
-                    "Sector" if len(_secs) == 1 else f"Sector {_i} of {len(_secs)}",
-                    label_of(sector["value"]), sector,
+                    "Sectors",
+                    ", ".join(label_of(x["value"]) for x in _secs),
+                    _secs,
                 )
-            attribute(
-                "Markets covered", ", ".join(c.get("coverage_markets", [])) or "—", None,
+            factline(
+                "Markets covered",
+                ", ".join(c.get("coverage_markets", [])) or "—",
                 note="inferred from location"
                 if c.get("coverage_markets_source") == "inferred" else "stated",
             )
-            attribute(
-                "Seniority",
-                f"{label_of(c.get('seniority_band'))} by career · "
-                f"{label_of(c.get('investment_seniority_band'))} by investing",
-            )
+            # Seniority is only worth a row when the two bands DISAGREE --
+            # a senior career with a junior investing record is a finding.
+            # When they agree it restates the two tenure metrics at the top
+            # of the pane in different words.
+            _sb, _isb = c.get("seniority_band"), c.get("investment_seniority_band")
+            if _sb and _isb and _sb != _isb:
+                factline(
+                    "Seniority",
+                    f"{label_of(_sb)} by career, {label_of(_isb)} by investing",
+                    note="the gap is the point",
+                )
 
-            section("Skills and credentials")
+            section("Skills and credentials", "As stated in the document.")
             for cred in c.get("credentials_summary", []) or []:
                 st.markdown(f"<div style='font-size:13px'>· {cred}</div>",
                             unsafe_allow_html=True)
@@ -2067,11 +2126,8 @@ with tab_search:
                         "pod; lineage resolved via knowledge base)")
                 if covered:
                     _lines.append(f"- {covered} names under research coverage")
-                st.caption(
-                    "Assembled from parsed facts and verbatim resume quotes — "
-                    "check the gap line before sending. Copy from the block, or "
-                    "download."
-                )
+                st.caption("Parsed facts and verbatim quotes. Check the gap "
+                           "line before sending.")
                 _draft = "\n".join(_lines)
                 st.code(_draft, language=None)
                 st.download_button(
@@ -2161,9 +2217,15 @@ with tab_search:
                     ("Software", ", ".join(c.get("software_tools", [])) or "—"),
                     ("Methods", ", ".join(c.get("methods", [])) or "—"),
                     ("Positions parsed", str(len(e["positions"]))),
+                    # The header pill counts WARNINGS; this row counted every
+                    # flag including the triaged-benign notes, so one profile
+                    # reported "2 issues" at the top and "5 issue(s)" here.
+                    # Same split as everywhere else: warnings, then notes.
                     ("Parse confidence",
                      f"{c['quality']['band']} {c['quality']['score']} · "
-                     f"{len(c['flags'])} issue(s)"),
+                     f"{sum(f.get('severity', 'warning') == 'warning' for f in c['flags'])}"
+                     f" warning(s), "
+                     f"{sum(f.get('severity') == 'info' for f in c['flags'])} note(s)"),
                     ("Missing fields", ", ".join(c["quality"]["missing_fields"]) or "none"),
                     ("Source file", c["source_file"]),
                 ]
@@ -2238,10 +2300,7 @@ with tab_insights:
         left, right = st.columns(2)
         with left:
             st.markdown("**Career length vs. investing tenure**")
-            st.caption(
-                "The gap is the point. Screening on total experience alone "
-                "overstates how long these candidates have been investing."
-            )
+            st.caption("The gap is the point.")
             pool = sorted([c for c in charted if c["years_experience"] is not None],
                           key=lambda c: c["years_experience"])
             if pool:
@@ -2272,10 +2331,8 @@ with tab_insights:
 
         with right:
             st.markdown("**Most common software and credentials**")
-            st.caption(
-                "What this pool can actually operate. A role naming a tool "
-                "nobody holds is a sourcing problem, not a screening one."
-            )
+            st.caption("A role naming a tool nobody holds is a sourcing "
+                       "problem, not a screening one.")
             tally: dict[str, int] = {}
             for c in charted:
                 for tool in c.get("software_tools", []):
@@ -2292,8 +2349,9 @@ with tab_insights:
                 values = [v for _, v in top_creds] + [v for _, v in top_tools]
                 colours = ["#123a6f"] * len(top_creds) + ["#8badd0"] * len(top_tools)
                 fig = go.Figure(go.Bar(
-                    x=values, y=labels, orientation="h", marker_color=colours,
-                    marker_line=dict(color=SURFACE, width=2),
+                    x=values, y=labels, orientation="h",
+                    marker=dict(color=colours, cornerradius=9),
+                    width=0.52,
                     hovertemplate="%{y}<br>%{x} candidate(s)<extra></extra>"))
                 fig.update_layout(showlegend=False, xaxis_title="Candidates")
                 fig.update_yaxes(showgrid=False, autorange="reversed")
@@ -2309,10 +2367,8 @@ with tab_insights:
 with tab_quality:
     st.markdown("#### How far to trust each record")
     st.caption(
-        "Parse confidence is a property of the DOCUMENT and of how well the "
-        "pipeline could read it — never a judgement about the candidate. A "
-        "resume built from tables or missing its dates scores lower because "
-        "our data on that person is thinner, not because they are weaker."
+        "A property of the DOCUMENT, never of the candidate: a resume built "
+        "from tables scores lower because our data is thinner."
     )
 
     ranked = sorted(candidates, key=lambda c: c["quality"]["score"])
@@ -2327,13 +2383,20 @@ with tab_quality:
 
     st.markdown("---")
     st.markdown("**Parse confidence by candidate**")
+    # Rounded caps, no outline, one hue in three lightnesses, and a bar
+    # thinner than its own gap. An outlined full-height bar in three
+    # saturated colours is a spreadsheet chart; the shape carries as much of
+    # the register as the palette does.
     fig = go.Figure(go.Bar(
         x=[c["quality"]["score"] for c in ranked],
         y=[c["display_name"] for c in ranked], orientation="h",
-        marker_color=[QUALITY_COLOUR[c["quality"]["band"]] for c in ranked],
-        marker_line=dict(color=SURFACE, width=2),
+        marker=dict(
+            color=[QUALITY_COLOUR[c["quality"]["band"]] for c in ranked],
+            cornerradius=9,
+        ),
+        width=0.52,
         text=[f"{c['quality']['score']:.2f}" for c in ranked],
-        textposition="outside", textfont=dict(size=11, color=INK),
+        textposition="outside", textfont=dict(size=11, color=MUTED),
         customdata=[len(c["flags"]) for c in ranked],
         hovertemplate="%{y}<br>confidence %{x:.2f}<br>%{customdata} issue(s)"
                       "<extra></extra>"))
