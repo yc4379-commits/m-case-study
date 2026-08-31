@@ -1,12 +1,12 @@
 """
-Assemble case_study.ipynb -- the case study's primary deliverable.
+Assemble Yuanzhi_Jasmine_Chen_Talent_Intelligence_Platform.ipynb -- the case study's primary deliverable.
 
 The notebook is deliberately thin on duplicated code: every section IMPORTS
 from src/ and reads the committed dataset, so when the pipeline or the app
 changes, re-running the notebook re-syncs it. Only the app section (link,
 screenshots, design prose) is written by hand.
 
-Run:  python tools/build_notebook.py     (writes and executes case_study.ipynb)
+Run:  python tools/build_notebook.py     (writes and executes Yuanzhi_Jasmine_Chen_Talent_Intelligence_Platform.ipynb)
 """
 
 import nbformat as nbf
@@ -23,7 +23,7 @@ md("""
 # Talent Intelligence Platform
 ### Millennium Business Development — Data Science case study
 
-**Jasmine (Yuanzhi) Chen** · August 2026
+**Yuanzhi (Jasmine) Chen** · August 2026
 
 | Deliverable | Where |
 |---|---|
@@ -34,48 +34,52 @@ md("""
 
 The task: parse ten resumes (PDF and Word) with an LLM API into structured
 JSON/CSV, and build a Streamlit application where a Business Development
-user can search and filter candidates against job requisitions, with
-distribution insights — designed to scale beyond ten resumes.
+user can search and filter **junior analyst candidates** against job
+requisitions, with distribution insights — designed to scale beyond ten
+resumes.
 
-Three commitments shape every design decision in this system:
+Three product claims shape every design decision in this system:
 
-1. **Hard constraints disqualify; soft signals rank.** A candidate outside
-   the role's region or experience band is not an 82% match — they are not a
-   match. Keeping the two separate is what lets this search honestly return
-   **zero results**, which commercial matching tools cannot do.
-2. **Every claim carries its evidence.** No classification appears without
-   the resume sentence that produced it, verified to appear verbatim in the
-   source. This is not decoration: the worst scoring bug in this project was
-   invisible in the aggregate numbers and obvious the moment one evidence
-   quote was read (§7).
-3. **Data quality is visible, never silent.** Every record carries a parse
-   confidence with the specific reasons, and formatting deliberately carries
-   **zero** weight in it — in this corpus, messy formatting tracks regional
-   convention, not candidate quality.
+1. **The matching is reliable enough to act on.** Hard constraints
+   disqualify; soft signals rank — a candidate outside the role's region or
+   experience band is not an 82% match, they are not a match, which is what
+   lets this search honestly return **zero results**. Which criteria are
+   hard and which can be relaxed follows how recruiting actually works:
+   geography and investment approach are non-negotiable, credentials and
+   skills are weighted preferences, and the weights live in YAML where they
+   can be argued about. The scoring respects industry rules for **junior
+   analyst** hiring specifically — demonstrated skills, credentials and
+   education carry weight; self-reported AUM and returns, the currency of
+   senior hiring, are displayed with their quotes but never scored.
+2. **The parsing reads the pile the way a careful screener would — and
+   proves it.** Every classification carries the resume sentence that
+   produced it, verified to appear **verbatim** in the source: nothing
+   invented, nothing silently dropped. The checks a human runs first on a
+   finance resume — employment gaps, overlapping dates, malformed contact
+   details, credential inconsistencies, formatting slips — are computed
+   automatically and surfaced as flags, with a human triage layer deciding
+   which are real risks and which are benign. Accuracy is measured, not
+   assumed: §7 scores the system against 40 blind human labels.
+3. **The interface is built for the BD workflow, not for a demo.** Accurate
+   display first, then speed: candidate features are split into fine
+   dimensions and zoned with tags and charts, so a screener catches the
+   deciding facts — and the risks — without reading walls of prose, and can
+   drill from any tag to its verbatim quote. Because the end user is a BD
+   team, the workflow continues past search: one-click outreach drafts,
+   pool-level insight views, and working previews of what more data
+   unlocks (an internal-knowledge AI assistant, a talent knowledge graph).
 """)
 
 # ------------------------------------------------------------- 1 · pipeline
 md("""
 ## 1 · Architecture
 
-```
-data/resumes/*.{docx,pdf}
-        │
-        ▼  src/extract.py        paragraphs + tables + floating text boxes;
-        │                        PDF column separation; ligature repair
-        ▼  src/parse.py          schema-constrained LLM extraction (Anthropic
-        │                        tool use), validation with corrective retry,
-        │                        verbatim-quote verification, content-hash cache
-        ▼  src/checks.py         deterministic checks: gaps, overlaps, contact
-        │                        details, credential pairs, city-zip sanity
-        ▼  src/enrich.py         knowledge-base lookups, tenure arithmetic,
-        │                        entity resolution, human flag-triage,
-        │                        confidence scoring
-        ▼
-data/candidates.json ──► app.py (Streamlit) ──► src/match.py (requisitions)
-                                    │
-                                    └──► src/evaluate.py (accuracy vs human labels)
-```
+![Pipeline](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/pipeline.png)
+
+Each dark box is one module in `src/`; the light boxes are data. The
+curated `knowledge/` YAML files feed enrichment, and everything the app
+shows is read from the committed `data/candidates.json` — the public
+deployment calls no model.
 
 The split of labour is a design position: **the model is asked only for
 judgement** (fundamental vs systematic, which sectors, is this an investment
@@ -85,8 +89,11 @@ judgement is a prompt experiment to fix; a wrong lookup is one line of YAML.
 """)
 
 md("""
-First, an orientation view — eight columns chosen for scanning, not the
-full record. Each parsed candidate carries **30+ top-level fields** plus the
+First, an orientation view of the **whole parsed pool** — all ten
+candidates before any requisition or filter is applied, eight columns
+chosen for scanning rather than the full record. (Requisition matching,
+where hard requirements start disqualifying, is §5.) Each parsed candidate
+carries **30+ top-level fields** plus the
 complete nested extraction (every position with dates and bullets, education,
 credentials, coverage, per-claim evidence quotes, flags); the field
 inventory and one record in full follow in §3, and the whole dataset is
@@ -139,6 +146,16 @@ of passing whatever it got:
   header lines; the shipped rule requires the right cluster to be at least
   4 lines and 15% of the page.
 
+Human review caught these failures first — but *staying* caught is
+systematic, not heroic: every document's extraction is diffed against a
+naive baseline (a large character-count gap flags recovered, or still
+missing, content); the model reports damage it can see in
+`extraction_notes` (it was the model that exposed the bad `ffi` repair);
+and §3's verbatim-quote verification doubles as an extraction alarm — a
+quote that cannot be found in our text is often the text's fault, not the
+model's. At scale this becomes sampled human audits plus drift alarms on
+the extraction-diagnostics distribution (§9).
+
 Per-document diagnostics from the committed extraction log:
 """)
 
@@ -171,11 +188,26 @@ The mechanics, end to end:
    after a prompt fix; it includes the schema because a schema change
    *must* re-parse.
 
-One prompt lesson: the filename was originally in the prompt, and the model
-used it for the candidate's name on some runs and refused on others —
-ambiguous instructions produce non-deterministic output. The filename is
-now withheld; a deterministic fallback applies only when the document
-itself states no name, and flags the record.
+**Nothing here is fine-tuned.** The accuracy comes from engineering around
+a general model, not from training one — which is what makes the approach
+reproducible and cheap to improve. Five things carry it: the model sees
+*complete* text (§2 — most "LLM parsing errors" are extraction losses);
+it is asked only for judgement, never for anything arithmetic can settle;
+the schema constrains the shape of every answer while the system prompt
+(above) constrains its discipline — transcribe don't embellish, verbatim
+evidence, classify by substance, distrust section headings; verification
+then catches what discipline misses, since an invented quote fails the
+verbatim check and lowers the record's confidence; and accuracy is
+*measured* against blind human labels (§7), so any prompt or schema change
+re-runs against that fixed yardstick. Iteration is the training loop here:
+edit a field description, re-parse (the cache makes unchanged documents
+free), re-evaluate.
+
+One prompt lesson from that loop: the filename was originally in the
+prompt, and the model used it for the candidate's name on some runs and
+refused on others — ambiguous instructions produce non-deterministic
+output. The filename is now withheld; a deterministic fallback applies
+only when the document itself states no name, and flags the record.
 
 Parsing all 10 resumes cost **≈ $0.80** (claude-sonnet-5); the public app
 calls no model and needs no key.
@@ -429,57 +461,94 @@ is the regression suite for any future scoring change.
 
 # ----------------------------------------------------------------- 8 · app
 md("""
-## 8 · The application
+## 8 · The application — one search, walked end to end
 
 Live: **<https://m-case-study-jasmine.streamlit.app/>** — public; calls no
 model. The deployment serves precomputed data, so no API key exists in the
-app to leak or spend.
+app to leak or spend. What follows is the path a BD user actually takes
+through it.
+
+### Step 1 · Say what you are hiring for
+
+The first control on the page is the only mandatory question. Three ways
+in: pick a posting from the **job library** (all four transcribed from
+real postings — three Millennium REQs and one Point72), **define your own
+criteria** when the seat is not in the library yet, or **browse** the
+whole pool with no matching at all:
+
+![Choosing how to filter](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_modes.png)
+
+### Step 2 · The role locks the hard requirements; the sidebar refines the rest
+
+Picking a role pins it above the results with its hard requirements as
+chips — and the sidebar *shrinks*. Dimensions the role has decided
+(region, approach, sector, experience) disappear rather than grey out: a
+second control over a decided axis would read as a second authority. Only
+what the role leaves open stays refinable:
+
+![Job-library mode — the role decides, the sidebar refines](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_sidebar_locked.png)
+
+In **browse mode** nothing is locked and all five facets are live —
+market, approach, sector, market side, asset class — each with counts
+that update as the others narrow, plus free-text keyword search:
+
+![Browse mode — every facet open](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_sidebar_browse.png)
+
+**Advanced filters** hold what junior-analyst screening actually turns
+on. A junior's record is coursework, licences and tools — not a track
+record — so software, credentials and an experience slider lead the
+list; a **minimum parse-confidence** control closes it, because with a
+large pool the cheapest first cut is dropping the badly-parsed — a
+resume that fails basic completeness and verifiability has not earned a
+screener's minute yet. Every control carries a hover definition, and no
+filter ever overrides the role:
+
+![Advanced filters](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_advanced.png)
+
+### Step 3 · Read the results
+
+Qualified and one-gap-away are separate groups, never one blended
+ranking. Rows sort by fit within each group, and every row answers
+"why" on sight — a match names the signals that earned its score, a
+near miss names its single gap with both numbers ("has 12.7 years, role
+needs 4–5"), which a recruiter reads as *what would I have to relax*:
+
+![The result list](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_results.png)
+
+At volume, the same results become a sortable **table** — the full
+parsed breadth, 21 columns, every header with a hover definition, and a
+CSV download carrying the same columns:
+
+![Table view](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_table.png)
+
+### Step 4 · Open the person
 
 ![Candidates view](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_candidates.png)
 
-Almost every commitment in this document is visible in that one frame:
+Three commitments are visible in that one frame. Ryan's **"Millennium
+alum"** pill is resolved through the firm knowledge base — platform
+experience is the first fact a multi-manager recruiter scans for, and the
+same resolver carries pod-to-platform lineage (North53 → Millennium, §4),
+so the pill would survive a resume that named only the pod. The **61% is
+green only because he clears all four hard requirements** — green marks
+eligibility, never magnitude — and "from 7 of 8 signals · 93% of the full
+weighting" concedes what the score could not see instead of quietly
+renormalising. And the header strip — **"Resume read cleanly · high 0.88
+· 4 issues"** — keeps parse confidence next to the name, not buried in an
+admin tab.
 
-- The **FILLING bar** pins the active requisition and its four hard
-  requirements as chips; everything below is conditioned on it. The
-  sidebar meanwhile shows only Market side, Asset class and Keyword —
-  the role has fixed region, approach, sector and experience, so those
-  filters are *gone*, not greyed out.
-- **"Qualified · 2" and "One gap away · 6"** are separate groups, never
-  one ranked list. Each near miss names the single constraint it failed
-  ("Gap — Region APAC — needs US") — a recruiter reads it as "what would
-  I have to relax", which is a decision, not a score.
-- Ryan Patel's **"Millennium alum"** pill: his resume names only Meridian
-  Capital Partners. The platform surfaced through pod-lineage entity
-  resolution in `firms.yaml` — one pill carrying the whole knowledge-base
-  argument.
-- The **61% is green only because he clears all four hard requirements** —
-  green marks eligibility, not magnitude. Under it, "from 7 of 8 signals ·
-  93% of the full weighting" concedes what the number could not see (no
-  stated coverage), instead of quietly renormalising.
-- The header strip says **"Resume read cleanly · high 0.88 · 4 issues"** —
-  parse confidence rides on every record, next to the name, not buried in
-  an admin tab.
-- The radar ("Fit, as a shape") decomposes the 61% into its eight signals,
-  and the **six pill views** (Fit / Profile / Figures / Issues / Outreach /
-  Full record) replace one long scroll; they sit inside a Streamlit
-  fragment, so switching redraws only the panel.
+The panel itself is **six views** switched by pills (inside a Streamlit
+fragment, so a click redraws only the panel). Each answers one screening
+question — Fit: *does the score hold up?* · Profile: *what are they good
+at?* · Figures: *what do they claim?* · Issues: *what should I
+double-check?* · Outreach: *how do I write to them?* · Full record:
+*what exactly was parsed?*
 
-**The filters.** Five primary facets — region, approach, sector, market
-side, asset class — each with live counts that update as the others
-narrow, plus free-text keyword search over employers, titles, bullets and
-tools. "Advanced filters" holds the rest: software, credentials, an
-experience slider whose top stop means *no upper limit*, platform-alum,
-and a parse-confidence floor with an optional prefer-well-parsed sort. Two
-rules govern all of them: a filter refines the eligible pool but **never
-overrides the role**, and every control carries a hover definition —
-the first reviewer could not tell what "coverage" meant, and a number a
-user cannot interpret is worse than no number.
+![The six views of one candidate](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_profile_tabs.png)
 
-### The profile, three of its six views
-
-**Profile** — every classified attribute as a three-tier block: the value,
-the keyword tags that earned it, the verbatim quote, with the model's
-confidence alongside. Absence is stated ("none listed" in a dashed pill),
+**Profile** — every classified attribute as a three-tier block: the
+value, the keyword tags that earned it, the verbatim quote, with the
+model's confidence alongside. Absence is stated ("none listed", dashed),
 never left blank:
 
 ![Profile view](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_profile.png)
@@ -487,29 +556,30 @@ never left blank:
 **Figures** — the resume's own numbers, structured. Stated AUM,
 performance and risk figures are extracted with verbatim quotes and
 **displayed, never scored**; the one comparable figure — names under
-coverage — is scored at 8% weight and its card says so. The dividing line
-is comparability, not importance: this very pool contains a
+coverage — is scored at 8% weight and its card says so. The dividing
+line is comparability, not importance: this very pool contains a
 "$4.5 trillion" that is Fidelity's AUM, not the candidate's book:
 
 ![Figures view](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_figures.png)
 
 **Outreach** — the step after "this candidate fits" is always "someone
-writes to them": a one-click briefing whose every claim quotes the resume,
-because a sourcing mail earns replies by proving someone actually read it:
+writes to them": a one-click briefing whose every claim quotes the
+resume, because a sourcing mail earns replies by proving someone
+actually read it:
 
 ![Outreach view](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_outreach.png)
 
-### Same score, different candidate
+### Step 5 · Compare the finalists
 
 Marcus and Ryan both score 61% on the Point72 seat. The compare view
-overlays their radars and prints the weighted components: Marcus earns it
-on requirements and skills, Ryan on firm type and platform lineage. One
-blended number would have hidden exactly the trade-off a recruiter is
-paid to make:
+overlays their radars and prints the weighted components: Marcus earns
+it on requirements and skills, Ryan on firm type and platform lineage.
+One blended number would have hidden exactly the trade-off a recruiter
+is paid to make:
 
 ![Compare view](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_compare.png)
 
-### The empty state is a feature
+### When the answer is no one
 
 Against the Mumbai posting's 4–5 year band, nobody qualifies — and the
 app says so instead of ranking unqualified people confidently. It names
@@ -517,37 +587,66 @@ each near miss's single gap and computes what each widening would admit:
 
 ![Zero results](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_zero_results.png)
 
-### Table view and export
+### The Insights tab — managing the pool, not one search
 
-The full parsed breadth as a sortable table — 21 columns, every header
-with a hover definition — and the same columns as a CSV download:
+The coverage heatmap maps the bench: regions by sectors, each cell the
+number of candidates covering both. **The empty cells are the point** —
+the seats this pool cannot fill — so the chart doubles as a sourcing
+to-do list. A parse-confidence threshold above it keeps thin records out
+of the counts:
 
-![Shortlist table](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_table.png)
+![Sector coverage by region](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_heatmap.png)
+
+Career length vs investing tenure, one row per candidate. The *gap*
+between the two dots is the story: a wide gap is a career changer
+arriving from banking, consulting or engineering — the reason the system
+computes both numbers instead of one:
+
+![Career length vs investing tenure](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_tenure.png)
+
+Credentials and software ranked by how many candidates hold them — a
+read on the market mainstream. It calibrates requisitions as much as
+candidates: a JD naming a tool nobody in the pool holds describes a
+sourcing problem, not a screening one:
+
+![Most common credentials and software](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_credentials.png)
+
+Last, the talent-network graph — platforms, firms and candidates as
+three layers, drawn live from `firms.yaml`. Grey edges are employment,
+which the resumes state; the bronze edge is an ownership link **no
+resume states** — J.P. Morgan Asset Management belongs to JPMorgan
+Chase, knowledge that lives only in the firm KB. The same KB carries
+pod-to-platform lineage (North53 → Millennium, §4), the class of edge
+that matters most at scale: the knowledge-graph roadmap item (§10) at
+its smallest honest size:
+
+![Talent network](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_network.png)
+
+### The Data quality tab — trust, cross-checked
+
+Every record's parse confidence with its specific deductions, ranked
+worst-first. It exists to let a human sanity-check the scores
+themselves, and it pairs with the triage layer (§4) where a human
+decides which flagged issues deduct and which are benign conventions:
+
+![Data quality](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_quality.png)
+
+### Ask · preview — the AI assistant, at its honest size
+
+Free-text questions over every parsed resume sentence, every answer a
+quoted sentence with its source. Today it runs the same auditable
+concept scorer the matcher uses; the production version is the roadmap's
+RAG step (§10) over resumes plus the internal sourcing corpus — meeting
+notes, call summaries — under the same rule:
+
+![Ask the pool](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_ask.png)
 
 The interface went through ~15 review rounds with two reviewers (a
 BD-user perspective and a UI designer). The grammar that survived: navy
 is chrome, **green means "clears every hard requirement"** and nothing
 else, bronze means gap or caveat, and informational facts are neutral
 pills — tags may carry a tinted background; coloured *text* was reviewed
-out. Qualified and one-gap-away are separate collapsible groups, one-line
-rows, because the *why* lives one glance right in the panel.
-
-The Insights tab reads the pool as a whole, on the axes the requisitions
-filter on. The heatmap's empty cells are the point — the seats this pool
-cannot fill; the dumbbell chart plots career length against investing
-tenure because the *gap* between them is the story for anyone who arrived
-from banking or engineering:
-
-![Insights view](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_insights.png)
-
-Below the distributions sits the talent-network graph — platforms, firms
-and candidates as three layers, drawn live from `firms.yaml`. Bronze edges
-are pod-to-platform lineage **the resumes never state**: this is the
-knowledge-graph roadmap item (§10) at its smallest honest size, and it is
-how "previously at Millennium" surfaces for a resume that only names the
-pod:
-
-![Talent network](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_network.png)
+out.
 """)
 
 # --------------------------------------------------------- 9 · scalability
@@ -630,8 +729,8 @@ python tools/build_notebook.py       # re-executes this notebook
 nb.cells = C
 
 import nbclient
-nbf.write(nb, "case_study.ipynb")
+nbf.write(nb, "Yuanzhi_Jasmine_Chen_Talent_Intelligence_Platform.ipynb")
 client = nbclient.NotebookClient(nb, timeout=180, kernel_name="python3")
 client.execute()
-nbf.write(nb, "case_study.ipynb")
-print("case_study.ipynb written and executed:", len(nb.cells), "cells")
+nbf.write(nb, "Yuanzhi_Jasmine_Chen_Talent_Intelligence_Platform.ipynb")
+print("Yuanzhi_Jasmine_Chen_Talent_Intelligence_Platform.ipynb written and executed:", len(nb.cells), "cells")

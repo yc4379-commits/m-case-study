@@ -6,7 +6,7 @@ by an LLM, enriched against a curated domain knowledge base, and searched
 against job requisitions in a Streamlit app.
 
 **Live app:** https://m-case-study-jasmine.streamlit.app/
-**Walk-through notebook:** [`case_study.ipynb`](case_study.ipynb)
+**Walk-through notebook:** [`Yuanzhi_Jasmine_Chen_Talent_Intelligence_Platform.ipynb`](Yuanzhi_Jasmine_Chen_Talent_Intelligence_Platform.ipynb)
 
 ---
 

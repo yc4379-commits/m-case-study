@@ -2182,10 +2182,14 @@ with tab_search:
                         _hits = [x for x in _mx if x["kind"] == _kind]
                         if not _hits:
                             continue
-                        _quotes = "".join(
-                            f"<div class='attrquote'><b>{_x['figure']}</b> — "
-                            f"“{_x['quote'][:200]}”</div>"
-                            for _x in _hits)
+                        # Same contract as every profile quote: clamped to
+                        # two lines on screen, full text on hover (title).
+                        def _qdiv(_x: dict) -> str:
+                            _t = _x["quote"].replace("'", "’")
+                            return (f"<div class='attrquote' title='{_t}'>"
+                                    f"<b>{_x['figure']}</b> — "
+                                    f"“{_x['quote'][:200]}”</div>")
+                        _quotes = "".join(_qdiv(_x) for _x in _hits)
                         st.markdown(
                             f"<div class='attr'>"
                             f"<div class='attrlabel'>{_KIND[_kind]} · "
@@ -2664,8 +2668,9 @@ with tab_insights:
     )
     st.plotly_chart(styled_chart(_fig, 430), use_container_width=True)
     st.caption(
-        "Bronze edges are pod-to-platform lineage the resumes never state. "
-        "Grey edges are employment, resolved through the firm knowledge base."
+        "Bronze edges are ownership and platform lineage from the firm "
+        "knowledge base — links no resume states. Grey edges are "
+        "employment, resolved through the same knowledge base."
     )
 
 
