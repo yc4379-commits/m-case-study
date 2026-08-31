@@ -1,41 +1,50 @@
 # Talent Intelligence Platform
 
-A candidate search and requisition-matching tool for a hedge fund Business
-Development team. Resumes in PDF and Word are parsed into structured records
-by an LLM, enriched against a curated domain knowledge base, and searched
-against job requisitions in a Streamlit app.
+Ten messy resumes in, a defensible shortlist out. A junior-analyst
+sourcing tool for a hedge fund Business Development team: LLM-parsed
+records with verbatim evidence behind every claim, matched against real
+job requisitions — by a search that is allowed to say **"no one
+qualifies."**
 
 **Live app:** https://m-case-study-jasmine.streamlit.app/
 **Walk-through notebook:** [`Yuanzhi_Jasmine_Chen_Talent_Intelligence_Platform.ipynb`](Yuanzhi_Jasmine_Chen_Talent_Intelligence_Platform.ipynb)
 
+![Candidates view](docs/app_candidates.png)
+
 ---
 
-## The problem this is built around
+## Three product claims
 
-A BD team sourcing investment talent needs to answer questions like *"who in
-our pipeline could fill this Mumbai fundamental equity seat?"* The resumes are
-a mess of formats, the categories that matter (fundamental vs systematic,
-buy-side vs sell-side, which sector, how senior) are not stated in any
-consistent way, and the tools that promise to solve this return a confident
-ranked list whether or not anyone actually qualifies.
+**1 · The matching is reliable enough to act on.** Hard requirements
+disqualify (region, approach, experience band — a candidate outside them
+is not an 82% match, they are not a match); soft signals rank the
+survivors, with the weights in YAML where they can be argued about.
+Which is which follows how recruiting actually works, and the scoring
+respects junior-analyst hiring specifically: demonstrated skills,
+credentials and education carry weight, while self-reported AUM and
+returns — the currency of senior hiring — are displayed with their
+quotes and never scored. Against one real Mumbai posting, nobody in this
+pool qualifies, and the app says exactly that, names each near miss's
+single gap, and computes what widening would admit.
 
-Three commitments shape the whole system:
+**2 · The parsing reads the pile the way a careful screener would — and
+proves it.** Every classification carries the resume sentence that
+produced it, verified to appear verbatim in the source. The checks a
+human runs first on a finance resume — employment gaps, overlapping
+dates, malformed contact details, credential inconsistencies — are
+computed automatically and flagged, with a human triage layer deciding
+which are real risks and which are benign conventions. Accuracy is
+measured, not assumed: 40 blind human labels, **precision 100%, recall
+57%** — and all three misses trace to a single experience-band rule,
+which turned out to be the most interesting finding in the project.
 
-**Hard constraints disqualify; soft signals rank.** A candidate outside the
-region or the experience band is not an 82% match — they are not a match.
-Blending both into one number is exactly why commercial match scores cannot
-be trusted. Here they never mix, which is what allows the search to return
-**zero results** and say so.
-
-**Every claim carries its evidence.** No classification appears without the
-resume sentence that produced it, and every quote is verified to appear
-verbatim in the source. This is not decoration: a scoring bug that inflated
-every requirement score was invisible in the aggregate numbers and obvious the
-moment one quote was read.
-
-**Data quality is visible, not hidden.** Each record carries a parse
-confidence and the specific reasons behind it. A tool that quietly presents a
-half-read resume as fact is worse than one that presents less.
+**3 · The interface is built for the BD workflow, not for a demo.**
+Fine-grained dimensions zoned with tags (tags may carry colour;
+coloured text may not — one of ~15 review rounds' worth of rules), a
+21-column table view with CSV export, one-click outreach drafts that
+quote the resume, pool-level insight charts whose empty cells are the
+point, and working previews of the roadmap: a retrieval-based Ask tab
+and a talent network drawn from a curated firm knowledge base.
 
 ---
 
