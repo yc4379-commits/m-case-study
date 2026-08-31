@@ -9,42 +9,26 @@ qualifies."**
 **Live app:** https://m-case-study-jasmine.streamlit.app/
 **Walk-through notebook:** [`Yuanzhi_Jasmine_Chen_Talent_Intelligence_Platform.ipynb`](Yuanzhi_Jasmine_Chen_Talent_Intelligence_Platform.ipynb)
 
-![Candidates view](docs/app_candidates.png)
-
 ---
 
 ## Three product claims
 
-**1 · The matching is reliable enough to act on.** Hard requirements
-disqualify (region, approach, experience band — a candidate outside them
-is not an 82% match, they are not a match); soft signals rank the
-survivors, with the weights in YAML where they can be argued about.
-Which is which follows how recruiting actually works, and the scoring
-respects junior-analyst hiring specifically: demonstrated skills,
-credentials and education carry weight, while self-reported AUM and
-returns — the currency of senior hiring — are displayed with their
-quotes and never scored. Against one real Mumbai posting, nobody in this
-pool qualifies, and the app says exactly that, names each near miss's
-single gap, and computes what widening would admit.
+**1 · Matching you can act on.** Hard requirements disqualify — outside
+the region or experience band is not an 82% match, it is not a match;
+soft signals rank the survivors, with the weights in YAML. Self-reported
+AUM and returns are shown with their quotes, never scored. Against one
+real Mumbai posting nobody qualifies, and the app says so.
 
-**2 · The parsing reads the pile the way a careful screener would — and
-proves it.** Every classification carries the resume sentence that
-produced it, verified to appear verbatim in the source. The checks a
-human runs first on a finance resume — employment gaps, overlapping
-dates, malformed contact details, credential inconsistencies — are
-computed automatically and flagged, with a human triage layer deciding
-which are real risks and which are benign conventions. Accuracy is
-measured, not assumed: 40 blind human labels, **precision 100%, recall
-57%** — and all three misses trace to a single experience-band rule,
-which turned out to be the most interesting finding in the project.
+**2 · Parsing that proves itself.** Every classification carries its
+resume sentence, verified verbatim. The checks a screener runs first —
+gaps, overlapping dates, malformed contacts, credential inconsistencies
+— are flagged automatically and triaged by a human. Measured against 40
+blind human labels: **precision 100%, recall 57%**, all three misses
+from a single rule.
 
-**3 · The interface is built for the BD workflow, not for a demo.**
-Fine-grained dimensions zoned with tags (tags may carry colour;
-coloured text may not — one of ~15 review rounds' worth of rules), a
-21-column table view with CSV export, one-click outreach drafts that
-quote the resume, pool-level insight charts whose empty cells are the
-point, and working previews of the roadmap: a retrieval-based Ask tab
-and a talent network drawn from a curated firm knowledge base.
+**3 · Built for the BD workflow.** Tagged profiles with evidence one
+hover away, a 21-column table with CSV export, one-click outreach drafts
+that quote the resume, and pool insights whose empty cells are the point.
 
 ---
 
