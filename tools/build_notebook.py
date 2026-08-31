@@ -166,51 +166,48 @@ log
 
 # -------------------------------------------------------------- 3 · parsing
 md("""
-## 3 · Structured extraction by the model
+## 3 · Structured LLM parsing — the technical core
 
-The mechanics, end to end:
+**The central technique: the Pydantic schema *is* the API contract.**
+`src/schema.py` is serialised to JSON Schema and sent to the Anthropic
+API (model: **claude-sonnet-5**) as a tool definition with **forced tool
+choice** — the model's only possible reply is an object of exactly that
+shape, so malformed output is not an error class to handle but a thing
+that structurally cannot occur. Just as important: **every field
+description in the schema is that field's prompt** — "never inferred
+from a title alone" on `team_leadership` is an instruction the model
+reads while filling that one field — so prompt engineering here is
+versioned, diffed and code-reviewed like any other code.
 
-1. **The schema is the interface.** The Pydantic model in `src/schema.py`
-   is serialised to JSON Schema and passed to the Anthropic API as a
-   **tool definition**, with tool choice forced — the model can only
-   answer as an object of exactly that shape. No free-text JSON to repair,
-   and every field's description doubles as that field's prompt, versioned
-   in code review like any other code.
-2. **Corrective retry.** A validation failure is sent back once *with the
-   specific errors attached*, not blindly re-rolled.
-3. **Verbatim-quote verification.** Every evidence quote is checked to
-   appear in the source text (whitespace and punctuation forgiven — our
-   own extraction reflows lines — words never). Unverified quotes reduce
-   the record's confidence score.
-4. **Content-hash cache** keyed on (text, model, schema, system prompt):
-   re-running after a knowledge-base change costs $0.00. The key includes
-   the prompt because an early version silently replayed pre-fix results
-   after a prompt fix; it includes the schema because a schema change
-   *must* re-parse.
+Three guards sit on top of the call:
 
-**Nothing here is fine-tuned.** The accuracy comes from engineering around
-a general model, not from training one — which is what makes the approach
-reproducible and cheap to improve. Five things carry it: the model sees
-*complete* text (§2 — most "LLM parsing errors" are extraction losses);
-it is asked only for judgement, never for anything arithmetic can settle;
-the schema constrains the shape of every answer while the system prompt
-(above) constrains its discipline — transcribe don't embellish, verbatim
-evidence, classify by substance, distrust section headings; verification
-then catches what discipline misses, since an invented quote fails the
-verbatim check and lowers the record's confidence; and accuracy is
-*measured* against blind human labels (§7), so any prompt or schema change
-re-runs against that fixed yardstick. Iteration is the training loop here:
-edit a field description, re-parse (the cache makes unchanged documents
-free), re-evaluate.
+1. **Corrective retry** — a validation failure goes back once *with the
+   specific errors attached*, never blindly re-rolled.
+2. **Verbatim-quote verification** — every evidence quote must appear in
+   the source text (whitespace forgiven, words never). A quote the model
+   composed rather than copied fails the check and lowers the record's
+   confidence: this is the anti-hallucination layer.
+3. **Content-hash cache** on (text, model, schema, prompt) — re-runs are
+   free unless something that changes output changed. Prompt and schema
+   are in the key because each silently invalidates old results.
 
-One prompt lesson from that loop: the filename was originally in the
-prompt, and the model used it for the candidate's name on some runs and
-refused on others — ambiguous instructions produce non-deterministic
-output. The filename is now withheld; a deterministic fallback applies
-only when the document itself states no name, and flags the record.
+**Nothing here is fine-tuned.** The accuracy is engineered, not trained —
+which keeps it reproducible and cheap to improve: complete input text
+(§2), a remit narrowed to judgement only, schema for shape, the system
+prompt for discipline, verification for truth, and blind human labels
+(§7) as the fixed yardstick every change re-runs against. **Iteration is
+the training loop**: edit a field description, re-parse (the cache makes
+unchanged documents free), re-evaluate. One lesson from that loop: the
+filename was originally in the prompt and the model sometimes used it as
+the candidate's name — ambiguous instructions produce non-deterministic
+output, so the filename is now withheld and a deterministic fallback
+applies only when the document itself states no name.
 
-Parsing all 10 resumes cost **≈ $0.80** (claude-sonnet-5); the public app
-calls no model and needs no key.
+Parsing all 10 resumes cost **≈ $0.80**; the public app calls no model
+and needs no key.
+
+The system prompt is six rules of screener discipline — the product's
+values written as instructions:
 """)
 
 code("""
@@ -219,21 +216,28 @@ print(SYSTEM_PROMPT)
 """)
 
 md("""
-What one parsed record looks like — **Ryan Patel**, as tables rather than a
-JSON wall. First every judgement the model made, each with its confidence
-and the verbatim quote that earned it; then the position history the tenure
-arithmetic runs on. The full nested record (bullets, education, flags) is
-`data/candidates.json` — nothing appears in the app that is not in it.
+**A worked example, used throughout the rest of this notebook.** One
+candidate serves as the running thread — **Ryan Patel** — not at random:
+his single resume exercises more of the machinery than any other. It
+misspells an employer ("J.P.Mogan") so the fuzzy resolver must catch it,
+includes a Millennium stint for the platform-alum logic, carries an
+internship and a student fraternity the tenure rules must exclude, and
+states five figures for the Figures view. Below, every judgement the
+model made on him — value, confidence, verbatim quote — then the
+position history the tenure arithmetic runs on. The full nested record
+is `data/candidates.json`; nothing appears in the app that is not in it.
 """)
 
 code("""
 ryan = next(c for c in candidates if c["display_name"] == "Ryan Patel")
 e = ryan["extraction"]
-pd.set_option("display.max_colwidth", 100)
+pd.set_option("display.max_colwidth", 84)
+clip = lambda t: t if len(t) <= 84 else t[:81] + "..."
 
 def j(field, item):
     return {"field": field, "value": str(item["value"]),
-            "conf": item["confidence"], "evidence (verbatim)": item["evidence"]}
+            "conf": item["confidence"],
+            "evidence (verbatim)": clip(item["evidence"])}
 
 pd.DataFrame(
     [j("investment_approach", e["investment_approach"]),
@@ -243,8 +247,8 @@ pd.DataFrame(
     + ([j("team_leadership", e["team_leadership"])]
        if e["team_leadership"]["value"] else [])
     + [{"field": f"stated_metric · {m['kind']}", "value": m["figure"],
-        "conf": "", "evidence (verbatim)": m["quote"]}
-       for m in e["stated_metrics"]]
+        "conf": "", "evidence (verbatim)": clip(m["quote"])}
+       for m in e["stated_metrics"] if m["kind"] != "other"]
 )
 """)
 
@@ -542,16 +546,24 @@ fragment, so a click redraws only the panel). Each answers one screening
 question — Fit: *does the score hold up?* · Profile: *what are they good
 at?* · Figures: *what do they claim?* · Issues: *what should I
 double-check?* · Outreach: *how do I write to them?* · Full record:
-*what exactly was parsed?*
+*what exactly was parsed?* — including a **download of the original
+resume** when the file is present (the public deployment ships no resume
+files by design; in production the originals live in a governed document
+store, since real resumes carry PII).
 
 ![The six views of one candidate](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_profile_tabs.png)
 
-**Profile** — every classified attribute as a three-tier block: the
+**Profile** (left) — every classified attribute as a three-tier block:
 value, the keyword tags that earned it, the verbatim quote, with the
-model's confidence alongside. Absence is stated ("none listed", dashed),
-never left blank:
+model's confidence alongside; absence is stated ("none listed", dashed),
+never left blank. **Outreach** (right) — the step after "this candidate
+fits" is always "someone writes to them": a one-click briefing whose
+every claim quotes the resume, because a sourcing mail earns replies by
+proving someone actually read it.
 
-![Profile view](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_profile.png)
+| Profile | Outreach |
+|---|---|
+| ![Profile view](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_profile.png) | ![Outreach view](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_outreach.png) |
 
 **Figures** — the resume's own numbers, structured. Stated AUM,
 performance and risk figures are extracted with verbatim quotes and
@@ -561,13 +573,6 @@ line is comparability, not importance: this very pool contains a
 "$4.5 trillion" that is Fidelity's AUM, not the candidate's book:
 
 ![Figures view](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_figures.png)
-
-**Outreach** — the step after "this candidate fits" is always "someone
-writes to them": a one-click briefing whose every claim quotes the
-resume, because a sourcing mail earns replies by proving someone
-actually read it:
-
-![Outreach view](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_outreach.png)
 
 ### Step 5 · Compare the finalists
 
@@ -597,19 +602,16 @@ of the counts:
 
 ![Sector coverage by region](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_heatmap.png)
 
-Career length vs investing tenure, one row per candidate. The *gap*
-between the two dots is the story: a wide gap is a career changer
-arriving from banking, consulting or engineering — the reason the system
-computes both numbers instead of one:
+**Career length vs investing tenure** (left) — the *gap* between the two
+dots is the story: a wide gap is a career changer arriving from banking,
+consulting or engineering, the reason the system computes both numbers.
+**Credentials and software** (right) — the market mainstream, which
+calibrates requisitions as much as candidates: a JD naming a tool nobody
+in the pool holds describes a sourcing problem, not a screening one.
 
-![Career length vs investing tenure](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_tenure.png)
-
-Credentials and software ranked by how many candidates hold them — a
-read on the market mainstream. It calibrates requisitions as much as
-candidates: a JD naming a tool nobody in the pool holds describes a
-sourcing problem, not a screening one:
-
-![Most common credentials and software](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_credentials.png)
+| Career vs investing tenure | Most common credentials & software |
+|---|---|
+| ![Career length vs investing tenure](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_tenure.png) | ![Most common credentials and software](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_credentials.png) |
 
 Last, the talent-network graph — platforms, firms and candidates as
 three layers, drawn live from `firms.yaml`. Grey edges are employment,

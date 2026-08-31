@@ -65,21 +65,13 @@ knowledge-base or enrichment change costs nothing.
 
 ## Pipeline
 
-```
-data/resumes/*.{docx,pdf}
-        │
-        ▼  src/extract.py        paragraphs + tables + floating text boxes;
-        │                        PDF column separation; ligature repair
-        ▼  src/parse.py          schema-constrained LLM extraction,
-        │                        validation with corrective retry,
-        │                        verbatim-quote verification
-        ▼  src/checks.py         computed checks: employment gaps, overlapping
-        │                        roles, malformed contact details
-        ▼  src/enrich.py         knowledge-base lookups, tenure arithmetic,
-        │                        entity resolution, confidence scoring
-        ▼
-data/candidates.json  ──►  app.py  ──►  src/match.py (requisition matching)
-```
+![Pipeline](docs/pipeline.png)
+
+Parsing is schema-constrained extraction against `claude-sonnet-5` via
+the Anthropic API: the Pydantic schema is passed as a tool definition
+with forced tool choice, validation failures are retried once with the
+errors attached, and every evidence quote is verified verbatim against
+the source text.
 
 ### Extraction does more work than it looks like
 
@@ -171,10 +163,15 @@ src/knowledge_base.py      entity resolution and domain lookups
 src/enrich.py              extraction + knowledge base → Candidate
 src/build_dataset.py       pipeline entry point
 src/match.py               requisition matching
+src/evaluate.py            accuracy against blind human labels
+src/glossary.py            every on-screen field's definition
 knowledge/*.yaml           curated domain facts
 data/candidates.json       parsed dataset (what the app loads)
 data/candidates.csv        flat export for spreadsheet review
 data/extraction_log.csv    per-document extraction diagnostics
+data/ground_truth.csv      40 blind human labels for evaluation
+tests/test_pipeline.py     11 regression tests (no API key needed)
+tools/build_notebook.py    regenerates the walk-through notebook
 tools/build_review_page.py side-by-side page used for manual verification
 ```
 

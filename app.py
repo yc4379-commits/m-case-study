@@ -264,6 +264,20 @@ st.markdown(
                     background: #eef1f5; color: {MUTED}; cursor: help;
                     display: inline-flex; align-items: center;
                     justify-content: center; letter-spacing: 0; }}
+      /* One tooltip mechanism for every custom help mark. Native title=
+         needs a ~1.5s hover and looks dead until then; this shows the
+         instant the pointer arrives, in the app's own style. */
+      [data-tip] {{ position: relative; cursor: help; }}
+      [data-tip]:hover::after {{
+          content: attr(data-tip); position: absolute; left: 0;
+          top: calc(100% + 7px); z-index: 9999; width: 340px;
+          max-width: 70vw; white-space: normal; text-transform: none;
+          letter-spacing: 0; font-size: 11.5px; font-weight: 400;
+          line-height: 1.55; text-align: left; background: {NAVY_DEEP};
+          color: #eef2f7; padding: 10px 13px; border-radius: 9px;
+          box-shadow: 0 6px 22px rgba(10,27,56,.28);
+          pointer-events: none; }}
+      .sechead i[data-tip]:hover::after {{ left: -12px; }}
       /* The contribution ledger: what each scoring dimension actually found,
          at the weight it was worth. */
       .ledger {{ display: flex; flex-direction: column; gap: 12px; }}
@@ -633,7 +647,7 @@ def record_note(c: dict) -> str:
     if warns:
         tail += f" · {warns} issue" + ("s" if warns != 1 else "")
     klass = "pill" if q["band"] == "high" and not missing else "pill pill-note"
-    return (f"<span class='{klass}' title='{METRIC_HELP['quality']}'>"
+    return (f"<span class='{klass}' data-tip='{METRIC_HELP['quality']}'>"
             f"{body}{tail}</span>")
 
 
@@ -735,7 +749,7 @@ def section(title: str, tip: str = "", container=None) -> None:
     is how a screen ends up with no readable structure. The prose moves into
     the title's tooltip, where the reader can ask for it.
     """
-    mark = "<i title='{}'>?</i>".format(tip.replace("'", "’")) if tip else ""
+    mark = "<i data-tip='{}'>?</i>".format(tip.replace("'", "’")) if tip else ""
     (container or st).markdown(
         f"<div class='sechead'>{title}{mark}</div>", unsafe_allow_html=True
     )
@@ -838,7 +852,7 @@ def contribution_ledger(result) -> str:
         did = crit.found or "no signal found in this resume"
         rows.append(
             f"<div class='ldrow'><div class='ldtop'>"
-            f"<span class='ldlbl' title='{CRITERION_HELP.get(crit.key, '')}'>"
+            f"<span class='ldlbl' data-tip='{CRITERION_HELP.get(crit.key, '')}'>"
             f"{CRITERION_LABEL.get(crit.key, label_of(crit.key))}</span>"
             f"<span class='ldw'>{crit.weight:.0%} of Fit</span>"
             f"<span class='ldval'>{crit.score:.0%}</span></div>"
@@ -1416,7 +1430,7 @@ def component_table(results: list) -> str:
             for r in results[:2]
         )
         rows.append(
-            f"<tr><td title='{CRITERION_HELP.get(crit.key, '')}'>"
+            f"<tr><td data-tip='{CRITERION_HELP.get(crit.key, '')}'>"
             f"{CRITERION_LABEL.get(crit.key, crit.key)}</td>"
             f"<td style='color:{MUTED}'>{crit.weight:.0%}</td>{cells}</tr>"
         )
@@ -1795,7 +1809,7 @@ with tab_search:
                 f"<div style='color:{MUTED};font-size:13px;margin:-6px 0 8px'>"
                 f"{meta}</div>"
                 + "".join(
-                    f"<span class='pill {_dtint(t)}' title='{_dtip(t, c)}'>{t}"
+                    f"<span class='pill {_dtint(t)}' data-tip='{_dtip(t, c)}'>{t}"
                     f"</span>" for t in distinctions(c)
                 )
                 + record_note(c),
@@ -1822,7 +1836,7 @@ with tab_search:
                            if m.is_exact else "1 requirement missed")
                 share, active_n, total_n = score_basis(m)
                 cols[0].markdown(
-                    f"<div title='{METRIC_HELP['fit']}'>"
+                    f"<div data-tip='{METRIC_HELP['fit']}'>"
                     f"<div style='color:{MUTED};font-size:13px'>Fit score</div>"
                     f"<div style='color:{verdict_colour};font-size:38px;"
                     f"font-weight:700;line-height:1.15'>{m.soft_score:.0%}</div>"
@@ -2004,7 +2018,7 @@ with tab_search:
                         tag = (f"<b>{label_of(b.get('value'))}</b> — "
                                if len(blocks) > 1 else "")
                         parts.append(
-                            f"<div class='attrquote' title='{ev}'>{tag}“{ev}”"
+                            f"<div data-tip='{ev}'><div class='attrquote'>{tag}“{ev}”</div>"
                             f"</div>"
                         )
                     st.markdown(f"<div class='attr'>{''.join(parts)}</div>",
@@ -2186,9 +2200,10 @@ with tab_search:
                         # two lines on screen, full text on hover (title).
                         def _qdiv(_x: dict) -> str:
                             _t = _x["quote"].replace("'", "’")
-                            return (f"<div class='attrquote' title='{_t}'>"
+                            return (f"<div data-tip='{_t}'>"
+                                    f"<div class='attrquote'>"
                                     f"<b>{_x['figure']}</b> — "
-                                    f"“{_x['quote'][:200]}”</div>")
+                                    f"“{_x['quote'][:200]}”</div></div>")
                         _quotes = "".join(_qdiv(_x) for _x in _hits)
                         st.markdown(
                             f"<div class='attr'>"
@@ -2378,6 +2393,27 @@ with tab_search:
 
 
             if _view == 5:
+                # The original document, when it is present. The public
+                # deployment deliberately ships no resume files (they are
+                # the case study's materials, and a real pipeline's
+                # originals carry PII that belongs in a governed document
+                # store, not a public repo) -- so this button appears on
+                # internal / local runs and degrades to a note in public.
+                _raw = Path("data/resumes") / c["source_file"]
+                if _raw.exists():
+                    st.download_button(
+                        "Download original resume",
+                        _raw.read_bytes(),
+                        file_name=c["source_file"],
+                        key=f"dl_{chosen_id}",
+                        icon=":material/download:",
+                    )
+                else:
+                    st.caption(
+                        "Original document not bundled with this public "
+                        "deployment — in production, originals live in a "
+                        "governed document store and download here."
+                    )
                 # Reference material, collapsed.
                 with st.expander("Experience, as parsed"):
                     head = ("<tr><th>Employer</th><th>Resolved to</th><th>Title</th>"
