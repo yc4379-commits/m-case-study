@@ -3053,8 +3053,34 @@ components below, each scored 0–1:
     st.markdown(
         "| Component | Weight | What it measures |\n|---|---|---|\n" + weights_rows
     )
+    _bench_rows = "\n".join(
+        f"| {sp['title']} | "
+        + (f"{sp.get('soft', {}).get('coverage_benchmark', 40)} names |"
+           if sp.get("soft", {}).get("coverage_benchmark", 40)
+           else "none — signal dropped, weights renormalise |")
+        for sp in store.items
+    )
     st.markdown(
         """
+The coverage benchmark is **per posting**, set in `requisitions.yaml`
+next to the criteria it serves, because the right number is
+strategy-dependent: a sector-focused long/short book typically runs
+15–40 names, a fundamental generalist 20–60, long-only far more, and
+coverage counts mean little for a quant seat.
+
+| Posting | Coverage benchmark |
+|---|---|
+"""
+        + _bench_rows
+        + """
+
+The three fundamental healthcare seats use 40, the top of the
+sector-focused range; the quant seat sets none, so the signal is
+dropped there, the remaining weights renormalise, and the ledger shows
+the row as *not measured* with the disclosed share ("from 7 of 8
+signals") saying so. The weights themselves are still global; making
+them per-posting is the same one-line change in the same file.
+
 `Fit = Σ(component × weight) / Σ(weight)`
 
 **Requirement similarity** is a pluggable backend. The default combines lexical

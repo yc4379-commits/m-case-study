@@ -513,7 +513,7 @@ their investing tenure. The eight soft signals score as follows:
 | Requirement fit | mean similarity between the posting's requirement lines and the candidate's own sentences, via the concept map |
 | Skills fit | share of the named software and methods held, on normalised names |
 | Firm type | whether they have worked in a comparable operating model |
-| Coverage depth | `min(1, names / 40)` — see the note below |
+| Coverage depth | `min(1, names / benchmark)`, per-posting benchmark — see the note below |
 | Credentials | preferred qualifications held or not |
 | Platform alum | prior multi-manager platform exposure, via firm lineage |
 | Buy side | prior buy-side experience |
@@ -529,10 +529,12 @@ document, shown beside the name instead.
 On coverage: the right benchmark is strategy-dependent — a
 sector-focused long/short book typically runs 15–40 names, a fundamental
 generalist 20–60, long-only far more, and coverage counts mean little
-for a quant seat. Forty sits at the top of the sector-focused range,
-which is what these postings are; at scale the benchmark, like the 8%
-weight itself (zeroed for a quant seat), belongs in `requisitions.yaml`
-per posting. The cap is deliberate — claiming 75 names buys nothing past
+for a quant seat. The benchmark is therefore **per posting**, set in
+`requisitions.yaml` next to the criteria it serves: the three
+fundamental healthcare seats use 40, the top of the sector-focused
+range, and the quant seat sets none — the signal is dropped there, the
+remaining weights renormalise, and the ledger shows the row as *not
+measured*. The cap is deliberate — claiming 75 names buys nothing past
 40, the same anti-inflation stance as never scoring self-reported AUM,
 in miniature. A candidate whose resume states no coverage scores zero on
 this component rather than being imputed or dropped: imputing invents
@@ -880,9 +882,23 @@ Every scale-sensitive choice has a stated threshold and a successor:
 | Quality & eval | per-record confidence; 40-pair human eval | sampled human labelling as a monitored metric; drift alarms on parse-confidence distribution |
 | Serving | Streamlit Community Cloud | internal deployment; JD upload wired to the parsing service with managed keys (deliberately absent from the public app) |
 
+**Refining judgment with no extra costs.** The model is paid once, at
+ingestion; every scoring rule lives downstream of it, in
+`knowledge/requisitions.yaml`, and scores are computed from the parsed
+data at query time, never stored. So as the pool grows, the standards
+can sharpen with it: per-posting weights, tenure-weighted firm exposure,
+recency decay, a different coverage benchmark per strategy. Each
+refinement is a YAML edit with zero marginal API cost, re-scoring the
+whole pool is a page load rather than a re-parse, and the change
+arrives as a reviewable diff, not a retrained model. Transparency
+scales the same way: whatever the rules become, every score still
+decomposes on screen into named signals with verbatim evidence.
+
 The **evaluation harness is the keystone for scale**: any threshold change,
 prompt change or backend swap re-runs against the labelled pairs before it
-ships.
+ships — which is exactly what makes cheap iteration safe. Rules that cost
+nothing to change are rules that get changed often; the labelled set is
+what keeps "often" from meaning "carelessly".
 """)
 
 # ------------------------------------------------------------ 10 · roadmap

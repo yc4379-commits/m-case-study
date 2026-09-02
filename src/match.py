@@ -437,16 +437,26 @@ def _soft_criteria(
         )
 
     # Coverage depth -- a research-hiring proxy that is concrete and checkable.
+    # The benchmark is per posting (soft.coverage_benchmark), because the
+    # right number is strategy-dependent: a sector-focused book runs 15-40
+    # names, a generalist more, and coverage counts mean little for a quant
+    # seat. A posting that sets no benchmark (0 / null) drops the signal:
+    # the criterion is kept at zero weight so the ledger shows it as "not
+    # measured" and the remaining weights renormalise, with the share
+    # disclosed on screen.
     covered = candidate["extraction"].get("coverage", {}).get("stocks_covered")
+    bench = soft.get("coverage_benchmark", 40) or 0
     criteria.append(
         Criterion(
             key="coverage_depth",
             label="Coverage depth",
             kind="soft",
-            score=min(1.0, (covered or 0) / 40),
-            weight=weights.get("coverage_depth", 0.0),
-            required="breadth of names under coverage",
-            found=f"{covered} names" if covered else "not stated",
+            score=min(1.0, (covered or 0) / bench) if bench else 0.0,
+            weight=weights.get("coverage_depth", 0.0) if bench else 0.0,
+            required=(f"breadth of names under coverage (benchmark {bench})"
+                      if bench else "coverage n/a for this strategy"),
+            found=(f"{covered} names (benchmark {bench})" if covered
+                   else "not stated") if bench else "not applicable",
         )
     )
 

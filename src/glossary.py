@@ -153,8 +153,11 @@ CRITERION_HELP: dict[str, str] = {
     "candidate holds.",
     "firm_type_fit": "Whether they have worked in a comparable operating "
     "model — a pod shop, a long-only manager, a research house.",
-    "coverage_depth": "Names under coverage, relative to a 40-stock "
-    "benchmark.",
+    "coverage_depth": "Names under coverage, scored min(1, names / "
+    "benchmark). Each posting sets its own benchmark, because the right "
+    "number is strategy-dependent: 40 for the sector-focused seats here, "
+    "none for the quant seat, where the signal is dropped and the "
+    "remaining weights renormalise.",
     "credentials": "Whether the preferred qualifications are held.",
     "platform_alum": "Prior multi-manager platform experience.",
     "buy_side": "Prior buy-side experience.",

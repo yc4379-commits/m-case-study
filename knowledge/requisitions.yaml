@@ -45,6 +45,9 @@ requisitions:
       investment_years: {min: 1}
     soft:
       sectors: {healthcare: 1.0}
+      # Strategy-dependent: a sector-focused L/S book runs 15-40 names, so
+      # 40 is the top of the range this seat occupies.
+      coverage_benchmark: 40
       firm_types:
         pod_shop: 1.0
         multi_strategy_platform: 1.0
@@ -90,6 +93,9 @@ requisitions:
       sectors_any: [healthcare]
     soft:
       sectors: {healthcare: 1.0}
+      # Strategy-dependent: a sector-focused L/S book runs 15-40 names, so
+      # 40 is the top of the range this seat occupies.
+      coverage_benchmark: 40
       firm_types:
         sell_side: 1.0
         investment_bank: 0.9
@@ -133,6 +139,9 @@ requisitions:
       investment_years: {min: 4, max: 5}
     soft:
       sectors: {healthcare: 1.0, generalist: 0.5}
+      # Junior seat "building toward independent coverage" -- benchmark kept
+      # at the sector-focused top; arguably lower for a 4-5 year hire.
+      coverage_benchmark: 40
       firm_types:
         sell_side: 1.0
         investment_bank: 0.8
@@ -178,6 +187,9 @@ requisitions:
       # keeps anyone it excludes visible.
       investment_years: {min: 1, max: 3}
     soft:
+      # Coverage counts mean little for a systematic seat: no benchmark, so
+      # the signal is dropped here and the remaining weights renormalise.
+      coverage_benchmark: 0
       # "Experience with sector-specific equity research, particularly in
       # industrials, commodities, healthcare, or financials."
       sectors: {industrials: 1.0, energy: 0.9, healthcare: 0.9,
