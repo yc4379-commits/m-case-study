@@ -2519,30 +2519,95 @@ with tab_search:
 
 with tab_insights:
     st.markdown("#### Talent pool insights")
+    st.caption(
+        "How the current candidate pool is distributed: where coverage "
+        "is deep, where it is thin, and which open roles are hardest to "
+        "fill. Charts respect the sidebar filters."
+    )
+
+    # -- Requisition coverage: the concrete question first ---------------
+    # "Which roles can this pool actually staff?" answered per posting,
+    # before any chart: qualified / near-match counts for every saved
+    # requisition, with the thinnest bench called out.
+    section("Requisition coverage",
+            "For each saved job posting: how many candidates in the pool "
+            "meet every hard requirement (qualified), and how many miss "
+            "exactly one (near match). Counts are for the full pool, "
+            "before sidebar filters.")
+    # Selectable, so the row scales past a handful of postings: every
+    # requisition is shown by default, and a user tracking two roles can
+    # narrow to just those.
+    _req_pick = st.multiselect(
+        "Requisitions to show",
+        options=[sp["id"] for sp in store.items],
+        default=[sp["id"] for sp in store.items],
+        format_func=lambda rid: next(
+            sp["title"] for sp in store.items if sp["id"] == rid),
+        label_visibility="collapsed",
+    )
+    _shown = [sp for sp in store.items if sp["id"] in _req_pick]
+    if not _shown:
+        st.caption("Pick at least one requisition to see its coverage.")
+    _unfilled = []
+    _PER_ROW = 4
+    _req_cols = []
+    for _i in range(0, len(_shown), _PER_ROW):
+        _req_cols.extend(st.columns(_PER_ROW))
+    for _col, _spec in zip(_req_cols, _shown):
+        _ex, _nr = match_all(candidates, _spec, store=store)
+        _title = _spec["title"]
+        _col.metric(
+            _title if len(_title) <= 34 else _title[:32] + "…",
+            f"{len(_ex)} qualified",
+            delta=f"{len(_nr)} near match" + ("es" if len(_nr) != 1 else ""),
+            delta_color="off",
+            help=f"{_spec.get('source', '')}. Qualified candidates meet "
+                 "every hard requirement; near matches miss exactly one.",
+        )
+        if not _ex:
+            _unfilled.append((_title, len(_nr)))
+    if _unfilled:
+        _parts = "; ".join(
+            f"<b>{t}</b> ({n} near match" + ("es" if n != 1 else "") + ")"
+            for t, n in _unfilled)
+        st.markdown(
+            f"<span class='pill pill-note'>hardest to fill</span> "
+            f"<span style='font-size:12.5px;color:{MUTED}'>"
+            f"No candidate in the pool meets every requirement for "
+            f"{_parts}. Open a role in Candidates to see what relaxing "
+            "each requirement would admit.</span>",
+            unsafe_allow_html=True,
+        )
+    st.markdown("---")
 
     ctrl1, ctrl2, ctrl3 = st.columns([1.2, 1.2, 1.6])
     chart_quality = ctrl1.select_slider(
-        "Minimum parse confidence for these charts",
+        "Minimum resume quality",
         options=["low", "medium", "high"], value="low",
-        help="Counts built from thin records overstate the bench.",
+        help="Exclude candidates whose resumes parsed below this quality "
+             "level, so thin records do not inflate the counts.",
     )
     group_by = ctrl2.selectbox(
-        "Break down by", ["Region", "Market side", "Seniority (investing)"],
+        "Group rows by", ["Region", "Market side", "Seniority (investing)"],
         help="The row dimension of the coverage matrix.",
     )
     charted = [c for c in filtered
                if BAND_ORDER[c["quality"]["band"]] >= BAND_ORDER[chart_quality]]
     ctrl3.markdown(
         f"<div style='padding-top:26px;color:{MUTED};font-size:12.5px'>"
-        f"<b style='color:{NAVY}'>{len(charted)}</b> of {len(candidates)} "
-        "candidates charted, after the sidebar refinements and this threshold."
-        "</div>",
+        f"Showing <b style='color:{NAVY}'>{len(charted)}</b> of "
+        f"{len(candidates)} candidates (sidebar filters and quality "
+        "threshold applied).</div>",
         unsafe_allow_html=True,
     )
     if not charted:
         st.info("No candidates left at this threshold.")
     else:
-        st.caption("Coverage gaps highlight where additional sourcing may be needed.")
+        st.caption(
+            "Each cell counts the candidates in a group who cover a "
+            "sector, with totals in the axis labels. Empty cells are "
+            "coverage gaps where additional sourcing may be needed."
+        )
         GROUP_KEY = {
             "Region": lambda c: c.get("region"),
             "Market side": lambda c: label_of(c.get("market_side")),
@@ -2556,8 +2621,14 @@ with tab_insights:
             matrix = [[sum(1 for c in charted
                            if GROUP_KEY(c) == g and s in c.get("sectors", []))
                        for s in sectors] for g in groups]
+            _col_tot = [sum(1 for c in charted if s in c.get("sectors", []))
+                        for s in sectors]
+            _row_tot = [sum(1 for c in charted if GROUP_KEY(c) == g)
+                        for g in groups]
             fig = go.Figure(go.Heatmap(
-                z=matrix, x=[label_of(s) for s in sectors], y=groups,
+                z=matrix,
+                x=[f"{label_of(s)} ({t})" for s, t in zip(sectors, _col_tot)],
+                y=[f"{g} ({t})" for g, t in zip(groups, _row_tot)],
                 colorscale=[[0.0, SURFACE], [0.001, SEQ[0]]] + [
                     [0.001 + 0.999 * i / (len(SEQ) - 1), col]
                     for i, col in enumerate(SEQ)],

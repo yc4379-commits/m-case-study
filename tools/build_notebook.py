@@ -91,10 +91,10 @@ judgment rather than replacing it.
 
 ### 2 · Trusted resume data: machine speed with screening-level checks
 
-The challenge is not simply extracting information from a resume; it is
-making sure the extracted information is complete, accurate and usable
-for downstream decisions. The pipeline therefore treats resume parsing
-as a data-quality problem. Every important classification is linked to
+The challenge is not just extracting resume information, but ensuring
+it is complete, accurate, and usable for downstream decisions.
+Therefore, the pipeline treats resume parsing as a data-quality
+problem. Every important classification is linked to
 verbatim evidence from the source document, the system does not infer
 missing information, and extracted claims are checked against the
 original text. Parsing confidence and extraction issues are surfaced
@@ -713,11 +713,19 @@ each near miss's single gap and computes what each widening would admit:
 
 ### Talent pool insights
 
-The coverage heatmap maps the bench: regions by sectors, each cell the
-number of candidates covering both. Coverage gaps show where
-additional sourcing is needed, so the chart doubles as a sourcing
-to-do list. A parse-confidence threshold above it keeps thin records out
-of the counts:
+The tab answers the concrete question first: **requisition coverage**.
+For every saved posting it shows how many candidates qualify and how
+many are near matches, the set of postings is selectable so the row
+scales as requisitions grow, and roles no one qualifies for are called
+out automatically:
+
+![Requisition coverage](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_req_coverage.png)
+
+The coverage heatmap then maps the bench: regions by sectors, each cell
+the number of candidates covering both, with group totals in the axis
+labels. Coverage gaps show where additional sourcing is needed, so the
+chart doubles as a sourcing to-do list. A resume-quality threshold above
+it keeps thin records out of the counts:
 
 ![Sector coverage by region](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_heatmap.png)
 
