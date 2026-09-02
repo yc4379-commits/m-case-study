@@ -40,6 +40,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 import sys
 from pathlib import Path
 
@@ -637,7 +638,7 @@ def record_note(c: dict) -> str:
     # changes, because "Data quality: high 0.94" never said whether it was
     # judging the document or the person.
     if missing:
-        body = ("Resume quality: incomplete — no "
+        body = ("Resume quality: incomplete, no "
                 + ", ".join(m.replace("_", " ") for m in missing[:3]))
         tail = f" · {q['score']}"
     else:
@@ -752,6 +753,28 @@ def section(title: str, tip: str = "", container=None) -> None:
     (container or st).markdown(
         f"<div class='sechead'>{title}{mark}</div>", unsafe_allow_html=True
     )
+
+
+def coverage_quote(c: dict) -> str:
+    """The resume sentence behind the stated coverage number, when one
+    exists among the extracted stated metrics.
+
+    Coverage is the one stated figure that is scored, so it should carry
+    its evidence like every other claim. The schema keeps the number in
+    `coverage`; the sentence usually arrives independently in
+    `stated_metrics`. This joins them deterministically: a quote counts
+    only if it contains the exact number and coverage vocabulary. No
+    match, no quote -- never a reconstruction.
+    """
+    cov = c["extraction"].get("coverage", {}).get("stocks_covered")
+    if not cov:
+        return ""
+    for m in c["extraction"].get("stated_metrics", []):
+        q = m.get("quote", "")
+        if re.search(rf"\b{cov}\b", q) and re.search(
+                r"coverage|covering|stocks|names|companies", q, re.I):
+            return q
+    return ""
 
 
 def _requirement_lines(reqs: list) -> str:
@@ -1856,7 +1879,10 @@ with tab_search:
                 help=METRIC_HELP["investing"],
             )
             cols[offset + 2].metric(
-                "Stocks covered", covered or "—", help=METRIC_HELP["coverage"],
+                "Stocks covered", covered or "—",
+                help=METRIC_HELP["coverage"] + (
+                    f' This resume: "{_cq}"' if (_cq := coverage_quote(c))
+                    else ""),
             )
 
             # The profile was one 3,000px scroll: metrics, hard checks, a chart,
@@ -2159,9 +2185,12 @@ with tab_search:
                     with _sum_cols[0]:
                         st.markdown(
                             "<div class='attrlabel'>Names covered</div>"
-                            + (f"<div class='figval'>{_cov}</div>"
-                               "<div class='attrwhy'><span class='kw'>"
-                               "scored · 8% weight</span></div>"
+                            + ((lambda _q: (
+                                   (f"<div data-tip='{_q}'>" if _q else "<div>")
+                                   + f"<div class='figval'>{_cov}</div></div>"
+                                   "<div class='attrwhy'><span class='kw'>"
+                                   "scored · 8% weight</span></div>"))(
+                                       coverage_quote(c).replace("'", "’"))
                                if _cov else
                                "<span class='pill pill-empty'>"
                                "none stated</span>"),
@@ -2190,19 +2219,34 @@ with tab_search:
                             )
                     st.markdown("")
                     # Breakdown: every figure with its verbatim quote, in
-                    # the standard attr block per kind.
+                    # the standard attr block per kind. Same contract as
+                    # every profile quote: clamped to two lines on screen,
+                    # full text on hover.
+                    def _qdiv(_x: dict) -> str:
+                        _t = _x["quote"].replace("'", "’")
+                        return (f"<div data-tip='{_t}'>"
+                                f"<div class='attrquote'>"
+                                f"<b>{_x['figure']}</b> — "
+                                f"“{_x['quote'][:200]}”</div></div>")
+
+                    # Coverage first: it is the one stated figure that is
+                    # scored, so its resume sentence sits in the breakdown
+                    # beside the others, not only behind a hover.
+                    _covq = coverage_quote(c)
+                    if _cov and _covq:
+                        st.markdown(
+                            f"<div class='attr'>"
+                            f"<div class='attrlabel'>Names covered · "
+                            f"breakdown</div>"
+                            + _qdiv({"figure": f"{_cov} names",
+                                     "quote": _covq})
+                            + "</div>",
+                            unsafe_allow_html=True,
+                        )
                     for _kind in ("aum", "performance", "risk"):
                         _hits = [x for x in _mx if x["kind"] == _kind]
                         if not _hits:
                             continue
-                        # Same contract as every profile quote: clamped to
-                        # two lines on screen, full text on hover (title).
-                        def _qdiv(_x: dict) -> str:
-                            _t = _x["quote"].replace("'", "’")
-                            return (f"<div data-tip='{_t}'>"
-                                    f"<div class='attrquote'>"
-                                    f"<b>{_x['figure']}</b> — "
-                                    f"“{_x['quote'][:200]}”</div></div>")
                         _quotes = "".join(_qdiv(_x) for _x in _hits)
                         st.markdown(
                             f"<div class='attr'>"
@@ -3026,14 +3070,42 @@ posting says "catalysts" where a resume says "earnings events".
 | Concept matching | word-boundary, not substring |
 | One gap away | fails exactly one hard requirement; two or more are not listed |
 
-The concept map is matched on word boundaries because an earlier substring
-version listed `r` for the R language, and `"r" in text` is true of nearly
-every English sentence — which made every requirement score about 0.75 on its
-concept term alone and rendered the evidence quotes arbitrary. Neural sentence
-embeddings would absorb paraphrase without a curated map and can be dropped in
-unchanged; at a few hundred candidate sentences a curated map performs
-comparably, adds no large dependency to a free-tier deployment, and is
-auditable — a bad match is fixed by editing a line of YAML.
+A worked example, one requirement against one resume sentence:
+
+| | |
+|---|---|
+| Requirement | "fundamental research on healthcare catalysts" |
+| Resume sentence | "conducted fundamental analysis of biotech companies around earnings events" |
+| Lexical | 1 of the requirement's 4 content words appears ("fundamental") = 0.25 |
+| Conceptual | the requirement's one mapped concept, *catalyst*, is shared, because "earnings events" is listed under it = 1.00 |
+| Combined | min(1, 0.45 × 0.25 + 0.75 × 1.00) = **0.86** |
+
+The concept layer is why these two texts score at all: they share almost
+no words, but they describe the same work. Lexical overlap alone would
+call them strangers.
+
+Two design notes, each answering a question the parameter table raises:
+
+**Why word-boundary matching, not substring?** An earlier version matched
+substrings, and the concept map lists `r` for the R language. The letter
+r appears in nearly every English sentence, so that one entry fired on
+everything: every requirement scored about 0.75 on its concept term
+alone, and the evidence quotes became arbitrary. Word boundaries fixed
+it, and the shipped code matches tokens everywhere.
+
+**Why a curated map now, and embeddings at scale?** The map works well
+at a few hundred candidate sentences because it is fast, lightweight,
+and auditable: a bad match is fixed by editing a line of YAML, not by
+retraining a model. Its weakness is paraphrase diversity: at larger
+scale, new ways of expressing the same skill appear faster than the map
+can be curated, and recall gradually degrades. When that happens, the
+`SimilarityBackend` swaps to sentence embeddings plus a vector index,
+and the rest of the system stays unchanged: hard eligibility rules,
+ranking weights, and evidence display all remain intact. The likely
+production design is hybrid retrieval, embeddings for semantic recall
+with lexical and concept matching kept for precision and explainability,
+and any new backend must pass the same labeled evaluation set before
+shipping.
         """
     )
 
@@ -3092,31 +3164,32 @@ do not count.
             )
         st.markdown(
             """
-**What the disagreements say.** Precision is perfect on this pool: the
-system never shortlisted anyone the reviewer would reject. Every miss has
-the same single cause — the Mumbai seat's posted **4-5 year band**, which
-excludes the three APAC healthcare analysts at 9.8-12.7 years, all of whom
-the reviewer shortlists. Nothing comparable happened with region: all nine
-region mismatches were labelled *no*, so the reviewer treats geography as
-genuinely hard while treating **over-qualification as negotiable** — a
-distinction the posting's text does not make. The borderline labels
-cluster the same way, on the quant seat's approach constraint: US
-fundamental analysts the reviewer might consider for a systematic seat.
+**Human review and rule validation.** We validate the matching logic
+against human shortlists, with particular attention to cases where the
+system and reviewer disagree.
 
-The reviewer's own account sharpens the point: the widening was
-**supply-driven** — with ten candidates in the pool she stretches the
-band; with ten thousand she would not. Shortlisting standards are elastic
-to pool depth, which no fixed threshold can encode, and which is the
-second reason the bands stay transcribed and the widening stays a visible,
-per-search decision rather than a buried parameter.
+In our review set, the system achieved **100% precision**: every
+candidate it shortlisted was also shortlisted by the reviewer. The three
+disagreements all came from the same rule: a 4–5 year experience band
+for a Mumbai Healthcare Research Analyst role. The system treated the
+posted range as a hard constraint; the reviewer was willing to consider
+candidates with 9.8–12.7 years of experience.
 
-The design conclusion is not "soften the band". The system transcribes
-the posting, and the disagreement surfaces exactly where the interface
-already points: all three missed candidates sit at the top of the
-one-gap-away list with the band named on their row — the recruiter's
-judgment call is presented, not pre-empted. At n=40 these percentages
-measure nothing statistically; what the exercise measures is *which rule*
-diverges from practitioner judgment, and it found precisely one.
+The key insight was that this flexibility was **supply-driven**. With a
+small candidate pool, the reviewer was willing to stretch the experience
+band; with a deeper pool, she would not. In contrast, geography remained
+a hard constraint regardless of supply.
+
+We therefore do not encode this flexibility as a hidden rule. The system
+preserves the requirements as posted and surfaces near-matches
+separately, showing the specific gap so recruiters can make the
+trade-off explicitly.
+
+With n=40, we do not treat the percentages as statistically
+representative. The purpose of the exercise is **rule validation**:
+identifying where structured requirements diverge from real recruiting
+judgment and understanding when those deviations are driven by candidate
+supply.
             """
         )
 

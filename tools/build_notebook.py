@@ -462,19 +462,90 @@ no years band, so it has none.
 experience band). **Soft signals rank** the survivors — a weighted blend of
 sector fit, requirement-text similarity, skills, firm type, coverage depth,
 credentials, platform lineage and buy-side experience, with the weights in
-`knowledge/requisitions.yaml` where they can be argued about. Requirement
-similarity is a pluggable backend; the default combines lexical overlap
-with a **curated concept map** (a requisition says "catalysts" where a
-resume says "earnings events"). Neural sentence embeddings drop in
-unchanged when the corpus outgrows curation (~low tens of thousands of
-documents); at 200 candidate sentences the map performs comparably, adds no
-500MB dependency to a free-tier deployment, and is auditable — a bad match
-is fixed by editing a line of YAML.
+`knowledge/requisitions.yaml` where they can be argued about.
+
+**Requirement similarity** scores each requirement line against every
+candidate sentence on two axes, both normalised by the requirement side,
+so a long resume cannot inflate a short requirement:
+
+- **Lexical** — the share of the requirement's content words that appear
+  in the sentence, matched on word boundaries.
+- **Conceptual** — the share of the requirement's mapped concepts that
+  the sentence also triggers, via a **curated concept map** in
+  `knowledge/requisitions.yaml`: a requisition says "catalysts" where a
+  resume says "earnings events", and the map lists both under *catalyst*.
+
+The combined score weights concepts above raw word overlap
+(`min(1, 0.45 × lexical + 0.75 × conceptual)`), damps sentences under
+six content words so a slogan cannot outscore a sentence describing
+actual work, and keeps the best-scoring sentence per requirement as the
+evidence shown on screen. The component score is the mean across the
+posting's requirement lines.
+
+The scorer sits behind a pluggable interface (`src/match.py`). A curated
+map is the right tool at a few hundred candidate sentences because it is
+fast, lightweight, and auditable: a bad match is fixed by editing one
+line of YAML, not by retraining a model. Its weakness is paraphrase
+diversity: at larger scale, new ways of expressing the same skill appear
+faster than the map can be curated, and recall gradually degrades. When
+that happens, the `SimilarityBackend` swaps to sentence embeddings plus
+a vector index, and the rest of the system stays unchanged: hard
+eligibility rules, ranking weights, and evidence display all remain
+intact. The likely production design is hybrid retrieval, embeddings for
+semantic recall with lexical and concept matching kept for precision and
+explainability, and any new backend must pass the same labeled
+evaluation set (§7) before shipping.
 
 Near misses — candidates failing **exactly one** hard requirement — are
 listed separately with the failed requirement and both numbers named.
 Failing two or more means a different person; padding lists with them is
 the behaviour this system exists to avoid.
+
+**Scoring conventions, in full.** Five criteria can be hard, whenever the
+posting sets them: region, approach family, sector (any of the named
+ones), market side, and the experience band — which runs on **investment
+years, not total career**, so a banking-to-buy-side mover is banded by
+their investing tenure. The eight soft signals score as follows:
+
+| Signal | Rule |
+|---|---|
+| Sector fit | the candidate's best-matching covered sector, at the centrality weight the posting assigns it — broad coverage is never penalised |
+| Requirement fit | mean similarity between the posting's requirement lines and the candidate's own sentences, via the concept map |
+| Skills fit | share of the named software and methods held, on normalised names |
+| Firm type | whether they have worked in a comparable operating model |
+| Coverage depth | `min(1, names / 40)` — see the note below |
+| Credentials | preferred qualifications held or not |
+| Platform alum | prior multi-manager platform exposure, via firm lineage |
+| Buy side | prior buy-side experience |
+
+The fit score is the weighted mean over the components **this posting
+supplies something to measure** — a role with no stated requirements
+drops that component, the remaining weights renormalise, and the
+interface discloses the share on screen ("from 7 of 8 signals · 93% of
+the full weighting") rather than presenting a thin score as a complete
+one. Parse quality never enters the fit score: it is a property of the
+document, shown beside the name instead.
+
+On coverage: the right benchmark is strategy-dependent — a
+sector-focused long/short book typically runs 15–40 names, a fundamental
+generalist 20–60, long-only far more, and coverage counts mean little
+for a quant seat. Forty sits at the top of the sector-focused range,
+which is what these postings are; at scale the benchmark, like the 8%
+weight itself (zeroed for a quant seat), belongs in `requisitions.yaml`
+per posting. The cap is deliberate — claiming 75 names buys nothing past
+40, the same anti-inflation stance as never scoring self-reported AUM,
+in miniature. A candidate whose resume states no coverage scores zero on
+this component rather than being imputed or dropped: imputing invents
+data, and dropping would reward silence over weak disclosure. The zero
+is never silent — the ledger shows "not stated" on the row. And because
+coverage is the one stated figure that is scored, the app joins the
+number to its resume sentence where one exists among the extracted
+stated metrics, shown on hover; no matching sentence, no quote.
+
+Every parameter behind these rules — the signal weights, the hard
+bands, and each signal's definition — is documented in the app's
+**Method** tab, next to the search it governs, together with a worked
+example of the similarity scoring.
 """)
 
 code("""
@@ -563,28 +634,37 @@ pd.DataFrame(ev["disagreements"])
 """)
 
 md("""
-**Reading the disagreements.** Precision is perfect on this pool — the
-system never shortlisted anyone the reviewer would reject. Every miss has a
-single cause: the Mumbai posting's 4–5 year band excludes three APAC
-healthcare analysts at 9.8–12.7 years, all of whom the reviewer shortlists.
-Nothing comparable happened with region — all nine region mismatches were
-labelled *no* — so the reviewer treats geography as genuinely hard while
-treating **over-qualification as negotiable**, a distinction the posting's
-text does not make. The borderline labels cluster the same way, on the
-quant seat's approach constraint.
+**Disagreements.** All three have the same pattern:
 
-The reviewer's own account sharpens it further: the widening was
-**supply-driven** — with ten candidates she stretches the band; with ten
-thousand she would not. Shortlisting standards are elastic to pool depth,
-which no fixed threshold can encode. The design response is not to soften
-the band but to keep it transcribed and make widening a *visible,
-per-search decision*: all three missed candidates sit at the top of the
-one-gap-away list with the band named on their row, and the empty state
-computes what each widening would admit.
+- **Priya Nakamura** × Research Analyst, Healthcare (Mumbai) — human:
+  shortlist; system: exclude. 12.7 years of investment experience vs. a
+  4–5 year requirement.
+- **Viktor Sharat** × Research Analyst, Healthcare (Mumbai) — human:
+  shortlist; system: exclude. 9.8 years vs. 4–5 years.
+- **Zara Al-Rashid** × Research Analyst, Healthcare (Mumbai) — human:
+  shortlist; system: exclude. 10.6 years vs. 4–5 years.
 
-At n=40 the percentages measure nothing statistically. What the exercise
-measures is **which rule diverges from practitioner judgment** — and it
-found exactly one. The same harness (`src/evaluate.py` + a labelling sheet)
+The system had perfect precision on this pool: it never shortlisted a
+candidate the reviewer rejected. All three misses came from the same
+rule — the Mumbai role's 4–5 year experience band. The reviewer treated
+**over-qualification as negotiable**, while geography remained a hard
+constraint.
+
+This suggests an important distinction: some requirements are genuinely
+hard constraints; others are elastic in practice. The reviewer also
+noted that this flexibility was **supply-driven**: with ten candidates,
+she would widen the experience band; with ten thousand, she would not.
+
+The system therefore does not silently relax the posting's requirements.
+Instead, it keeps the stated band intact and surfaces near-matches
+explicitly. These three candidates appear at the top of the one-gap-away
+list, with the experience mismatch shown on each row, leaving the final
+judgment to the recruiter.
+
+With only n=40, these percentages are not statistically meaningful. The
+value of the exercise is identifying **which rule diverges from
+practitioner judgment** — and here, it was clearly over-qualification,
+not geography. The same harness (`src/evaluate.py` + a labelling sheet)
 is the regression suite for any future scoring change.
 """)
 
