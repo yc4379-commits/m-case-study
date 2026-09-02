@@ -2526,59 +2526,76 @@ with tab_insights:
     )
 
     # -- Requisition coverage: the concrete question first ---------------
-    # "Which roles can this pool actually staff?" answered per posting,
-    # before any chart: qualified / near-match counts for every saved
-    # requisition, with the thinnest bench called out.
-    section("Requisition coverage",
-            "For each saved job posting: how many candidates in the pool "
-            "meet every hard requirement (qualified), and how many miss "
-            "exactly one (near match). Counts are for the full pool, "
-            "before sidebar filters.")
-    # Selectable, so the row scales past a handful of postings: every
-    # requisition is shown by default, and a user tracking two roles can
-    # narrow to just those.
-    _req_pick = st.multiselect(
-        "Requisitions to show",
-        options=[sp["id"] for sp in store.items],
-        default=[sp["id"] for sp in store.items],
-        format_func=lambda rid: next(
-            sp["title"] for sp in store.items if sp["id"] == rid),
-        label_visibility="collapsed",
-    )
-    _shown = [sp for sp in store.items if sp["id"] in _req_pick]
-    if not _shown:
-        st.caption("Pick at least one requisition to see its coverage.")
-    _unfilled = []
-    _PER_ROW = 4
-    _req_cols = []
-    for _i in range(0, len(_shown), _PER_ROW):
-        _req_cols.extend(st.columns(_PER_ROW))
-    for _col, _spec in zip(_req_cols, _shown):
-        _ex, _nr = match_all(candidates, _spec, store=store)
-        _title = _spec["title"]
-        _col.metric(
-            _title if len(_title) <= 34 else _title[:32] + "…",
-            f"{len(_ex)} qualified",
-            delta=f"{len(_nr)} near match" + ("es" if len(_nr) != 1 else ""),
-            delta_color="off",
-            help=f"{_spec.get('source', '')}. Qualified candidates meet "
-                 "every hard requirement; near matches miss exactly one.",
-        )
-        if not _ex:
-            _unfilled.append((_title, len(_nr)))
-    if _unfilled:
-        _parts = "; ".join(
-            f"<b>{t}</b> ({n} near match" + ("es" if n != 1 else "") + ")"
-            for t, n in _unfilled)
-        st.markdown(
-            f"<span class='pill pill-note'>hardest to fill</span> "
-            f"<span style='font-size:12.5px;color:{MUTED}'>"
-            f"No candidate in the pool meets every requirement for "
-            f"{_parts}. Open a role in Candidates to see what relaxing "
-            "each requirement would admit.</span>",
-            unsafe_allow_html=True,
-        )
-    st.markdown("---")
+    # Its own bordered card, run as a fragment: the posting picker reruns
+    # only this block, not the whole script, and the card border separates
+    # it from the pool charts below, which answer a different question.
+    @st.cache_data(show_spinner=False)
+    def _req_counts() -> list[tuple[str, str, str, int, int]]:
+        out = []
+        for _sp in store.items:
+            _ex, _nr = match_all(candidates, _sp, store=store)
+            out.append((_sp["id"], _sp["title"], _sp.get("source", ""),
+                        len(_ex), len(_nr)))
+        return out
+
+    @st.fragment
+    def _req_coverage() -> None:
+        with st.container(border=True):
+            section("Requisition coverage",
+                    "For each saved job posting: how many candidates in "
+                    "the pool meet every hard requirement (qualified), "
+                    "and how many miss exactly one (near match). Counts "
+                    "are for the full pool, before sidebar filters.")
+            _rows = _req_counts()
+            _req_pick = st.multiselect(
+                "Requisitions to show",
+                options=[r[0] for r in _rows],
+                default=[r[0] for r in _rows],
+                format_func=lambda rid: next(
+                    r[1] for r in _rows if r[0] == rid),
+                label_visibility="collapsed",
+            )
+            _shown = [r for r in _rows if r[0] in _req_pick]
+            if not _shown:
+                st.caption("Pick at least one requisition to see its "
+                           "coverage.")
+            _PER_ROW = 4
+            _req_cols = []
+            for _i in range(0, len(_shown), _PER_ROW):
+                _req_cols.extend(st.columns(_PER_ROW))
+            _unfilled = []
+            for _col, (_rid, _title, _src, _nq, _nn) in zip(_req_cols,
+                                                            _shown):
+                _col.metric(
+                    _title if len(_title) <= 34 else _title[:32] + "…",
+                    f"{_nq} qualified",
+                    delta=f"{_nn} near match" + ("es" if _nn != 1 else ""),
+                    delta_color="off",
+                    help=f"{_src}. Qualified candidates meet every hard "
+                         "requirement; near matches miss exactly one.",
+                )
+                if not _nq:
+                    _unfilled.append((_title, _nn))
+            if _unfilled:
+                _parts = "; ".join(
+                    f"<b>{t}</b> ({n} near match"
+                    + ("es" if n != 1 else "") + ")"
+                    for t, n in _unfilled)
+                st.markdown(
+                    f"<span class='pill pill-note'>hardest to fill</span> "
+                    f"<span style='font-size:12.5px;color:{MUTED}'>"
+                    f"No candidate in the pool meets every requirement "
+                    f"for {_parts}. Open a role in Candidates to see what "
+                    "relaxing each requirement would admit.</span>",
+                    unsafe_allow_html=True,
+                )
+
+    _req_coverage()
+
+    section("Pool distribution",
+            "How the filtered pool spreads across regions, sectors, "
+            "tenure and credentials. These charts respect the sidebar "
+            "filters and the quality threshold below.")
 
     ctrl1, ctrl2, ctrl3 = st.columns([1.2, 1.2, 1.6])
     chart_quality = ctrl1.select_slider(
@@ -2603,11 +2620,6 @@ with tab_insights:
     if not charted:
         st.info("No candidates left at this threshold.")
     else:
-        st.caption(
-            "Each cell counts the candidates in a group who cover a "
-            "sector, with totals in the axis labels. Empty cells are "
-            "coverage gaps where additional sourcing may be needed."
-        )
         GROUP_KEY = {
             "Region": lambda c: c.get("region"),
             "Market side": lambda c: label_of(c.get("market_side")),
@@ -2637,16 +2649,22 @@ with tab_insights:
                 texttemplate="%{text}", textfont=dict(size=13),
                 hovertemplate="%{y} · %{x}<br>%{z} candidate(s)<extra></extra>",
             ))
-            fig.update_layout(title=f"Sector coverage by {group_by.lower()}",
-                              showlegend=False)
+            section(f"Sector coverage by {group_by.lower()}",
+                    "Each cell counts the candidates in a group who "
+                    "cover a sector; totals sit in the axis labels. "
+                    "Empty cells are coverage gaps.")
+            fig.update_layout(showlegend=False)
             fig.update_yaxes(showgrid=False)
             st.plotly_chart(styled_chart(fig, 300), use_container_width=True)
 
         st.markdown("---")
         left, right = st.columns(2)
         with left:
-            st.markdown("**Career length vs. investing tenure**")
-            st.caption("The gap is the point.")
+            section("Career vs. investing tenure",
+                    "One row per candidate: total career years next to "
+                    "years in investment roles. A wide gap means a "
+                    "career changer from banking, consulting or "
+                    "engineering.")
             pool = sorted([c for c in charted if c["years_experience"] is not None],
                           key=lambda c: c["years_experience"])
             if pool:
@@ -2676,9 +2694,10 @@ with tab_insights:
                 st.plotly_chart(styled_chart(fig, 360), use_container_width=True)
 
         with right:
-            st.markdown("**Most common software and credentials**")
-            st.caption("A role naming a tool nobody holds is a sourcing "
-                       "problem, not a screening one.")
+            section("Software and credentials",
+                    "How many candidates hold each tool and "
+                    "qualification. A role naming a tool nobody holds "
+                    "is a sourcing problem, not a screening one.")
             tally: dict[str, int] = {}
             for c in charted:
                 for tool in c.get("software_tools", []):
