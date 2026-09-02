@@ -637,15 +637,14 @@ def record_note(c: dict) -> str:
     # changes, because "Data quality: high 0.94" never said whether it was
     # judging the document or the person.
     if missing:
-        body = ("Resume partly unreadable — no "
+        body = ("Resume quality: incomplete — no "
                 + ", ".join(m.replace("_", " ") for m in missing[:3]))
-    elif q["band"] == "high":
-        body = "Resume read cleanly"
+        tail = f" · {q['score']}"
     else:
-        body = "Resume read with difficulty"
-    tail = f" · {q['band']} {q['score']}"
+        body = f"Resume quality: {q['band'].title()}"
+        tail = f" ({q['score']})"
     if warns:
-        tail += f" · {warns} issue" + ("s" if warns != 1 else "")
+        tail += f" · {warns} flag" + ("s" if warns != 1 else "")
     klass = "pill" if q["band"] == "high" and not missing else "pill pill-note"
     return (f"<span class='{klass}' data-tip='{METRIC_HELP['quality']}'>"
             f"{body}{tail}</span>")
@@ -901,7 +900,7 @@ MODE_NOTES = {
         "Set market, approach, sector and experience yourself, and "
         "optionally add requirement lines for a richer ranking.",
     "Browse all candidates":
-        "See the whole pool with filters only — no matching, no ranking.",
+        "Explore the full candidate list with your own filters.",
 }
 
 # The role picker lives in a collapsed panel whose label states the current
@@ -1563,7 +1562,7 @@ with tab_search:
                     for x in c.get("credentials_summary", [])) or "—",
                 "Languages": ", ".join(c.get("languages", [])) or "—",
                 "Data": c["quality"]["band"],
-                "Issues": sum(f.get("severity", "warning") == "warning"
+                "Flags": sum(f.get("severity", "warning") == "warning"
                               for f in c["flags"]),
             })
         frame = pd.DataFrame(rows)
@@ -1886,7 +1885,7 @@ with tab_search:
             _fig_n = len([x for x in e.get("stated_metrics", [])
                           if x["kind"] in ("aum", "performance", "risk")])
             _views = ["Fit", "Profile", f"Figures ({_fig_n})",
-                      f"Issues ({_warn_n})", "Outreach", "Full record"]
+                      f"Flags ({_warn_n})", "Outreach", "Full record"]
             _vkey = f"view_{chosen_id}"
             st.session_state.setdefault(_vkey, 0)
 
@@ -1943,7 +1942,7 @@ with tab_search:
                         unsafe_allow_html=True,
                     )
                     section(
-                        "Fit, as a shape",
+                        "Match components",
                         "Read the shape, not the area — a radar exaggerates "
                         "differences. Values are printed below.",
                     )
@@ -2213,7 +2212,7 @@ with tab_search:
                         )
 
             if _view == 3:
-                section("Issues in this resume", METRIC_HELP["issues"])
+                section("Review flags", METRIC_HELP["issues"])
                 # Issues sit AFTER the profile: a reviewer wants to know who this
                 # person is before being told what is uncertain about the record. The
                 # data-quality badge at the top links down here, so the caveats are
@@ -2519,7 +2518,7 @@ with tab_search:
 # ===========================================================================
 
 with tab_insights:
-    st.markdown("#### Where the bench is, and where it isn't")
+    st.markdown("#### Talent pool insights")
 
     ctrl1, ctrl2, ctrl3 = st.columns([1.2, 1.2, 1.6])
     chart_quality = ctrl1.select_slider(
@@ -2543,7 +2542,7 @@ with tab_insights:
     if not charted:
         st.info("No candidates left at this threshold.")
     else:
-        st.caption("Empty cells are the point: the seats this pool cannot fill.")
+        st.caption("Coverage gaps highlight where additional sourcing may be needed.")
         GROUP_KEY = {
             "Region": lambda c: c.get("region"),
             "Market side": lambda c: label_of(c.get("market_side")),
@@ -2748,7 +2747,7 @@ with tab_quality:
         text=[f"{c['quality']['score']:.2f}" for c in ranked],
         textposition="outside", textfont=dict(size=11, color=MUTED),
         customdata=[len(c["flags"]) for c in ranked],
-        hovertemplate="%{y}<br>confidence %{x:.2f}<br>%{customdata} issue(s)"
+        hovertemplate="%{y}<br>confidence %{x:.2f}<br>%{customdata} flag(s)"
                       "<extra></extra>"))
     fig.update_layout(showlegend=False, xaxis_title="Parse confidence (0–1)")
     fig.update_xaxes(range=[0, 1.12], showgrid=True, gridcolor=GRID)
@@ -2768,7 +2767,7 @@ with tab_quality:
         band = c["quality"]["band"]
         with st.expander(
             f"{c['display_name']} — {band} {c['quality']['score']} · "
-            f"{len(c['flags'])} issue(s)", expanded=(band != "high"),
+            f"{len(c['flags'])} flag(s)", expanded=(band != "high"),
         ):
             if c["quality"]["missing_fields"]:
                 st.markdown(
@@ -3044,16 +3043,15 @@ diverges from practitioner judgment, and it found precisely one.
 with tab_ask:
     section(
         "Ask the pool",
-        "Free-text retrieval over every parsed resume sentence.",
+        "Search across structured candidate data using natural language.",
     )
     st.markdown(
         "<span class='pill pill-note'>preview</span> "
         "<span style='font-size:12.5px;color:" + MUTED + "'>"
-        "Today this runs the same auditable keyword + concept scorer the "
-        "matcher uses, over resume sentences only. The production version "
-        "is the roadmap's RAG step: neural retrieval over resumes plus the "
-        "internal sourcing corpus (meeting notes, call summaries), with the "
-        "same rule — every answer quotes its source.</span>",
+        "Every answer is a quoted sentence from a resume, with its source. "
+        "Coming next: connecting candidate data with internal sourcing "
+        "knowledge — meeting notes and call summaries — under the same "
+        "rule.</span>",
         unsafe_allow_html=True,
     )
     _q = st.text_input(

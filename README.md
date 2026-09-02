@@ -3,32 +3,24 @@
 Ten messy resumes in, a defensible shortlist out. A junior-analyst
 sourcing tool for a hedge fund Business Development team: LLM-parsed
 records with verbatim evidence behind every claim, matched against real
-job requisitions — by a search that is allowed to say **"no one
-qualifies."**
+job requisitions.
 
 **Live app:** https://m-case-study-jasmine.streamlit.app/
 **Walk-through notebook:** [`Yuanzhi_Jasmine_Chen_Talent_Intelligence_Platform.ipynb`](Yuanzhi_Jasmine_Chen_Talent_Intelligence_Platform.ipynb)
 
 ---
 
-## Three product claims
+## What it does for a BD user
 
-**1 · Matching you can act on.** Hard requirements disqualify — outside
-the region or experience band is not an 82% match, it is not a match;
-soft signals rank the survivors, with the weights in YAML. Self-reported
-AUM and returns are shown with their quotes, never scored. Against one
-real Mumbai posting nobody qualifies, and the app says so.
-
-**2 · Parsing that proves itself.** Every classification carries its
-resume sentence, verified verbatim. The checks a screener runs first —
-gaps, overlapping dates, malformed contacts, credential inconsistencies
-— are flagged automatically and triaged by a human. Measured against 40
-blind human labels: **precision 100%, recall 57%**, all three misses
-from a single rule.
-
-**3 · Built for the BD workflow.** Tagged profiles with evidence one
-hover away, a 21-column table with CSV export, one-click outreach drafts
-that quote the resume, and pool insights whose empty cells are the point.
+- **Search against a real requisition.** Pick a posting; hard
+  requirements filter the pool, everything else ranks it. If nobody
+  fits, it says so and shows what relaxing each requirement would admit.
+- **Trust what you read.** Every tag on a profile traces back to the
+  resume's own sentence, and records with gaps, inconsistencies or thin
+  parses are flagged before you spend time on them.
+- **Move straight to action.** A sortable shortlist table with CSV
+  export, a one-click outreach draft that quotes the resume, and
+  pool-level charts showing which seats this bench can and cannot fill.
 
 ---
 

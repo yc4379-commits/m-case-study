@@ -23,51 +23,155 @@ md("""
 # Talent Intelligence Platform
 ### Millennium Business Development — Data Science case study
 
-**Yuanzhi (Jasmine) Chen** · August 2026
+**Yuanzhi (Jasmine) Chen** · September 2026
 
 | Deliverable | Where |
 |---|---|
 | Live application | **https://m-case-study-jasmine.streamlit.app/** |
 | Code repository | https://github.com/yc4379-commits/m-case-study |
 | Parsed data (JSON / CSV) | `data/candidates.json` · `data/candidates.csv` |
-| This notebook | the walk-through: every section below runs against the committed code and data |
+| This notebook | End-to-end walkthrough of the data pipeline, matching logic, evaluation, and product design |
 
-The task: parse ten resumes (PDF and Word) with an LLM API into structured
-JSON/CSV, and build a Streamlit application where a Business Development
-user can search and filter **junior analyst candidates** against job
-requisitions, with distribution insights — designed to scale beyond ten
-resumes.
+The goal: help a Business Development team identify and evaluate
+**junior investment talent** across markets, strategies, sectors and
+experience levels. The system converts PDF and Word resumes into
+structured candidate profiles, matches them against job requisitions,
+and presents the results through a search and analytics interface —
+designed to scale beyond the ten resumes supplied.
 
-Three product claims shape every design decision in this system:
+A reliable talent-intelligence system for investment hiring, built
+around three principles:
 
-1. **The matching is reliable enough to act on.** Hard constraints
-   disqualify; soft signals rank — a candidate outside the role's region or
-   experience band is not an 82% match, they are not a match, which is what
-   lets this search honestly return **zero results**. Which criteria are
-   hard and which can be relaxed follows how recruiting actually works:
-   geography and investment approach are non-negotiable, credentials and
-   skills are weighted preferences, and the weights live in YAML where they
-   can be argued about. The scoring respects industry rules for **junior
-   analyst** hiring specifically — demonstrated skills, credentials and
-   education carry weight; self-reported AUM and returns, the currency of
-   senior hiring, are displayed with their quotes but never scored.
-2. **The parsing reads the pile the way a careful screener would — and
-   proves it.** Every classification carries the resume sentence that
-   produced it, verified to appear **verbatim** in the source: nothing
-   invented, nothing silently dropped. The checks a human runs first on a
-   finance resume — employment gaps, overlapping dates, malformed contact
-   details, credential inconsistencies, formatting slips — are computed
-   automatically and surfaced as flags, with a human triage layer deciding
-   which are real risks and which are benign. Accuracy is measured, not
-   assumed: §7 scores the system against 40 blind human labels.
-3. **The interface is built for the BD workflow, not for a demo.** Accurate
-   display first, then speed: candidate features are split into fine
-   dimensions and zoned with tags and charts, so a screener catches the
-   deciding facts — and the risks — without reading walls of prose, and can
-   drill from any tag to its verbatim quote. Because the end user is a BD
-   team, the workflow continues past search: one-click outreach drafts,
-   pool-level insight views, and working previews of what more data
-   unlocks (an internal-knowledge AI assistant, a talent knowledge graph).
+1. **Match candidates the way a human screener would.** Hard requirements
+   determine eligibility; softer signals determine priority. The
+   trade-offs are explicit rather than hidden inside a single opaque
+   score, and the logic is calibrated for junior-analyst hiring:
+   demonstrated ability is scored, while self-reported track record is
+   shown with its evidence and never scored.
+2. **Turn resumes into trusted, finance-specific data.** Every extracted
+   fact is traceable to the source resume, and automated checks surface
+   the issues a recruiter would normally catch manually — gaps,
+   inconsistencies, typos, ambiguous firms, parsing problems — with
+   human review where judgment is genuinely required. Accuracy is
+   measured against blind human labels (§7), not assumed.
+3. **Make the information easy to act on.** The interface organizes
+   candidate data around the decisions a BD user actually makes: who
+   qualifies, why they qualify, what needs a second look, and who to
+   contact next. Pool-level insights turn individual searches into
+   sourcing intelligence, and two longer-term capabilities — assisted
+   search and a talent network — ship as small working previews designed
+   to expand as more data becomes available.
+""")
+
+# ---------------------------------------------------- 0a · principles
+md("""
+## Product principles
+
+### 1 · Reliable matching: eligibility first, ranking second
+
+Candidate matching should reflect how investment recruiting actually
+works. Hard requirements determine eligibility; soft signals determine
+priority. A candidate who fails a true requirement should not appear in
+a ranked shortlist simply because they score well on other dimensions.
+At the same time, not every requirement should be treated as absolute:
+the system preserves the distinction between mandatory and preferred
+criteria and surfaces near matches separately, showing exactly what
+would need to be relaxed.
+
+The scoring model is transparent and configurable. It uses job-relevant
+signals such as sector experience, investment approach, skills, firm
+type, coverage, credentials, platform experience and buy-side
+experience, rather than relying on an opaque model score. Importantly,
+the logic is calibrated for junior analyst hiring: early-career
+candidates are evaluated primarily on demonstrated experience,
+education, technical skills, credentials and relevant exposure — not on
+senior-level signals such as an established investment track record or
+portfolio size. The result is a matching system that supports recruiter
+judgment rather than replacing it.
+
+### 2 · Trusted resume data: machine speed with screening-level checks
+
+The challenge is not simply extracting information from a resume; it is
+making sure the extracted information is complete, accurate and usable
+for downstream decisions. The pipeline therefore treats resume parsing
+as a data-quality problem. Every important classification is linked to
+verbatim evidence from the source document, the system does not infer
+missing information, and extracted claims are checked against the
+original text. Parsing confidence and extraction issues are surfaced
+directly to the user.
+
+On top of the extraction layer, finance-specific checks identify the
+issues that matter during manual screening: missing or ambiguous dates,
+employment gaps, inconsistent or potentially incorrect firm names,
+formatting or extraction problems, unsupported claims, incomplete
+records, and ambiguous firm or platform relationships. Human review is
+used where judgment is genuinely required — benign conventions can be
+marked as such without silently removing the underlying flag. This
+creates a clear division of labor: the machine handles repetitive
+reading and checking, while humans make the final judgment.
+
+### 3 · Decision-focused UX for BD
+
+The interface is designed around the workflow of a BD user, not around
+the underlying data model. The goal is simple: make key candidate
+information easy to understand and keep important context visible.
+Attributes are organized into clear dimensions with tags, summaries,
+and drill-down views. A user can quickly see whether a candidate
+qualifies, which signals drive the match, what requirement is missing
+for a near match, what the candidate's relevant experience is, which
+claims require verification, whether the resume itself has quality
+issues, and how the candidate compares with other finalists.
+
+The workflow then extends beyond screening: once a candidate is
+identified, the platform supports outreach, and at the pool level it
+provides talent coverage and sourcing insights across regions, sectors,
+credentials and experience. The current application also includes early
+previews of two longer-term capabilities — an AI-assisted search
+experience and a talent knowledge graph — intentionally demonstrated at
+a small scale today and designed to expand as more internal sourcing
+data becomes available.
+""")
+
+# ----------------------------------------------------- 0b · brief, verbatim
+md("""
+## The brief, as received
+
+> ### Background
+> You are joining the Business Development team at Millennium which is a
+> global hedge fund that manages assets across multiple investment
+> strategies (fundamental equity, systematic trading, credit, etc.). The
+> BD team is responsible for sourcing junior analyst talent across
+> different: **Geographic Markets** (US, Europe, Asia-Pacific) ·
+> **Investment Approaches** (Fundamental vs. Systematic/Quantitative
+> strategies) · **Sectors** (Technology, Healthcare, Financial Services,
+> Energy, Industrials, Consumer, Credit, Macro, etc.) · **Experience
+> Levels** (depending on the job requisitions)
+>
+> ### Goal
+> Build a **searchable platform** to quickly identify candidates based on
+> specific criteria based on job requisitions.
+>
+> ### Your Task
+> 1. Parse resume data from PDF/Word documents using **LLM models via API**
+> 2. Create parsed resume data as **JSON, CSV, etc.** for further analysis
+> 3. Create a **Streamlit web application** where BD users can search and
+>    filter candidates using multiple criteria
+> 4. Visualize candidate distributions and insights
+> 5. **Design for scalability** to handle large volumes of resumes
+>
+> ### Output
+> 1. Code for data parsing and Streamlit in **this Jupyter notebook** for
+>    ease of review
+> 2. Include the **link to Streamlit app** in the notebook
+> 3. **JSON/CSV exports** of parsed resume data
+> 4. Discussion of additional features and implementation approach if
+>    more time was available
+
+On output 1: every pipeline stage below is imported and **executed live
+in this notebook** against the committed data. The code lives in `src/`
+modules rather than inline cells so the exact same code serves the
+notebook, the deployed app, and the test suite — and re-running this
+notebook after any pipeline change re-syncs every result shown here.
 """)
 
 # ------------------------------------------------------------- 1 · pipeline
@@ -122,7 +226,7 @@ pd.DataFrame([{
 
 # ----------------------------------------------------------- 2 · extraction
 md("""
-## 2 · Reading the documents (where most pipelines silently fail)
+## 2 · Building a reliable resume data layer
 
 The largest source of error in a resume pipeline is not the model — it is
 **losing content before the model ever sees it**. Three real failures in this
@@ -190,6 +294,20 @@ Three guards sit on top of the call:
 3. **Content-hash cache** on (text, model, schema, prompt) — re-runs are
    free unless something that changes output changed. Prompt and schema
    are in the key because each silently invalidates old results.
+
+One property drives all three guards: **the model is stochastic**. The
+same resume, re-parsed, phrases its flags differently — this project
+learned that firsthand when a text-matched triage rule went stale after
+a re-parse. So no downstream logic ever matches the model's prose; code
+consumes the schema's typed fields, and human annotations attach to
+stable identifiers, never to wording.
+
+**Deliberately not used**, each for a reason: *fine-tuning* (needs
+labelled output data that does not exist yet, and prompt-plus-schema
+already hits the accuracy target reproducibly); *agents* (single-shot
+structured extraction needs no multi-step tool loop — adding one buys
+failure modes, not accuracy); *neural embeddings* (§5 — the pluggable
+backend accepts them the day the corpus outgrows a curated map).
 
 **Nothing here is fine-tuned.** The accuracy is engineered, not trained —
 which keeps it reproducible and cheap to improve: complete input text
@@ -386,7 +504,7 @@ pd.DataFrame([{
 
 # ------------------------------------------------------------ 6 · big bug
 md("""
-## 6 · The bug that justifies the evidence rule
+## 6 · Making matching explainable
 
 Mid-project, every requirement similarity score came out around 0.75 and the
 ranking looked plausible. The aggregate numbers hid the cause completely;
@@ -477,8 +595,8 @@ through it.
 The first control on the page is the only mandatory question. Three ways
 in: pick a posting from the **job library** (all four transcribed from
 real postings — three Millennium REQs and one Point72), **define your own
-criteria** when the seat is not in the library yet, or **browse** the
-whole pool with no matching at all:
+criteria** when the seat is not in the library yet, or **browse** the full
+candidate list with your own filters:
 
 ![Choosing how to filter](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_modes.png)
 
@@ -537,14 +655,14 @@ so the pill would survive a resume that named only the pod. The **61% is
 green only because he clears all four hard requirements** — green marks
 eligibility, never magnitude — and "from 7 of 8 signals · 93% of the full
 weighting" concedes what the score could not see instead of quietly
-renormalising. And the header strip — **"Resume read cleanly · high 0.88
-· 4 issues"** — keeps parse confidence next to the name, not buried in an
+renormalising. And the header strip — **"Resume quality: High (0.88)
+· 4 flags"** — keeps parse confidence next to the name, not buried in an
 admin tab.
 
 The panel itself is **six views** switched by pills (inside a Streamlit
 fragment, so a click redraws only the panel). Each answers one screening
 question — Fit: *does the score hold up?* · Profile: *what are they good
-at?* · Figures: *what do they claim?* · Issues: *what should I
+at?* · Figures: *what do they claim?* · Flags: *what should I
 double-check?* · Outreach: *how do I write to them?* · Full record:
 *what exactly was parsed?* — including a **download of the original
 resume** when the file is present (the public deployment ships no resume
@@ -587,16 +705,17 @@ is paid to make:
 ### When the answer is no one
 
 Against the Mumbai posting's 4–5 year band, nobody qualifies — and the
-app says so instead of ranking unqualified people confidently. It names
+app says so, without ranking candidates who fail required criteria. It
+names
 each near miss's single gap and computes what each widening would admit:
 
 ![Zero results](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/app_zero_results.png)
 
-### The Insights tab — managing the pool, not one search
+### Talent pool insights
 
 The coverage heatmap maps the bench: regions by sectors, each cell the
-number of candidates covering both. **The empty cells are the point** —
-the seats this pool cannot fill — so the chart doubles as a sourcing
+number of candidates covering both. Coverage gaps show where
+additional sourcing is needed, so the chart doubles as a sourcing
 to-do list. A parse-confidence threshold above it keeps thin records out
 of the counts:
 
@@ -633,7 +752,7 @@ decides which flagged issues deduct and which are benign conventions:
 
 ![Data quality](https://raw.githubusercontent.com/yc4379-commits/m-case-study/main/docs/tour_quality.png)
 
-### Ask · preview — the AI assistant, at its honest size
+### Ask the pool · preview
 
 Free-text questions over every parsed resume sentence, every answer a
 quoted sentence with its source. Today it runs the same auditable
@@ -673,7 +792,7 @@ ships.
 
 # ------------------------------------------------------------ 10 · roadmap
 md("""
-## 10 · If I had more time (and the features I chose not to fake)
+## 10 · Roadmap
 
 Three of these already exist in the app as deliberately small **previews**
 — real code over real data, never a mock with invented output — so the

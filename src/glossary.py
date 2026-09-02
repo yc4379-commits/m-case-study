@@ -63,7 +63,7 @@ COLUMN_HELP: dict[str, str] = {
     "and unverified — shown on the profile, never scored.",
     "Leadership": "Largest people-leadership responsibility the resume "
     "states, with its quote. Never inferred from a title alone.",
-    "Issues": "Count of open warnings on this record — contradictions, "
+    "Flags": "Count of open review flags on this record — contradictions, "
     "gaps, malformed details. Notes triaged as benign are not counted.",
 }
 
