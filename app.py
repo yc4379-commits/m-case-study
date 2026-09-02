@@ -196,6 +196,13 @@ st.markdown(
       div[role="tablist"] [data-testid="stTab"][aria-selected="true"] p {{
         font-weight: 600;
       }}
+      /* The sidebar refines the Candidates search. Insights, Data quality,
+         Method and Ask are views over the whole pool, so showing filters
+         there would imply they apply; the sidebar disappears instead
+         whenever the first tab is not the selected one. */
+      .stApp:has(div[role="tablist"]
+                 [data-testid="stTab"]:first-of-type[aria-selected="false"])
+        section[data-testid="stSidebar"] {{ display: none; }}
       /* Reopen control for a collapsed sidebar: it normally sits in the
          strip the masthead now covers, which left no way back. */
       [data-testid="stSidebarCollapsedControl"],
@@ -2564,9 +2571,9 @@ with tab_search:
 with tab_insights:
     st.markdown("#### Talent pool insights")
     st.caption(
-        "How the current candidate pool is distributed: where coverage "
+        "How the full candidate pool is distributed: where coverage "
         "is deep, where it is thin, and which open roles are hardest to "
-        "fill. Charts respect the sidebar filters."
+        "fill."
     )
 
     # -- Requisition coverage: the concrete question first ---------------
@@ -2589,7 +2596,7 @@ with tab_insights:
                     "For each saved job posting: how many candidates in "
                     "the pool meet every hard requirement (qualified), "
                     "and how many miss exactly one (near match). Counts "
-                    "are for the full pool, before sidebar filters.")
+                    "are for the full pool.")
             _rows = _req_counts()
             _req_pick = st.multiselect(
                 "Requisitions to show",
@@ -2637,9 +2644,9 @@ with tab_insights:
     _req_coverage()
 
     section("Pool distribution",
-            "How the filtered pool spreads across regions, sectors, "
-            "tenure and credentials. These charts respect the sidebar "
-            "filters and the quality threshold below.")
+            "How the pool spreads across regions, sectors, tenure and "
+            "credentials. The whole pool is charted, filtered only by "
+            "the quality threshold below.")
 
     ctrl1, ctrl2, ctrl3 = st.columns([1.2, 1.2, 1.6])
     chart_quality = ctrl1.select_slider(
@@ -2652,13 +2659,12 @@ with tab_insights:
         "Group rows by", ["Region", "Market side", "Seniority (investing)"],
         help="The row dimension of the coverage matrix.",
     )
-    charted = [c for c in filtered
+    charted = [c for c in candidates
                if BAND_ORDER[c["quality"]["band"]] >= BAND_ORDER[chart_quality]]
     ctrl3.markdown(
         f"<div style='padding-top:26px;color:{MUTED};font-size:12.5px'>"
         f"Showing <b style='color:{NAVY}'>{len(charted)}</b> of "
-        f"{len(candidates)} candidates (sidebar filters and quality "
-        "threshold applied).</div>",
+        f"{len(candidates)} candidates (quality threshold applied).</div>",
         unsafe_allow_html=True,
     )
     if not charted:
@@ -3047,12 +3053,21 @@ components below, each scored 0–1:
         """
     )
     weights_rows = "\n".join(
-        f"| {CRITERION_LABEL.get(k, k)} | {v:.0%} | {CRITERION_HELP.get(k, '')} |"
+        f"| {CRITERION_LABEL.get(k, k)}"
+        + (" \\*" if k == "coverage_depth" else "")
+        + f" | {v:.0%} | {CRITERION_HELP.get(k, '')} |"
         for k, v in sorted(store.weights.items(), key=lambda kv: -kv[1])
     )
     st.markdown(
         "| Component | Weight | What it measures |\n|---|---|---|\n" + weights_rows
     )
+    st.markdown(
+        """
+`Fit = Σ(component × weight) / Σ(weight)`
+        """
+    )
+
+    st.markdown("###### \\* The coverage benchmark is per posting")
     _bench_rows = "\n".join(
         f"| {sp['title']} | "
         + (f"{sp.get('soft', {}).get('coverage_benchmark', 40)} names |"
@@ -3062,11 +3077,11 @@ components below, each scored 0–1:
     )
     st.markdown(
         """
-The coverage benchmark is **per posting**, set in `requisitions.yaml`
-next to the criteria it serves, because the right number is
-strategy-dependent: a sector-focused long/short book typically runs
-15–40 names, a fundamental generalist 20–60, long-only far more, and
-coverage counts mean little for a quant seat.
+The right number is strategy-dependent: a sector-focused long/short
+book typically runs 15–40 names, a fundamental generalist 20–60,
+long-only far more, and coverage counts mean little for a quant seat.
+Each posting therefore sets its own benchmark in `requisitions.yaml`,
+next to the criteria it serves:
 
 | Posting | Coverage benchmark |
 |---|---|
@@ -3074,18 +3089,20 @@ coverage counts mean little for a quant seat.
         + _bench_rows
         + """
 
-The three fundamental healthcare seats use 40, the top of the
-sector-focused range; the quant seat sets none, so the signal is
-dropped there, the remaining weights renormalise, and the ledger shows
-the row as *not measured* with the disclosed share ("from 7 of 8
-signals") saying so. The weights themselves are still global; making
-them per-posting is the same one-line change in the same file.
+The three healthcare seats use 40, the top of the sector-focused range;
+the quant seat sets none, so the signal is dropped there, the remaining
+weights renormalise, and the ledger shows the row as *not measured*.
+The weights themselves are still global; making them per-posting is the
+same one-line change in the same file.
+        """
+    )
 
-`Fit = Σ(component × weight) / Σ(weight)`
-
-**Requirement similarity** is a pluggable backend. The default combines lexical
-overlap with a curated concept map, because this domain runs on paraphrase — a
-posting says "catalysts" where a resume says "earnings events".
+    st.markdown("###### Requirement similarity")
+    st.markdown(
+        """
+A pluggable backend. The default combines lexical overlap with a
+curated concept map, because this domain runs on paraphrase — a posting
+says "catalysts" where a resume says "earnings events".
 
 | Parameter | Value |
 |---|---|
