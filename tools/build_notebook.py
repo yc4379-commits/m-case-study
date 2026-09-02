@@ -27,47 +27,75 @@ md("""
 
 | Deliverable | Where |
 |---|---|
-| Live application | **https://m-case-study-jasmine.streamlit.app/** |
+| Live application | https://m-case-study-jasmine.streamlit.app |
 | Code repository | https://github.com/yc4379-commits/m-case-study |
 | Parsed data (JSON / CSV) | `data/candidates.json` · `data/candidates.csv` |
 | This notebook | End-to-end walkthrough of the data pipeline, matching logic, evaluation, and product design |
 
 The goal: help a Business Development team identify and evaluate
-**junior investment talent** across markets, strategies, sectors and
-experience levels. The system converts PDF and Word resumes into
-structured candidate profiles, matches them against job requisitions,
-and presents the results through a search and analytics interface —
-designed to scale beyond the ten resumes supplied.
+**junior investment talent** across markets, strategies/approaches,
+sectors and experience levels. The system converts PDF and Word resumes
+into structured candidate profiles, matches them against job
+requisitions, and presents the results through a search and analytics
+interface — designed to scale beyond the ten resumes supplied.
 
-A reliable talent-intelligence system for investment hiring, built
-around three principles:
+This is a reliable talent-intelligence system for investment hiring,
+built around three principles:
 
-1. **Match candidates the way a human screener would.** Hard requirements
+1. **Turn resumes into trusted, finance-specific data.** Every extracted
+   fact is traceable to the source resume, and automated checks surface
+   the issues a recruiter would normally catch manually: gaps,
+   inconsistencies, typos, ambiguous firms, parsing problems, with
+   human review where judgment is genuinely required. Accuracy is
+   measured against blind human labels (§7), not assumed.
+2. **Match candidates the way a human screener would.** Hard requirements
    determine eligibility; softer signals determine priority. The
    trade-offs are explicit rather than hidden inside a single opaque
    score, and the logic is calibrated for junior-analyst hiring:
    demonstrated ability is scored, while self-reported track record is
    shown with its evidence and never scored.
-2. **Turn resumes into trusted, finance-specific data.** Every extracted
-   fact is traceable to the source resume, and automated checks surface
-   the issues a recruiter would normally catch manually — gaps,
-   inconsistencies, typos, ambiguous firms, parsing problems — with
-   human review where judgment is genuinely required. Accuracy is
-   measured against blind human labels (§7), not assumed.
 3. **Make the information easy to act on.** The interface organizes
    candidate data around the decisions a BD user actually makes: who
    qualifies, why they qualify, what needs a second look, and who to
    contact next. Pool-level insights turn individual searches into
-   sourcing intelligence, and two longer-term capabilities — assisted
-   search and a talent network — ship as small working previews designed
-   to expand as more data becomes available.
+   sourcing intelligence, and two longer-term capabilities - AI-assisted
+   search and a talent network - are shipped as small working previews
+   designed to expand as more data becomes available.
+
+Each principle is unpacked in the next section; the numbered sections
+that follow walk through the implementation and the evidence behind
+them.
 """)
 
 # ---------------------------------------------------- 0a · principles
 md("""
-## Product principles
+## Product principles, in practice
 
-### 1 · Reliable matching: eligibility first, ranking second
+The three claims above, made concrete: what each principle means in the
+product, the design choices it drove, and where to look for proof.
+
+### 1 · Trusted resume data: machine speed with screening-level checks
+
+The challenge is not just extracting resume information, but ensuring
+it is complete, accurate, and usable for downstream decisions.
+Therefore, the pipeline treats resume parsing as a data-quality
+problem. Every important classification is linked to
+verbatim evidence from the source document, the system does not infer
+missing information, and extracted claims are checked against the
+original text. Parsing confidence and extraction issues are surfaced
+directly to the user.
+
+On top of the extraction layer, finance-specific checks identify the
+issues that matter during manual screening: missing or ambiguous dates,
+employment gaps, inconsistent or potentially incorrect firm names,
+formatting or extraction problems, unsupported claims, incomplete
+records, and ambiguous firm or platform relationships. Human review is
+used where judgment is genuinely required — benign conventions can be
+marked as such without silently removing the underlying flag. This
+creates a clear division of labor: the machine handles repetitive
+reading and checking, while humans make the final judgment.
+
+### 2 · Reliable matching: eligibility first, ranking second
 
 Candidate matching should reflect how investment recruiting actually
 works. Hard requirements determine eligibility; soft signals determine
@@ -88,27 +116,6 @@ education, technical skills, credentials and relevant exposure — not on
 senior-level signals such as an established investment track record or
 portfolio size. The result is a matching system that supports recruiter
 judgment rather than replacing it.
-
-### 2 · Trusted resume data: machine speed with screening-level checks
-
-The challenge is not just extracting resume information, but ensuring
-it is complete, accurate, and usable for downstream decisions.
-Therefore, the pipeline treats resume parsing as a data-quality
-problem. Every important classification is linked to
-verbatim evidence from the source document, the system does not infer
-missing information, and extracted claims are checked against the
-original text. Parsing confidence and extraction issues are surfaced
-directly to the user.
-
-On top of the extraction layer, finance-specific checks identify the
-issues that matter during manual screening: missing or ambiguous dates,
-employment gaps, inconsistent or potentially incorrect firm names,
-formatting or extraction problems, unsupported claims, incomplete
-records, and ambiguous firm or platform relationships. Human review is
-used where judgment is genuinely required — benign conventions can be
-marked as such without silently removing the underlying flag. This
-creates a clear division of labor: the machine handles repetitive
-reading and checking, while humans make the final judgment.
 
 ### 3 · Decision-focused UX for BD
 
